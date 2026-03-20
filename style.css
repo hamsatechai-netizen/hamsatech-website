@@ -95,6 +95,40 @@ footer {
 .hero-right {
   width: 45%;
 }
+.growth {
+  text-align: center;
+  padding: 80px 40px;
+  background: #f7f9fb;
+}
+
+.growth h2 {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.growth-cards {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.card {
+  width: 30%;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.card h3 {
+  margin-bottom: 10px;
+}
 
 .hero-right img {
   width: 100%;
