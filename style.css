@@ -25,13 +25,6 @@ nav a {
   color: white;
 }
 
-.hero button {
-  padding: 10px 20px;
-  background: gold;
-  border: none;
-  cursor: pointer;
-}
-
 .features {
   display: flex;
   justify-content: space-around;
@@ -56,4 +49,54 @@ footer {
 .logo img {
   height: 35px;   /* controls size */
   width: auto;
+}
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 80px 60px;
+}
+
+.hero-left {
+  width: 50%;
+}
+
+.hero-left h1 {
+  font-size: 48px;
+  line-height: 1.2;
+}
+
+.hero-left p {
+  margin-top: 20px;
+  font-size: 18px;
+  color: #555;
+}
+
+.hero-buttons {
+  margin-top: 30px;
+}
+
+.primary {
+  background: #0f8f7f;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  margin-right: 15px;
+  border-radius: 8px;
+}
+
+.secondary {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px 25px;
+  border-radius: 8px;
+}
+
+.hero-right {
+  width: 45%;
+}
+
+.hero-right img {
+  width: 100%;
+  border-radius: 12px;
 }
