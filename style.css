@@ -6,7 +6,8 @@ body {
 header {
   display: flex;
   justify-content: space-between;
-  padding: 20px;
+  align-items: center;   /* 👈 important for vertical alignment */
+  padding: 10px 30px;
   background: #0a0f2c;
   color: white;
 }
