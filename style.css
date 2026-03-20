@@ -45,6 +45,10 @@ nav a {
   padding: 40px;
   text-align: center;
 }
+.logo img {
+  height: 35px;   /* controls size */
+  width: auto;
+}
 
 footer {
   background: #0a0f2c;
