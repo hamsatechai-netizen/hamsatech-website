@@ -14,7 +14,7 @@ function NextPage() {
     <>
       <section className="hero next-page" id="landing">
         <div className="hero-content">
-          <h1 className="hero-title">Welcome to HAMSATECH-AI</h1>
+          <h1 className="hero-title">Welcome to HAMSATECH-AI </h1>
           <button className="btn btn-primary" onClick={handleGetStarted}>Get Started</button>
         </div>
       </section>
