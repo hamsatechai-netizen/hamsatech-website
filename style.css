@@ -12,12 +12,10 @@ body {
 }
 
 /* CONTAINER */
-.container {
-  width: 90%;
-  max-width: 1200px;
-  margin: auto;
+.container.hero-grid {
+  width: 95%;            /* 👈 more breathing space */
+  max-width: 1300px;     /* 👈 allows image to move right */
 }
-
 .center {
   text-align: center;
 }
