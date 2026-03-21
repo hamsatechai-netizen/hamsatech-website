@@ -101,8 +101,8 @@ nav a {
   gap: 15px;
 }
 
-/* DASHBOARD IMAGE */
-.hero img {
+/* DASHBOARD IMAGE ONLY */
+.dashboard-img {
   width: 100%;
   max-width: 620px;
   margin-left: auto;
@@ -117,7 +117,7 @@ nav a {
   transition: all 0.4s ease;
 }
 
-.hero img:hover {
+.dashboard-img:hover {
   transform: perspective(1200px) rotateY(0deg) scale(1.02);
 }
 
@@ -207,17 +207,12 @@ nav a {
 
 /* RESPONSIVE */
 @media (max-width: 900px) {
-  .hero-grid,
-  .cards-3,
-  .steps {
-    grid-template-columns: 1fr;
+  .dashboard-img {
+    margin: 40px auto 0;
+    max-width: 90%;
+    transform: none;
   }
-
-  .hero {
-    padding: 60px 0;
-    text-align: center;
-  }
-
+}
   .hero img {
     margin: 40px auto 0;
     max-width: 90%;
