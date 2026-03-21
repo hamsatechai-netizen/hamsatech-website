@@ -69,26 +69,31 @@ nav a {
 
 /* HERO */
 .hero {
-  padding: 80px 0;
-  background: #fff;
+  padding: 100px 0;
+  background: #ffffff;
+  overflow: hidden;
 }
 
 .hero-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: 60px;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
+/* TEXT */
 .hero h1 {
-  font-size: 48px;
-  line-height: 1.2;
+  font-size: 52px;
+  line-height: 1.15;
   margin-bottom: 20px;
 }
 
 .hero p {
   color: #555;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-size: 18px;
 }
 
 .hero-buttons {
@@ -96,9 +101,37 @@ nav a {
   gap: 15px;
 }
 
+/* DASHBOARD IMAGE */
 .hero img {
   width: 100%;
-  border-radius: 20px;
+  max-width: 620px;
+  margin-left: auto;
+  display: block;
+  border-radius: 18px;
+
+  box-shadow: 
+    0 30px 80px rgba(0, 0, 0, 0.15),
+    0 10px 30px rgba(13, 148, 136, 0.15);
+
+  transform: perspective(1200px) rotateY(-6deg);
+  transition: all 0.4s ease;
+}
+
+.hero img:hover {
+  transform: perspective(1200px) rotateY(0deg) scale(1.02);
+}
+
+/* GLOW EFFECT */
+.hero-grid::after {
+  content: "";
+  position: absolute;
+  right: 5%;
+  top: 10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(13,148,136,0.15), transparent 70%);
+  filter: blur(40px);
+  z-index: 0;
 }
 
 /* SECTIONS */
@@ -180,7 +213,18 @@ nav a {
     grid-template-columns: 1fr;
   }
 
+  .hero {
+    padding: 60px 0;
+    text-align: center;
+  }
+
+  .hero img {
+    margin: 40px auto 0;
+    max-width: 90%;
+    transform: none;
+  }
+
   .hero h1 {
-    font-size: 32px;
+    font-size: 34px;
   }
 }
