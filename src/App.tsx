@@ -9,6 +9,7 @@ import NextPage from './components/NextPage'
 import PlatformPage from './components/PlatformPage'
 import UseCasesPage from './components/UseCasesPage'
 import HowItWorksPage from './components/HowItWorksPage'
+import ScrollToHash from './components/ScrollToHash'
 
 function App() {
   const features = [
@@ -31,6 +32,7 @@ function App() {
 
   return (
     <div className="App">
+      <ScrollToHash />
       <Navigation />
       <Routes>
         <Route path="/" element={<NextPage />} />

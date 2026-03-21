@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import '../styles/Navigation.css'
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const closeMenu = () => setIsOpen(false)
 
   return (
     <nav className="navbar">
@@ -22,6 +23,8 @@ function Navigation() {
         <button
           className={`menu-toggle ${isOpen ? 'active' : ''}`}
           onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle navigation menu"
+          aria-expanded={isOpen}
         >
           <span></span>
           <span></span>
@@ -29,9 +32,21 @@ function Navigation() {
         </button>
 
         <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
-          <li><a href="/">Home</a></li>
-          <li><a href="/about">About</a></li>
-          <li><a href="/home#contact">Contact</a></li>
+          <li>
+            <NavLink to="/" onClick={closeMenu}>
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/about" onClick={closeMenu}>
+              About
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/home#contact" onClick={closeMenu}>
+              Contact
+            </NavLink>
+          </li>
         </ul>
       </div>
     </nav>

@@ -46,11 +46,12 @@ function HowItWorksPage() {
           }}
           aria-label="Go back"
         >
-          ← Back
+          {'<-'} Back
         </button>
         <h2 className="about-title">How It Works</h2>
         <p className="about-description">
-          A simplified, compelling execution path to start using HamsaTech right away.
+          A simplified, compelling execution path to start using HamsaTech right
+          away.
         </p>
         <div className="features-grid" style={{ marginTop: '40px' }}>
           {howItWorksItems.map((item) => (
@@ -61,9 +62,17 @@ function HowItWorksPage() {
           ))}
         </div>
       </div>
-      <div className="how-it-works-bottom" style={{ background: '#021d39', color: '#fff', textAlign: 'center', padding: '80px 20px' }}>
-        <h2 style={{ fontSize: '3rem', marginBottom: '20px' }}>Start Building Your Personal Intelligence</h2>
-        <p style={{ fontSize: '1.2rem', marginBottom: '35px' }}>Use human-centered AI to drive measurable growth in sports, wellness, and life decisions.</p>
+      <div
+        className="how-it-works-bottom"
+        style={{ background: '#021d39', color: '#fff', textAlign: 'center', padding: '80px 20px' }}
+      >
+        <h2 style={{ fontSize: '3rem', marginBottom: '20px' }}>
+          Start Building Your Personal Intelligence
+        </h2>
+        <p style={{ fontSize: '1.2rem', marginBottom: '35px' }}>
+          Use human-centered AI to drive measurable growth in sports, wellness,
+          and life decisions.
+        </p>
         <button
           className="btn btn-primary"
           onClick={handleStart}

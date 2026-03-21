@@ -48,11 +48,12 @@ function UseCasesPage() {
           }}
           aria-label="Go back"
         >
-          ← Back
+          {'<-'} Back
         </button>
         <h2 className="about-title">Use Cases</h2>
         <p className="about-description">
-          Explore complete use-case paths designed for sports professionals, wellness seekers, and high performers.
+          Explore complete use-case paths designed for sports professionals,
+          wellness seekers, and high performers.
         </p>
 
         <div className="features-grid" style={{ marginTop: '40px' }}>

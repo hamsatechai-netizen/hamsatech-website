@@ -48,12 +48,14 @@ function PlatformPage() {
           }}
           aria-label="Go back"
         >
-          ← Back
+          {'<-'} Back
         </button>
         <h2 className="about-title">Platform</h2>
         <p className="about-description">
-          Our platform delivers AI-driven insights, performance metrics, and personalized training recommendations.
-          Explore real-time analytics, training programs, and adaptive coaching designed to help you reach peak potential.
+          Our platform delivers AI-driven insights, performance metrics, and
+          personalized training recommendations. Explore real-time analytics,
+          training programs, and adaptive coaching designed to help you reach
+          peak potential.
         </p>
         <div className="features-grid" style={{ marginTop: '40px' }}>
           {platformItems.map((item) => (

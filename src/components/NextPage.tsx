@@ -14,8 +14,10 @@ function NextPage() {
     <>
       <section className="hero next-page" id="landing">
         <div className="hero-content">
-          <h1 className="hero-title">Welcome to HAMSATECH-AI </h1>
-          <button className="btn btn-primary" onClick={handleGetStarted}>Get Started</button>
+          <h1 className="hero-title">Welcome to HAMSATECH-AI</h1>
+          <button className="btn btn-primary" onClick={handleGetStarted}>
+            Get Started
+          </button>
         </div>
       </section>
 
@@ -23,10 +25,17 @@ function NextPage() {
         <div className="container">
           <h2 className="about-title">About HamsaTech</h2>
           <p className="about-description">
-            HamsaTech is built on the belief that personal intelligence combined with AI creates transformative outcomes. We focus on the human element—understanding your unique patterns, goals, and potential—while leveraging advanced technology to provide actionable, data-driven guidance that helps you achieve measurable growth in every aspect of your life.
+            HamsaTech is built on the belief that personal intelligence combined with AI
+            creates transformative outcomes. We focus on the human element,
+            understanding your unique patterns, goals, and potential, while
+            leveraging advanced technology to provide actionable, data-driven
+            guidance that helps you achieve measurable growth in every aspect of
+            your life.
           </p>
           <p className="about-description" style={{ marginTop: '20px' }}>
-            Whether you're optimizing athletic performance, improving your wellness, or making important life decisions, HamsaTech is your partner in growth.
+            Whether you&apos;re optimizing athletic performance, improving your
+            wellness, or making important life decisions, HamsaTech is your
+            partner in growth.
           </p>
         </div>
       </section>
