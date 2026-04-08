@@ -1,0 +1,113 @@
+.about-section {
+  padding: 80px 0;
+  background: rgba(255, 250, 243, 0.82);
+  border-top: 1px solid rgba(212, 173, 133, 0.18);
+}
+
+.page-return-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(159, 79, 36, 0.14);
+  background: rgba(255, 244, 221, 0.88);
+  color: #8e3f1b;
+  border-radius: 999px;
+  padding: 12px 18px;
+  margin-bottom: 28px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.page-return-button:hover {
+  transform: translateY(-1px);
+  background: #fff0d2;
+  box-shadow: 0 14px 28px rgba(94, 39, 17, 0.1);
+}
+
+.page-return-button-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6b1f16 0%, #a4511f 100%);
+  color: #fff8ea;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.about-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #4d2417;
+}
+
+.about-description {
+  font-size: 1.1rem;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+  color: #6f5548;
+  line-height: 1.8;
+}
+
+.how-it-works-bottom {
+  margin-top: 72px;
+  padding: 84px 20px;
+  text-align: center;
+  color: #fff8ef;
+  background:
+    radial-gradient(circle at top right, rgba(255, 220, 152, 0.16), transparent 22%),
+    linear-gradient(135deg, #4f1f11 0%, #9e4b20 100%);
+}
+
+.how-it-works-bottom-title {
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  margin-bottom: 18px;
+  color: #fff8ef;
+}
+
+.how-it-works-bottom-text {
+  font-size: 1.15rem;
+  margin: 0 auto 34px;
+  max-width: 760px;
+  line-height: 1.8;
+  color: rgba(255, 248, 239, 0.82);
+}
+
+.how-it-works-bottom-button {
+  border: none;
+  border-radius: 16px;
+  padding: 16px 34px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #27160e;
+  background: linear-gradient(135deg, #ffd166 0%, #ffb703 100%);
+  box-shadow: 0 16px 28px rgba(255, 183, 3, 0.18);
+}
+
+.how-it-works-bottom-button:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .about-section {
+    padding: 60px 0;
+  }
+
+  .about-title {
+    font-size: 2rem;
+    margin-bottom: 25px;
+  }
+
+  .about-description {
+    font-size: 1rem;
+  }
+}

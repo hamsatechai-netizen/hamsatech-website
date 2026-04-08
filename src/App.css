@@ -1,0 +1,28 @@
+.App {
+  width: 100%;
+  min-height: 100vh;
+  background: transparent;
+}
+
+.features-section {
+  padding: 80px 0;
+  background: rgba(255, 250, 243, 0.72);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 768px) {
+  .features-section {
+    padding: 60px 0;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
