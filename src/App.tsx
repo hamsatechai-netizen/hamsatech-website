@@ -8,7 +8,7 @@ import NextPage from './components/NextPage'
 import PlatformPage from './components/PlatformPage'
 import UseCasesPage from './components/UseCasesPage'
 import HowItWorksPage from './components/HowItWorksPage'
-import ScrollToHash from './components/ScrollToHash'
+import ScrollNavigator from './components/ScrollNavigator'
 import SignInPage from './components/SignInPage'
 import SignOutPage from './components/SignOutPage'
 import SignUpPage from './components/SignUpPage'
@@ -38,7 +38,7 @@ function App() {
 
   return (
     <div className="App">
-      <ScrollToHash />
+      <ScrollNavigator />
       <Navigation />
       <Routes>
         <Route path="/" element={<NextPage />} />
