@@ -273,7 +273,24 @@ type AthleteIntakeResponse = {
   success: boolean
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
+function getApiBaseUrl() {
+  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
+
+  if (configuredBaseUrl) {
+    return configuredBaseUrl
+  }
+
+  if (typeof window !== 'undefined') {
+    const { hostname } = window.location
+    if (hostname === '127.0.0.1' || hostname === 'localhost') {
+      return 'http://127.0.0.1:8000'
+    }
+  }
+
+  return ''
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 type ErrorResponse = {
   detail?: string | Array<{ msg?: string; loc?: Array<string | number> }>
@@ -297,6 +314,10 @@ function getErrorMessage(data: ErrorResponse, fallback: string) {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  if (!API_BASE_URL) {
+    throw new Error('API is not configured. Set VITE_API_BASE_URL for this deployment.')
+  }
+
   const response = await fetch(`${API_BASE_URL}${path}`, {
     credentials: 'include',
     headers: {
@@ -332,6 +353,10 @@ export async function signIn(payload: LoginPayload): Promise<AuthUser> {
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
+  if (!API_BASE_URL) {
+    throw new Error('API is not configured. Set VITE_API_BASE_URL for this deployment.')
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
     credentials: 'include',
   })
