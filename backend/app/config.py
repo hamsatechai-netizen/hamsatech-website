@@ -20,6 +20,7 @@ class Settings:
     default_coach_code: str = os.getenv("HAMSA_DEFAULT_COACH_CODE", "HAMSA-COACH-001")
     frontend_origin: str = os.getenv("HAMSA_FRONTEND_ORIGIN", "http://127.0.0.1:5173")
     frontend_origins_raw: str = os.getenv("HAMSA_FRONTEND_ORIGINS", "http://127.0.0.1:5173,http://localhost:5173")
+    frontend_origin_regex: str | None = os.getenv("HAMSA_FRONTEND_ORIGIN_REGEX")
     cookie_secure_raw: str = os.getenv("HAMSA_COOKIE_SECURE", "false")
     cookie_samesite_raw: str = os.getenv("HAMSA_COOKIE_SAMESITE", "lax")
 
@@ -29,6 +30,11 @@ class Settings:
         if self.frontend_origin and self.frontend_origin not in origins:
             origins.append(self.frontend_origin)
         return origins
+
+    @property
+    def normalized_frontend_origin_regex(self) -> str | None:
+        regex = (self.frontend_origin_regex or "").strip()
+        return regex or None
 
     @property
     def cookie_secure(self) -> bool:
