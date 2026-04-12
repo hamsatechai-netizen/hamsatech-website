@@ -172,9 +172,65 @@ HAMSA_COOKIE_SECURE=true
 HAMSA_COOKIE_SAMESITE=none
 ```
 
-### Important note
+## Render Backend Deployment
 
-Cloudflare Pages deploys only the frontend. The FastAPI backend in this repo must be deployed separately and exposed over HTTPS, then referenced through `VITE_API_BASE_URL`.
+This repo includes a [`render.yaml`](c:/Users/hp/Desktop/HamsAi/render.yaml) blueprint for deploying the FastAPI backend on Render.
+
+### Render setup
+
+1. Push this repository to GitHub.
+2. In Render, create a new `Blueprint` deployment from the repository.
+3. Select the branch you want to deploy.
+4. Render will create the `hamsatech-api` web service using `render.yaml`.
+5. Set the secret environment variables in Render:
+
+```bash
+HAMSA_DEFAULT_PASSWORD=your-secure-coach-password
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+HAMSA_FRONTEND_ORIGIN=https://your-cloudflare-pages-domain.pages.dev
+HAMSA_FRONTEND_ORIGINS=https://your-cloudflare-pages-domain.pages.dev,https://www.your-domain.com
+```
+
+If you are using the current Cloudflare Pages preview domain shown in this project, start with:
+
+```bash
+HAMSA_FRONTEND_ORIGIN=https://9727d29b.hamsatech-website.pages.dev
+HAMSA_FRONTEND_ORIGINS=https://9727d29b.hamsatech-website.pages.dev
+```
+
+6. After Render deploys, note the public backend URL, for example:
+
+```bash
+https://hamsatech-api.onrender.com
+```
+
+7. In Cloudflare Pages, set:
+
+```bash
+VITE_API_BASE_URL=https://hamsatech-api.onrender.com
+```
+
+8. Redeploy Cloudflare Pages after updating the environment variable.
+
+### Quick production checklist
+
+1. Render backend deploys successfully.
+2. Render health check returns `200` at `/api/health`.
+3. Cloudflare Pages has `VITE_API_BASE_URL` set to the Render backend URL.
+4. Render includes your Pages origin in `HAMSA_FRONTEND_ORIGINS`.
+5. Render uses:
+
+```bash
+HAMSA_COOKIE_SECURE=true
+HAMSA_COOKIE_SAMESITE=none
+```
+
+6. After changing env vars, redeploy both Render and Cloudflare Pages.
+
+### Important production note
+
+Cloudflare Pages hosts only the frontend. Signup, signin, assignment, intake, and feedback require the FastAPI backend to be deployed separately over HTTPS.
 
 ### Production cookie settings
 
