@@ -138,7 +138,7 @@ function AthleteIntakePage() {
     } catch {
       window.localStorage.removeItem(draftStorageKey)
     }
-  }, [draftStorageKey, user?.email])
+  }, [draftStorageKey, user?.assignedCoachEmail, user?.email])
 
   useEffect(() => {
     if (!tabStorageKey || typeof window === 'undefined') {

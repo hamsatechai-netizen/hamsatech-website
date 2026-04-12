@@ -25,7 +25,7 @@ function ProfilePage() {
     setSport(storedProfile.sport ?? user.sport ?? '')
     setFocusArea(storedProfile.focusArea ?? user.focusArea ?? '')
     setDateOfBirth(storedProfile.dateOfBirth ?? user.dateOfBirth ?? '')
-  }, [user?.email, user?.fullName])
+  }, [user?.dateOfBirth, user?.email, user?.focusArea, user?.fullName, user?.sport])
 
   if (!isLoading && !user) {
     return <Navigate to="/signin" replace state={{ from: { pathname: '/profile' } }} />

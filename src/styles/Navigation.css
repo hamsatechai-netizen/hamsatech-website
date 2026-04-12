@@ -58,6 +58,14 @@
   background: linear-gradient(135deg, rgba(255, 188, 89, 0.3), rgba(255, 255, 255, 0.12));
   border-radius: 50%;
   box-shadow: inset 0 0 18px rgba(255, 219, 132, 0.18);
+  overflow: hidden;
+}
+
+.logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .nav-menu {
@@ -271,8 +279,7 @@
 }
 
 .logout-btn,
-.signin-btn,
-.signup-btn {
+.auth-btn {
   padding: 8px 18px;
   border-radius: 6px;
   border: none;
@@ -288,23 +295,28 @@
   justify-content: center;
 }
 
-.signin-btn {
+.auth-btn--primary {
   background: linear-gradient(135deg, #ffd166 0%, #ffb703 100%);
   color: #000000;
   box-shadow: 0 10px 24px rgba(255, 183, 3, 0.22);
 }
 
-.signin-btn:hover,
-.signup-btn:hover {
-  background-color: #ffed4e;
+.auth-btn--primary:hover {
+  background: linear-gradient(135deg, #ffe08a 0%, #ffbf1a 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 }
 
-.signup-btn {
+.auth-btn--secondary {
   background: rgba(255, 244, 221, 0.12);
   color: #ffffff;
   border: 1px solid rgba(255, 225, 168, 0.28);
+}
+
+.auth-btn--secondary:hover {
+  background: rgba(255, 244, 221, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(255, 215, 0, 0.12);
 }
 
 .logout-btn {
@@ -403,8 +415,7 @@
     width: min(300px, calc(100vw - 24px));
   }
 
-  .signin-btn,
-  .signup-btn,
+  .auth-btn,
   .logout-btn {
     padding: 8px 20px;
     font-size: 0.9rem;
