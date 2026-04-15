@@ -2,21 +2,27 @@
 
 :root {
   color-scheme: light;
-  color: #2f1d15;
-  background-color: #f9f2e6;
+  color: #08222c;
+  background-color: #eef9f7;
   font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
-  --surface-bg: #fffaf3;
-  --surface-border: #ead5b9;
-  --text-main: #3d2419;
-  --text-soft: #77584c;
-  --brand-deep: #6b1f16;
-  --brand-mid: #9f4b24;
-  --brand-gold: #d4a24c;
-  --brand-sand: #f4e6cf;
-  --brand-cream: #fbf6ee;
-  --success-bg: #edf8ef;
-  --warning-bg: #fff4df;
-  --danger-bg: #fff1ef;
+  --surface-bg: #f7fcfb;
+  --surface-border: #cfe6e1;
+  --text-main: #08222c;
+  --text-soft: #496a74;
+  --text-invert: #ffffff;
+  --brand-deep: #0b3b50;
+  --brand-mid: #2f8aa0;
+  --brand-mid-2: #1d6f86;
+  --brand-gold: #9ad6c2;
+  --brand-sand: #d7f0ea;
+  --brand-cream: #f7fcfb;
+  --accent-warm: #f5b7ad;
+  --accent-sun: #f5a345;
+  --success-bg: #e7f7f1;
+  --warning-bg: #e8f5ff;
+  --danger-bg: #ffe9ec;
+  --danger-border: #e296a0;
+  --shadow-color: 3, 40, 56;
 }
 
 * {
@@ -35,8 +41,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background:
-    radial-gradient(circle at top left, rgba(212, 162, 76, 0.14), transparent 22%),
-    linear-gradient(180deg, #fcf8f1 0%, #f3eadc 100%);
+    radial-gradient(circle at 18% 10%, rgba(154, 214, 194, 0.32), transparent 34%),
+    radial-gradient(circle at 86% 14%, rgba(47, 138, 160, 0.2), transparent 30%),
+    linear-gradient(180deg, #eef9f7 0%, #d9f0ec 100%);
   min-height: 100vh;
   color: var(--text-main);
 }

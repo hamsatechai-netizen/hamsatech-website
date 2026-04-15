@@ -5,8 +5,8 @@
   justify-content: center;
   padding: 80px 20px;
   background:
-    radial-gradient(circle at top right, rgba(212, 162, 76, 0.16), transparent 20%),
-    linear-gradient(135deg, #5f1d14 0%, #8b341f 50%, #a65b25 100%);
+    radial-gradient(circle at top right, rgba(154, 214, 194, 0.22), transparent 20%),
+    linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-mid) 55%, var(--brand-mid-2) 100%);
   position: relative;
   overflow: hidden;
 }
@@ -29,7 +29,7 @@
 
 .hero-subtitle {
   font-size: 1.3rem;
-  color: rgba(255, 244, 227, 0.84);
+  color: rgba(255, 255, 255, 0.86);
   margin-bottom: 40px;
   font-weight: 400;
   line-height: 1.6;
@@ -48,15 +48,15 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #d4a24c 0%, #e8be6a 100%);
-  color: #000000;
-  box-shadow: 0 8px 22px rgba(212, 162, 76, 0.24);
+  background: linear-gradient(135deg, var(--brand-mid) 0%, var(--brand-gold) 100%);
+  color: var(--text-main);
+  box-shadow: 0 8px 22px rgba(var(--shadow-color), 0.24);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #ddb061 0%, #f0cb86 100%);
+  background: linear-gradient(135deg, var(--brand-mid-2) 0%, var(--brand-gold) 100%);
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(212, 162, 76, 0.3);
+  box-shadow: 0 10px 24px rgba(var(--shadow-color), 0.3);
 }
 
 .btn-secondary {
@@ -79,12 +79,12 @@
 }
 
 .hero-buttons .btn {
-  background: linear-gradient(135deg, #d4a24c 0%, #e8be6a 100%);
-  color: #000000;
+  background: linear-gradient(135deg, var(--brand-mid) 0%, var(--brand-gold) 100%);
+  color: var(--text-main);
 }
 
 .hero-buttons .btn:hover {
-  background: linear-gradient(135deg, #ddb061 0%, #f0cb86 100%);
+  background: linear-gradient(135deg, var(--brand-mid-2) 0%, var(--brand-gold) 100%);
 }
 
 @keyframes fadeInUp {

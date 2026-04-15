@@ -1,6 +1,6 @@
 .feature-card {
   padding: 40px 30px;
-  background: #ffffff;
+  background: var(--surface-bg);
   border-radius: 4px;
   transition: all 0.3s ease;
   border-bottom: 4px solid transparent;
@@ -39,17 +39,17 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 15px;
-  color: #1a1a1a;
+  color: var(--text-main);
   transition: color 0.3s ease;
 }
 
 .feature-card:hover .feature-title {
-  color: #0a1e4d;
+  color: var(--brand-deep);
 }
 
 .feature-description {
   font-size: 1rem;
-  color: #555555;
+  color: var(--text-soft);
   line-height: 1.6;
   margin: 0;
 }

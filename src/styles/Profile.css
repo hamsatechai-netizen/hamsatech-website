@@ -2,8 +2,8 @@
   min-height: calc(100vh - 88px);
   padding: 42px 20px 72px;
   background:
-    radial-gradient(circle at 12% 18%, rgba(233, 179, 71, 0.16), transparent 22%),
-    linear-gradient(180deg, #fff8ef 0%, #f5ebdd 100%);
+    radial-gradient(circle at 12% 18%, rgba(154, 214, 194, 0.18), transparent 24%),
+    linear-gradient(180deg, rgba(239, 251, 249, 0.92) 0%, rgba(215, 240, 234, 0.82) 100%);
 }
 
 .profile-page-container {
@@ -16,9 +16,9 @@
   padding: 34px;
   color: #fffaf2;
   background:
-    radial-gradient(circle at top right, rgba(255, 220, 152, 0.16), transparent 22%),
-    linear-gradient(135deg, #4f1f11 0%, #9e4b20 100%);
-  box-shadow: 0 24px 60px rgba(94, 39, 17, 0.16);
+    radial-gradient(circle at top right, rgba(154, 214, 194, 0.18), transparent 22%),
+    linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-mid) 100%);
+  box-shadow: 0 24px 60px rgba(var(--shadow-color), 0.18);
 }
 
 .profile-page-eyebrow {
@@ -26,7 +26,7 @@
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.18em;
-  color: #ffd78d;
+  color: rgba(154, 214, 194, 0.9);
   text-transform: uppercase;
 }
 
@@ -37,11 +37,11 @@
 
 .profile-page-card {
   margin-top: 24px;
-  background: rgba(255, 251, 246, 0.98);
+  background: rgba(247, 252, 251, 0.98);
   border-radius: 28px;
   padding: 28px;
-  box-shadow: 0 20px 50px rgba(78, 31, 15, 0.08);
-  border: 1px solid rgba(212, 173, 133, 0.28);
+  box-shadow: 0 20px 50px rgba(var(--shadow-color), 0.1);
+  border: 1px solid rgba(47, 138, 160, 0.18);
 }
 
 .profile-page-layout {
@@ -57,8 +57,8 @@
   gap: 14px;
   padding: 22px;
   border-radius: 24px;
-  background: #fff8ee;
-  border: 1px solid #edd9bf;
+  background: rgba(239, 251, 249, 0.92);
+  border: 1px solid var(--surface-border);
 }
 
 .profile-page-avatar {
@@ -68,8 +68,8 @@
   border: none;
   cursor: pointer;
   overflow: hidden;
-  background: linear-gradient(135deg, #ffd166 0%, #ffb703 100%);
-  color: #4b2309;
+  background: linear-gradient(135deg, var(--brand-mid) 0%, var(--brand-gold) 100%);
+  color: var(--text-main);
   font-size: 2.6rem;
   font-weight: 800;
   display: inline-flex;
@@ -106,14 +106,14 @@
 
 .profile-page-photo-button,
 .profile-page-submit {
-  background: linear-gradient(135deg, #ffd166 0%, #ffb703 100%);
-  color: #23160d;
+  background: linear-gradient(135deg, var(--brand-mid) 0%, var(--brand-gold) 100%);
+  color: var(--text-main);
 }
 
 .profile-page-photo-reset,
 .profile-page-secondary {
-  background: #fff2df;
-  color: #8e3f1b;
+  background: var(--brand-sand);
+  color: var(--brand-deep);
 }
 
 .profile-page-file-input {
@@ -128,33 +128,33 @@
 .profile-page-fields label {
   display: grid;
   gap: 8px;
-  color: #4c1f12;
+  color: var(--text-main);
   font-weight: 600;
 }
 
 .profile-page-fields input {
   width: 100%;
-  border: 1px solid #e3c9ad;
+  border: 1px solid var(--surface-border);
   border-radius: 14px;
   padding: 14px 16px;
   font-size: 1rem;
-  color: #4b291d;
-  background: #fffaf3;
+  color: var(--text-main);
+  background: var(--brand-cream);
 }
 
 .profile-page-fields input:disabled {
-  background: #f9f0e3;
-  color: #77584c;
+  background: rgba(215, 240, 234, 0.55);
+  color: var(--text-soft);
 }
 
 .profile-page-fields input:focus {
   outline: none;
-  border-color: #a04b20;
-  box-shadow: 0 0 0 4px rgba(160, 75, 32, 0.12);
+  border-color: var(--brand-mid);
+  box-shadow: 0 0 0 4px rgba(47, 138, 160, 0.16);
 }
 
 .profile-page-fields small {
-  color: #815642;
+  color: var(--text-soft);
   font-size: 0.85rem;
 }
 
