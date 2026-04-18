@@ -29,11 +29,10 @@ function PlatformPage() {
   return (
     <section className="about-section">
       <div className="container">
-        <h2 className="about-title">Platform</h2>
+        <h2 className="about-title">A unified intelligence platform that understands you — and guides better decisions</h2>
         <p className="about-description">
-          Our platform delivers AI-driven insights, performance metrics, and personalized training recommendations.
-          Explore real-time analytics, training programs, and adaptive coaching designed to help you reach peak
-          potential.
+         HamsaTech brings together data, behavior, and context into a continuous system — helping you understand what’s happening, 
+          make better decisions, and improve over time.
         </p>
         <div className="features-grid" style={{ marginTop: '40px' }}>
           {platformItems.map((item) => (
