@@ -4,14 +4,10 @@ import { useAuth } from '../context/AuthContext'
 import {
   approveCoachAssignment,
   getCoachAssignmentRequests,
-  getCoachAthleteDetails,
-  getCoachAthletes,
   getStudentFeedback,
   getStudents,
   requestCoachAssignment,
   type CoachAssignmentRequest,
-  type CoachAthleteDetail,
-  type CoachAthleteListItem,
   type CoachFeedbackRecord,
   type StudentProfile,
 } from '../lib/authApi'
@@ -41,18 +37,13 @@ function getGreeting(fullName: string) {
 function DashboardPage() {
   const { user, isLoading, refreshUser } = useAuth()
   const [students, setStudents] = useState<StudentProfile[]>([])
-  const [athletes, setAthletes] = useState<CoachAthleteListItem[]>([])
   const [assignmentRequests, setAssignmentRequests] = useState<CoachAssignmentRequest[]>([])
   const [feedback, setFeedback] = useState<CoachFeedbackRecord[]>([])
   const [error, setError] = useState('')
   const [isFetching, setIsFetching] = useState(false)
   const [studentSearchTerm, setStudentSearchTerm] = useState('')
-  const [intakeSearchTerm, setIntakeSearchTerm] = useState('')
   const [selectedStudentEmail, setSelectedStudentEmail] = useState('')
-  const [selectedAthleteId, setSelectedAthleteId] = useState('')
   const [selectedRequestEmail, setSelectedRequestEmail] = useState('')
-  const [selectedAthleteDetail, setSelectedAthleteDetail] = useState<CoachAthleteDetail | null>(null)
-  const [isLoadingAthleteDetail, setIsLoadingAthleteDetail] = useState(false)
   const [studentProfileOverrides, setStudentProfileOverrides] = useState({
     sport: '',
     focusArea: '',
@@ -105,34 +96,30 @@ function DashboardPage() {
 
     try {
       if (user.role === 'coach') {
-        const [studentProfiles, athleteRecords, pendingRequests] = await Promise.all([
+        const [studentProfiles, pendingRequests] = await Promise.all([
           getStudents(),
-          getCoachAthletes(intakeSearchTerm),
           getCoachAssignmentRequests(),
         ])
         setStudents(studentProfiles)
-        setAthletes(athleteRecords)
         setAssignmentRequests(pendingRequests)
         setFeedback([])
       } else {
         const feedbackRecords = await getStudentFeedback()
         setFeedback(feedbackRecords)
         setStudents([])
-        setAthletes([])
         setAssignmentRequests([])
       }
     } catch (fetchError) {
       const nextMessage =
         fetchError instanceof Error ? fetchError.message : 'Unable to load dashboard data'
       setStudents([])
-      setAthletes([])
       setAssignmentRequests([])
       setFeedback([])
       setError(nextMessage)
     } finally {
       setIsFetching(false)
     }
-  }, [intakeSearchTerm, user])
+  }, [user])
 
   useEffect(() => {
     void loadDashboard()
@@ -166,19 +153,6 @@ function DashboardPage() {
 
   useEffect(() => {
     if (user?.role !== 'coach') {
-      setSelectedAthleteId('')
-      setSelectedAthleteDetail(null)
-      return
-    }
-
-    if (!athletes.some((athlete) => athlete.athleteId === selectedAthleteId)) {
-      setSelectedAthleteId('')
-      setSelectedAthleteDetail(null)
-    }
-  }, [athletes, selectedAthleteId, user?.role])
-
-  useEffect(() => {
-    if (user?.role !== 'coach') {
       setSelectedRequestEmail('')
       return
     }
@@ -187,28 +161,6 @@ function DashboardPage() {
       setSelectedRequestEmail('')
     }
   }, [assignmentRequests, selectedRequestEmail, user?.role])
-
-  useEffect(() => {
-    const loadSelectedAthlete = async () => {
-      if (!user || user.role !== 'coach' || !selectedAthleteId) {
-        setSelectedAthleteDetail(null)
-        return
-      }
-
-      setIsLoadingAthleteDetail(true)
-
-      try {
-        const detail = await getCoachAthleteDetails(selectedAthleteId)
-        setSelectedAthleteDetail(detail)
-      } catch {
-        setSelectedAthleteDetail(null)
-      } finally {
-        setIsLoadingAthleteDetail(false)
-      }
-    }
-
-    void loadSelectedAthlete()
-  }, [selectedAthleteId, user])
 
   if (!isLoading && !user) {
     return <Navigate to="/signin" replace state={{ from: { pathname: '/dashboard' } }} />
@@ -221,11 +173,6 @@ function DashboardPage() {
   const selectedStudent =
     user.role === 'coach'
       ? filteredStudents.find((student) => student.email === selectedStudentEmail) ?? null
-      : null
-
-  const selectedAthlete =
-    user.role === 'coach'
-      ? athletes.find((athlete) => athlete.athleteId === selectedAthleteId) ?? null
       : null
 
   const selectedRequest =
@@ -306,8 +253,8 @@ function DashboardPage() {
                   <strong>{filteredStudents.length}</strong>
                 </article>
                 <article>
-                  <span>Submitted Intakes</span>
-                  <strong>{athletes.length}</strong>
+                  <span>Pending Requests</span>
+                  <strong>{assignmentRequests.length}</strong>
                 </article>
               </div>
             </div>
@@ -479,101 +426,6 @@ function DashboardPage() {
                       ? 'No assigned student profiles match the current search.'
                       : 'No students are mapped to your coach account yet.'}
                   </p>
-                </div>
-              )}
-            </section>
-
-            <section className="dashboard-section">
-              <div className="dashboard-section-header">
-                <h2>Student Intake Records</h2>
-                <p>Open a record to review details, identify weak areas, and add coach feedback.</p>
-              </div>
-              <label className="dashboard-search dashboard-section-search">
-                <span>Search Intake Records</span>
-                <input
-                  type="search"
-                  placeholder="Search by student or intake name"
-                  value={intakeSearchTerm}
-                  onChange={(event) => setIntakeSearchTerm(event.target.value)}
-                />
-              </label>
-              {athletes.length > 0 ? (
-                <div className="coach-student-browser">
-                  <div className="coach-student-tabs" role="tablist" aria-label="Student intake records">
-                    {athletes.map((athlete) => (
-                      <button
-                        key={athlete.athleteId}
-                        type="button"
-                        className={`coach-student-tab ${selectedAthlete?.athleteId === athlete.athleteId ? 'active' : ''}`}
-                        onClick={() => setSelectedAthleteId(athlete.athleteId)}
-                      >
-                        <span className="coach-student-tab-name">{athlete.name}</span>
-                        <span className="coach-student-tab-meta">{formatDate(athlete.createdAt)}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {isLoadingAthleteDetail ? (
-                    <div className="dashboard-empty-card coach-student-placeholder">
-                      <p>Loading intake details...</p>
-                    </div>
-                  ) : selectedAthlete && selectedAthleteDetail ? (
-                    <article className="student-card coach-student-panel">
-                      <div className="student-card-header">
-                        <div>
-                          <p className="student-role">Submitted Intake</p>
-                          <h2>{selectedAthlete.name}</h2>
-                        </div>
-                        <span className="student-score">{selectedAthlete.age}</span>
-                      </div>
-                      <dl className="student-meta">
-                        <div>
-                          <dt>Email</dt>
-                          <dd>{selectedAthlete.email}</dd>
-                        </div>
-                        <div>
-                          <dt>Gender</dt>
-                          <dd>{selectedAthlete.gender}</dd>
-                        </div>
-                        <div>
-                          <dt>Academy ID</dt>
-                          <dd>{selectedAthlete.academyId}</dd>
-                        </div>
-                        <div>
-                          <dt>Latest Session</dt>
-                          <dd>
-                            {selectedAthleteDetail.sessionsLog[0]
-                              ? formatDate(selectedAthleteDetail.sessionsLog[0].sessionDate)
-                              : 'Not added'}
-                          </dd>
-                        </div>
-                        <div>
-                          <dt>Latest Recovery</dt>
-                          <dd>{selectedAthleteDetail.physiologyData[0]?.recoveryScore ?? 'Not added'}</dd>
-                        </div>
-                        <div>
-                          <dt>Latest Stress</dt>
-                          <dd>{selectedAthleteDetail.physiologyData[0]?.stressScore ?? 'Not added'}</dd>
-                        </div>
-                      </dl>
-                      <div className="dashboard-inline-actions">
-                        <Link
-                          to={`/coach/athletes/${selectedAthlete.athleteId}`}
-                          className="dashboard-inline-link"
-                        >
-                          Open Full Intake
-                        </Link>
-                      </div>
-                    </article>
-                  ) : (
-                    <div className="dashboard-empty-card coach-student-placeholder">
-                      <p>Select an intake record to open the actual submission details.</p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="dashboard-empty-card">
-                  <p>No intake submissions match the current filter.</p>
                 </div>
               )}
             </section>

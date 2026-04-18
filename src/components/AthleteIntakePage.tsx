@@ -8,6 +8,7 @@ import {
   type PsychologyQuestion,
 } from '../lib/authApi'
 import '../styles/AthleteIntake.css'
+import CoachIntakePage from './CoachIntakePage'
 
 const tabs = [
   { id: 'athlete', label: 'Athlete Master' },
@@ -413,8 +414,8 @@ function AthleteIntakePage() {
     return null
   }
 
-  if (user.role !== 'student') {
-    return <Navigate to="/dashboard" replace />
+  if (user.role === 'coach') {
+    return <CoachIntakePage />
   }
 
   if (!user.assignedCoachEmail) {

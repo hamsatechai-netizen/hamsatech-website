@@ -3,6 +3,24 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/Auth.css'
 
+type ReturnLocation = { pathname?: string; search?: string; hash?: string }
+
+function sanitizeReturnTo(value: ReturnLocation | string | null | undefined) {
+  const raw =
+    typeof value === 'string'
+      ? value
+      : `${value?.pathname ?? ''}${value?.search ?? ''}${value?.hash ?? ''}`
+
+  const trimmed = raw.trim()
+  if (!trimmed || !trimmed.startsWith('/') || trimmed.startsWith('//')) {
+    return '/dashboard'
+  }
+  if (trimmed.startsWith('/signin') || trimmed.startsWith('/signup') || trimmed.startsWith('/signout')) {
+    return '/dashboard'
+  }
+  return trimmed
+}
+
 function SignInPage() {
   const { user, signIn } = useAuth()
   const navigate = useNavigate()
@@ -13,10 +31,16 @@ function SignInPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
-  const from = useMemo(
-    () => (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ?? '/dashboard',
-    [location.state],
-  )
+  const from = useMemo(() => {
+    const stateFrom = (location.state as { from?: ReturnLocation } | null)?.from
+    if (stateFrom) {
+      return sanitizeReturnTo(stateFrom)
+    }
+
+    const params = new URLSearchParams(location.search)
+    const next = params.get('next')
+    return sanitizeReturnTo(next)
+  }, [location.search, location.state])
 
   if (user) {
     return <Navigate to={from} replace />

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import '../styles/Navigation.css'
 import { useAuth } from '../context/AuthContext'
 import { getStoredProfile, saveStoredProfile, subscribeToStoredProfile } from '../lib/profileStorage'
@@ -11,9 +11,11 @@ function Navigation() {
   const [displayName, setDisplayName] = useState('')
   const [profileSport, setProfileSport] = useState('')
   const { user, isLoading } = useAuth()
+  const location = useLocation()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const profileMenuRef = useRef<HTMLDivElement | null>(null)
   const closeMenu = () => setIsOpen(false)
+  const authReturnState = { from: { pathname: location.pathname, search: location.search, hash: location.hash } }
 
   useEffect(() => {
     if (!user?.email) {
@@ -93,7 +95,10 @@ function Navigation() {
               srcSet="/logo-mark-128.png 1x, /logo-mark-256.png 2x, /logo-mark-384.png 3x"
               sizes="40px"
               alt="HamsaTech"
+              width={40}
+              height={40}
               decoding="async"
+              fetchPriority="high"
             />
           </span>
           <span className="logo-text">HamsaTech</span>
@@ -112,13 +117,49 @@ function Navigation() {
 
         <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
           <li>
-            <NavLink to="/" onClick={closeMenu}>
+            <NavLink
+              to="/"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              end
+            >
               Home
             </NavLink>
           </li>
           <li>
-            <NavLink to="/#contact" onClick={closeMenu}>
-              Contact
+            <NavLink
+              to="/platform"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              Platform
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/usecases"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              Use Cases
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/howitworks"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              How It Works
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/about"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              About
             </NavLink>
           </li>
           {user ? (
@@ -209,6 +250,7 @@ function Navigation() {
             <>
               <NavLink
                 to="/signup"
+                state={authReturnState}
                 className={({ isActive }) => `auth-btn ${isActive ? 'auth-btn--primary' : 'auth-btn--secondary'}`}
                 onClick={closeMenu}
               >
@@ -216,6 +258,7 @@ function Navigation() {
               </NavLink>
               <NavLink
                 to="/signin"
+                state={authReturnState}
                 className={({ isActive }) => `auth-btn ${isActive ? 'auth-btn--primary' : 'auth-btn--secondary'}`}
                 onClick={closeMenu}
               >

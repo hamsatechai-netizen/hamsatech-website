@@ -52,6 +52,12 @@ a {
   color: inherit;
 }
 
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(47, 138, 160, 0.65);
+  outline-offset: 3px;
+}
+
 h1,
 h2,
 h3,

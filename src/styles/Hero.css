@@ -25,6 +25,7 @@
   color: #ffffff;
   line-height: 1.2;
   font-family: 'IBM Plex Serif', Georgia, serif;
+  text-wrap: balance;
 }
 
 .hero-subtitle {
@@ -33,6 +34,7 @@
   margin-bottom: 40px;
   font-weight: 400;
   line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .btn {

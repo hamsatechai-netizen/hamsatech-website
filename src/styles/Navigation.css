@@ -106,6 +106,24 @@
   width: 100%;
 }
 
+.nav-menu a.active {
+  opacity: 1;
+}
+
+.nav-menu a.active::after {
+  width: 100%;
+}
+
+.nav-menu a:focus-visible,
+.nav-logo:focus-visible,
+.auth-btn:focus-visible,
+.logout-btn:focus-visible,
+.profile-trigger:focus-visible {
+  outline: 3px solid rgba(154, 214, 194, 0.75);
+  outline-offset: 3px;
+  border-radius: 10px;
+}
+
 .nav-auth {
   display: flex;
   align-items: center;

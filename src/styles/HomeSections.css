@@ -1,0 +1,128 @@
+.home-section {
+  padding: 86px 0;
+  border-top: 1px solid rgba(47, 138, 160, 0.12);
+}
+
+.home-section--problem {
+  background: rgba(247, 252, 251, 0.72);
+}
+
+.home-section--solution {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(154, 214, 194, 0.26), transparent 32%),
+    radial-gradient(circle at 86% 24%, rgba(47, 138, 160, 0.18), transparent 30%),
+    rgba(247, 252, 251, 0.82);
+}
+
+.home-section--system {
+  background: rgba(247, 252, 251, 0.72);
+}
+
+.section-header {
+  max-width: 880px;
+}
+
+.section-header--center {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(11, 59, 80, 0.78);
+}
+
+.section-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(154, 214, 194, 0.22);
+  border: 1px solid rgba(47, 138, 160, 0.18);
+  color: rgba(11, 59, 80, 0.9);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.section-title {
+  margin-top: 18px;
+  font-size: clamp(2.2rem, 3.5vw, 3.1rem);
+  line-height: 1.12;
+  color: var(--text-main);
+  text-wrap: balance;
+}
+
+.section-subtitle {
+  margin-top: 16px;
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+.problem-grid {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.problem-block {
+  padding: 26px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(47, 138, 160, 0.16);
+  box-shadow: 0 18px 30px rgba(var(--shadow-color), 0.08);
+}
+
+.problem-block h3 {
+  font-size: 1.35rem;
+  margin-bottom: 10px;
+  color: var(--brand-deep);
+}
+
+.problem-block p {
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.solution-grid {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.solution-item {
+  padding: 26px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(47, 138, 160, 0.14);
+}
+
+.solution-item h3 {
+  color: var(--brand-deep);
+  margin-bottom: 8px;
+  font-size: 1.35rem;
+}
+
+.solution-item p {
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+@media (max-width: 900px) {
+  .problem-grid,
+  .solution-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-section {
+    padding: 70px 0;
+  }
+}
