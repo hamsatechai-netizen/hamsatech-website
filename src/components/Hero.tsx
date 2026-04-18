@@ -21,14 +21,24 @@ function Hero() {
   }
 
   return (
+  <>
     <section className="hero" id="home">
       <div className="hero-content">
-        <h1 className="hero-title">Unified intelligence for better decisions and outcomes</h1>
-        <p className="hero-subtitle">Combining data, behavior, and performance signals — so you can understand, act, and improve with clarity.</p>
-        <p className="hero-micro">Most performance challenges aren’t visible — until they impact outcomes.</p>       
+        <h1 className="hero-title">
+          Unified intelligence for better decisions and outcomes
+        </h1>
+
+        <p className="hero-subtitle">
+          Combining data, behavior, and performance signals — so you can understand, act, and improve with clarity.
+        </p>
+
+        <p className="hero-micro">
+          Most performance challenges aren’t visible — until they impact outcomes.
+        </p>
       </div>
     </section>
-       <section className="problem-section">
+
+    <section className="problem-section">
       <div className="container">
         <h2 className="section-title">
           Performance isn’t limited by effort — it’s limited by visibility
@@ -58,7 +68,7 @@ function Hero() {
         </div>
       </div>
     </section>
-   )
-}
+  </>
+);
 
 export default Hero
