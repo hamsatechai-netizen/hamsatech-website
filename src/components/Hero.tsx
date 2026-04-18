@@ -24,7 +24,7 @@ function Hero() {
     <section className="hero" id="home">
       <div className="hero-content">
         <h1 className="hero-title">Unified intelligence for better decisions and outcomes</h1>
-        <p className="hero-subtitle">Bringing together data, behavior, and performance signals into one platform — to understand, act, and improve with clarity.</p>
+        <p className="hero-subtitle">Combining data, behavior, and performance signals — so you can understand, act, and improve with clarity.</p>
         <div className="hero-buttons">
           <button className="btn btn-primary" onClick={goToPlatform}>Platform</button>
           <button className="btn btn-primary" onClick={goToUseCases}>Use Cases</button>
