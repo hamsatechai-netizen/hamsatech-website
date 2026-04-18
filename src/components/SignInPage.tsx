@@ -148,7 +148,7 @@ function SignInPage() {
           </button>
 
           <p className="auth-footnote">
-            Returning to the site without signing in? <Link to="/home">Go back to Home</Link>
+            Returning to the site without signing in? <Link to="/">Go back to Home</Link>
           </p>
           <p className="auth-footnote">
             Need a new account? <Link to="/signup">Create one</Link>

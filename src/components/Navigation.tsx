@@ -117,7 +117,7 @@ function Navigation() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/home#contact" onClick={closeMenu}>
+            <NavLink to="/#contact" onClick={closeMenu}>
               Contact
             </NavLink>
           </li>

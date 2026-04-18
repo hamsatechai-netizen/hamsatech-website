@@ -723,7 +723,7 @@ function DashboardPage() {
         )}
 
         <div className="dashboard-links">
-          <Link to="/home">Home</Link>
+          <Link to="/">Home</Link>
           {user.role === 'student' ? <Link to="/athlete-intake">My Intake</Link> : null}
           <Link to="/profile">Profile</Link>
         </div>

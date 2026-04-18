@@ -46,7 +46,7 @@ function SignOutPage() {
           <Link className="auth-submit auth-link-button" to="/signin">
             Sign In Again
           </Link>
-          <Link className="auth-secondary-link" to="/home">
+          <Link className="auth-secondary-link" to="/">
             Return to Home
           </Link>
         </div>

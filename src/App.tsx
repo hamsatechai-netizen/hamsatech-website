@@ -1,10 +1,9 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
 import Hero from './components/Hero'
 import FeatureCard from './components/FeatureCard'
 import Navigation from './components/Navigation'
 import AboutPage from './components/AboutPage'
-import NextPage from './components/NextPage'
 import PlatformPage from './components/PlatformPage'
 import UseCasesPage from './components/UseCasesPage'
 import HowItWorksPage from './components/HowItWorksPage'
@@ -41,9 +40,8 @@ function App() {
       <ScrollNavigator />
       <Navigation />
       <Routes>
-        <Route path="/" element={<NextPage />} />
         <Route
-          path="/home"
+          path="/"
           element={
             <>
               <Hero />
@@ -59,14 +57,13 @@ function App() {
               <section id="contact" className="about-section">
                 <div className="container">
                   <h2 className="about-title">Contact</h2>
-                  <p className="about-description">
-                    Reach us at contact@hamsatech.ai
-                  </p>
+                  <p className="about-description">Reach us at contact@hamsatech.ai</p>
                 </div>
               </section>
             </>
           }
         />
+        <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/platform" element={<PlatformPage />} />
         <Route path="/usecases" element={<UseCasesPage />} />
         <Route path="/howitworks" element={<HowItWorksPage />} />

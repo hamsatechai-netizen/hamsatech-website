@@ -21,8 +21,8 @@ HamsaTech is a Vite/React frontend with a FastAPI backend for student intake, co
 
 ## Routes
 
-- `/` - landing page
-- `/home` - main showcase page
+- `/` - home (hero, features, contact)
+- `/home` - legacy alias (redirects to `/`)
 - `/platform` - platform details
 - `/usecases` - use cases
 - `/howitworks` - process overview
@@ -288,8 +288,7 @@ supabase/
 #### UI map (routes → components → styles)
 
 - Navbar: `src/components/Navigation.tsx` → `src/styles/Navigation.css`
-- Landing: `/` → `src/components/NextPage.tsx` (uses shared styles in `src/App.css` / `src/index.css`)
-- Home: `/home` → `src/components/Hero.tsx` + `src/components/FeatureCard.tsx` → `src/styles/Hero.css`, `src/styles/FeatureCard.css`
+- Home: `/` → `src/components/Hero.tsx` + `src/components/FeatureCard.tsx` → `src/styles/Hero.css`, `src/styles/FeatureCard.css`
 - About: `/about` → `src/components/AboutPage.tsx` → `src/styles/About.css`
 - Auth: `/signin`, `/signup` → `src/components/SignInPage.tsx`, `src/components/SignUpPage.tsx` → `src/styles/Auth.css`
 - Dashboard: `/dashboard` → `src/components/DashboardPage.tsx` → `src/styles/Dashboard.css`
