@@ -27,20 +27,20 @@ const capabilityCards = [
 const useCasesItems = [
   {
     id: 1,
-    title: 'Athlete Performance',
-    description: 'Personalized training plans based on AI analytics for athletes.',
+    title: 'Performance',
+    description: 'Improve outcomes by understanding what’s affecting focus, energy, and consistency.',
     image: image4,
   },
   {
     id: 2,
-    title: 'Wellness Optimization',
-    description: 'Behavioral insights to improve recovery, sleep, and mindfulness.',
+    title: 'Relationships & Compatibility',
+    description: 'Gain clarity in relationships by understanding emotional patterns, communication, and behavior.',
     image: image5,
   },
   {
     id: 3,
-    title: 'Decision Intelligence',
-    description: 'Data-backed decisions for coaching, career, and life strategy.',
+    title: 'Work, Parenting & Wellbeing',
+    description: 'Make better decisions by recognizing stress, habits, and energy patterns across daily life.',
     image: image6,
   },
 ]
@@ -114,9 +114,9 @@ function HomePage() {
         <div className="container">
           <div className="section-header section-header--center">
             <span className="section-eyebrow">Use Cases</span>
-            <h2 className="section-title">Built for real-world performance</h2>
+            <h2 className="section-title">Where HamsaTech creates impact/h2>
             <p className="section-subtitle">
-              Clear paths for athletes, coaches, and high performers—so you can apply insights immediately.
+              From performance to personal life — understanding what drives outcomes across every area.
             </p>
           </div>
 
