@@ -94,38 +94,12 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="home-section home-section--solution" id="platform">
-        <div className="container">
-          <div className="section-header">
-            <span className="section-eyebrow">How HamsaTech helps</span>
-            <h2 className="section-title">A single system for clarity and informed decisions</h2>
-            <p className="section-subtitle">
-              Bring your signals together, understand what matters, and act with confidence—without guesswork.
-            </p>
-          </div>
-
-          <div className="solution-grid">
-            <div className="solution-item">
-              <h3>Capture</h3>
-              <p>Bring key signals into one place.</p>
-            </div>
-            <div className="solution-item">
-              <h3>Connect</h3>
-              <p>Reveal how behavior and context shape outcomes.</p>
-            </div>
-            <div className="solution-item">
-              <h3>Conclude</h3>
-              <p>Take the next best action with confidence.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+     
       <section className="features-section" id="capabilities">
         <div className="container">
           <div className="section-header section-header--center">
-            <span className="section-eyebrow">How HamsaTech hepls you move forwa</span>
-            <h2 className="section-title">Understanding you is where it starts</h2>
+            <span className="section-eyebrow">How HamsaTech helps you move forward</span>
+            <h2 className="section-title">Understanding you and your body is where we start</h2>
           </div>
 
           <div className="features-grid">
