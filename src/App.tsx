@@ -20,18 +20,18 @@ function App() {
   const features = [
     {
       id: 1,
-      title: 'AI Coaching',
-      description: 'Data-driven performance insights for athletes.'
+      title: 'Inner Awareness',
+      description: 'Make your internal state visible — understand what your body, behavior, and emotions are really telling you.'
     },
     {
       id: 2,
-      title: 'Smart Analytics',
-      description: 'Track, analyze, and improve every move.'
+      title: 'Meaningful Interpretation',
+      description: 'Decode patterns across signals to identify root causes — whether it’s stress, habits, or emotional imbalance.'
     },
     {
       id: 3,
-      title: 'Elite Training',
-      description: 'Olympic-level precision training systems.'
+      title: 'Guided with Empathy',
+      description: 'Turn insights into meaningful action with guidance that understands your context — helping you improve performance, relationships, and everyday decisions.'
     }
   ]
 
@@ -45,6 +45,16 @@ function App() {
           element={
             <>
               <Hero />
+              <section className="solution-section">
+      <div className="container">
+        <h2 className="section-title">
+          A unified approach to understanding and improving performance
+        </h2>
+        <p className="section-subtext">
+          HamsaTech connects data, behavior, and performance into a continuous feedback system — helping you see clearly, act decisively, and improve consistently.
+        </p>
+      </div>
+    </section>
               <section id="platform" className="features-section">
                 <div className="container">
                   <div className="features-grid">
