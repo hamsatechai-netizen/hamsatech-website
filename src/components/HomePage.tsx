@@ -9,18 +9,18 @@ import image6 from '../images/image6.png'
 const capabilityCards = [
   {
     id: 1,
-    title: 'AI Coaching',
-    description: 'Data-driven performance insights for athletes.',
+    title: 'Inner Awareness',
+    description: 'Make your internal state visible — understand what your body, behavior, and emotions are really telling you.',
   },
   {
     id: 2,
-    title: 'Smart Analytics',
-    description: 'Track, analyze, and improve every move.',
+    title: 'Meaningful Interpretation',
+    description: 'Decode patterns across signals to identify root causes — whether it’s stress, habits, or emotional imbalance.',
   },
   {
     id: 3,
-    title: 'Elite Training',
-    description: 'Olympic-level precision training systems.',
+    title: 'Guided with Empathy',
+    description: 'Turn insights into meaningful action with guidance that understands your context',
   },
 ]
 
@@ -71,24 +71,24 @@ function HomePage() {
       <section className="home-section home-section--problem" id="problem">
         <div className="container">
           <div className="section-header">
-            <span className="section-pill">What you SHOULD do</span>
-            <h2 className="section-title">
+            <span className="section-pill">Why you feel stuck — in performance, relationships, and life</span>
+            <h3 className="section-title">
               Performance isn’t limited by effort — it’s limited by visibility
-            </h2>
+            </h3>
           </div>
 
           <div className="problem-grid">
             <div className="problem-block">
-              <h3>Disconnected Data</h3>
-              <p>Training, wellness, and results live in separate places—so patterns stay hidden.</p>
+              <h3>Signals Without Clarity</h3>
+              <p>You feel changes — in energy, focus, or mood — but don’t always understand what they mean.</p>
             </div>
             <div className="problem-block">
-              <h3>Unseen Influences</h3>
-              <p>Stress, recovery, habits, and environment quietly shape performance every day.</p>
+              <h3>Hidden Influences</h3>
+              <p>Stress, habits, and emotions quietly shape your outcomes — often without you realizing it.</p>
             </div>
             <div className="problem-block">
               <h3>Unclear Decisions</h3>
-              <p>Without a single view, it’s hard to know what to change and what to ignore.</p>
+              <p>Without clear understanding, it’s hard to know what to change, when to act, or what actually works.</p>
             </div>
           </div>
         </div>
@@ -97,16 +97,16 @@ function HomePage() {
       <section className="home-section home-section--solution" id="platform">
         <div className="container">
           <div className="section-header">
-            <span className="section-eyebrow">Solution</span>
-            <h2 className="section-title">A single system for clarity and progress</h2>
+            <span className="section-eyebrow">How HamsaTech helps</span>
+            <h2 className="section-title">A single system for clarity and informed decisions</h2>
             <p className="section-subtitle">
-              Unify your signals, see what matters, and follow a plan you can trust—without guesswork.
+              Bring your signals together, understand what matters, and act with confidence—without guesswork.
             </p>
           </div>
 
           <div className="solution-grid">
             <div className="solution-item">
-              <h3>Collect</h3>
+              <h3>Capture</h3>
               <p>Bring key signals into one place.</p>
             </div>
             <div className="solution-item">
@@ -114,7 +114,7 @@ function HomePage() {
               <p>Reveal how behavior and context shape outcomes.</p>
             </div>
             <div className="solution-item">
-              <h3>Decide</h3>
+              <h3>Conclude</h3>
               <p>Take the next best action with confidence.</p>
             </div>
           </div>
@@ -124,8 +124,8 @@ function HomePage() {
       <section className="features-section" id="capabilities">
         <div className="container">
           <div className="section-header section-header--center">
-            <span className="section-eyebrow">Capabilities</span>
-            <h2 className="section-title">Everything you need to move forward</h2>
+            <span className="section-eyebrow">How HamsaTech hepls you move forwa</span>
+            <h2 className="section-title">Understanding you is where it starts</h2>
           </div>
 
           <div className="features-grid">
