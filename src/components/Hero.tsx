@@ -21,8 +21,7 @@ function Hero() {
   }
 
   return (
-  <>
-    <section className="hero" id="home">
+      <section className="hero" id="home">
       <div className="hero-content">
         <h1 className="hero-title">
           Unified intelligence for better decisions and outcomes
@@ -69,6 +68,7 @@ function Hero() {
       </div>
     </section>
   </>
-);
+)
+};
 
 export default Hero
