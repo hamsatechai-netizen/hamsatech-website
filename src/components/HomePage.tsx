@@ -48,18 +48,18 @@ const useCasesItems = [
 const systemItems = [
   {
     id: 1,
-    title: 'Understand',
-    description: 'Bring together data, behavior, and performance signals in one view.',
+    title: 'Collect Data',
+    description: 'Capture signals across your body, mind, behavior, and context',
   },
   {
     id: 2,
-    title: 'Act',
-    description: 'Turn insights into clear actions you can follow consistently.',
+    title: 'Decode Patterns ',
+    description: 'Use AI to uncover patterns and root causes.',
   },
   {
     id: 3,
-    title: 'Improve',
-    description: 'Measure change over time so decisions get easier and outcomes get better.',
+    title: 'Guide',
+    description: 'Deliver insights that are psychologically grounded and actionable',
   },
 ]
 
@@ -137,8 +137,8 @@ function HomePage() {
       <section className="about-section home-section--system" id="system">
         <div className="container">
           <div className="section-header section-header--center">
-            <span className="section-eyebrow">System</span>
-            <h2 className="section-title">How it works (simple, repeatable)</h2>
+            <span className="section-eyebrow">Behind the intelligence-How it works</span>
+            <h2 className="section-title">Powered by AI, grounded in psychology, and guided by deeper human insight.</h2>
             <p className="section-subtitle">
               A lightweight loop that keeps you aligned—so improvements compound over time.
             </p>
