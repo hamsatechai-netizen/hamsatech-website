@@ -2,23 +2,23 @@ import { useNavigate } from 'react-router-dom'
 import '../styles/Hero.css'
 
 function Hero() {
-  const navigate = useNavigate()
+  //const navigate = useNavigate()
 
-  const goToPlatform = () => {
-    navigate('/platform')
-  }
+  //const goToPlatform = () => {
+   // navigate('/platform')
+ // }
 
-  const goToUseCases = () => {
-    navigate('/usecases')
-  }
+  //const goToUseCases = () => {
+   // navigate('/usecases')
+  //}
 
-  const goToHowItWorks = () => {
-    navigate('/howitworks')
-  }
+ // const goToHowItWorks = () => {
+ //   navigate('/howitworks')
+ // }
 
-  const goToAbout = () => {
-    navigate('/about')
-  }
+  //const goToAbout = () => {
+  //  navigate('/about')
+  //}
 
   return (
     <>
