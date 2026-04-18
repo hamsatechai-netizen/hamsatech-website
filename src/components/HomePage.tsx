@@ -114,7 +114,7 @@ function HomePage() {
         <div className="container">
           <div className="section-header section-header--center">
             <span className="section-eyebrow">Use Cases</span>
-            <h2 className="section-title">Where HamsaTech creates impact/h2>
+            <h2 className="section-title">Where HamsaTech creates impact</h2>
             <p className="section-subtitle">
               From performance to personal life — understanding what drives outcomes across every area.
             </p>
