@@ -2,6 +2,13 @@
 
 HamsaTech is a Vite/React frontend with a FastAPI backend for student intake, coach review, secure coach-to-student assignment, and Supabase-backed persistence.
 
+## What this repo contains (high level)
+
+- `src/` - React app (UI + routes)
+- `public/` - static assets served by Vite (redirects + logo)
+- `backend/` - FastAPI API service (auth, intake, coach workflows, Supabase persistence)
+- `supabase/` - database schema used by the backend
+
 ## Stack
 
 - React 18
@@ -27,6 +34,8 @@ HamsaTech is a Vite/React frontend with a FastAPI backend for student intake, co
 - `/athlete-intake` - student intake form
 
 ## Local Development
+
+### 1) Frontend (Vite + React)
 
 ```bash
 npm install
@@ -58,6 +67,8 @@ The backend owns:
 - coach feedback persistence
 
 ### Backend setup
+
+### 2) Backend (FastAPI)
 
 ```bash
 python -m venv .venv
@@ -174,7 +185,7 @@ HAMSA_COOKIE_SAMESITE=none
 
 ## Render Backend Deployment
 
-This repo includes a [`render.yaml`](c:/Users/hp/Desktop/HamsAi/render.yaml) blueprint for deploying the FastAPI backend on Render.
+This repo includes a `render.yaml` blueprint for deploying the FastAPI backend on Render.
 
 ### Render setup
 
@@ -244,13 +255,58 @@ HAMSA_COOKIE_SAMESITE=none
 ## Project Structure
 
 ```text
+public/
+  _redirects
+  logo-mark-128.png
+  logo-mark-256.png
+  logo-mark-384.png
 src/
   components/
   images/
   styles/
   App.tsx
   main.tsx
+backend/
+  app/
+  requirements.txt
+supabase/
+  schema.sql
 ```
+
+## File/Folder Guide (what each thing is for)
+
+### Frontend (`src/`)
+
+- `src/main.tsx` - app bootstrap (React root, `BrowserRouter`, `AuthProvider`)
+- `src/App.tsx` - route table (React Router) and top-level layout
+- `src/components/` - UI components + page components used by routes (ex: `Navigation.tsx`, `SignInPage.tsx`, `DashboardPage.tsx`)
+- `src/context/` - React context providers (auth/session state, etc.)
+- `src/lib/` - browser-side helpers (storage, API helpers, utilities)
+- `src/styles/` - CSS modules used by components/pages
+- `src/images/` - image assets used by the React app (keep only assets that are referenced)
+
+#### UI map (routes → components → styles)
+
+- Navbar: `src/components/Navigation.tsx` → `src/styles/Navigation.css`
+- Landing: `/` → `src/components/NextPage.tsx` (uses shared styles in `src/App.css` / `src/index.css`)
+- Home: `/home` → `src/components/Hero.tsx` + `src/components/FeatureCard.tsx` → `src/styles/Hero.css`, `src/styles/FeatureCard.css`
+- About: `/about` → `src/components/AboutPage.tsx` → `src/styles/About.css`
+- Auth: `/signin`, `/signup` → `src/components/SignInPage.tsx`, `src/components/SignUpPage.tsx` → `src/styles/Auth.css`
+- Dashboard: `/dashboard` → `src/components/DashboardPage.tsx` → `src/styles/Dashboard.css`
+- Profile: `/profile` → `src/components/ProfilePage.tsx` → `src/styles/Profile.css`
+- Intake: `/athlete-intake` → `src/components/AthleteIntakePage.tsx` → `src/styles/AthleteIntake.css`
+
+### Backend (`backend/`)
+
+- `backend/app/main.py` - FastAPI app + routes (auth, assignment, intake, coach pages data)
+- `backend/app/config.py` - environment-driven settings (CORS origins, cookie config, defaults)
+- `backend/app/security.py` - password hashing + session helpers
+- `backend/app/supabase_client.py` - Supabase admin client helper
+- `backend/requirements.txt` - Python dependencies for FastAPI service
+
+### Supabase (`supabase/`)
+
+- `supabase/schema.sql` - creates all required tables (run in Supabase SQL editor)
 
 ## Notes
 
@@ -258,6 +314,8 @@ src/
 - `node_modules/` is ignored.
 - `.env` and `backend/.env` should not be committed.
 - `.venv/` and `backend/.venv/` should not be committed.
+- `.npm-cache/` (local npm cache) should not be committed.
+- `vite-dev.err` / `vite-dev.log` are local logs and should not be committed.
 - Internal navigation is handled with React Router.
 - Safe deployment support files included in the repo:
   - `.env.example`

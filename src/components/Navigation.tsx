@@ -88,7 +88,13 @@ function Navigation() {
       <div className="nav-container">
         <Link to="/" className="nav-logo">
           <span className="logo-icon" aria-hidden="true">
-            <img src="/logoTWO.jpeg" alt="" decoding="async" />
+            <img
+              src="/logo-mark-128.png"
+              srcSet="/logo-mark-128.png 1x, /logo-mark-256.png 2x, /logo-mark-384.png 3x"
+              sizes="40px"
+              alt="HamsaTech"
+              decoding="async"
+            />
           </span>
           <span className="logo-text">HamsaTech</span>
         </Link>
