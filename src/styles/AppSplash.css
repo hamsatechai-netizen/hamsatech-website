@@ -1,0 +1,19 @@
+.app-splash {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(154, 214, 194, 0.24), transparent 34%),
+    radial-gradient(circle at 86% 14%, rgba(47, 138, 160, 0.22), transparent 30%),
+    linear-gradient(180deg, rgba(11, 59, 80, 0.98), rgba(8, 34, 44, 0.98));
+  z-index: 2000;
+}
+
+.app-splash-logo {
+  width: clamp(110px, 12vw, 150px);
+  height: auto;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 46px rgba(0, 0, 0, 0.34));
+}

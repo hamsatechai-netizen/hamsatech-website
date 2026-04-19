@@ -1,6 +1,7 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
+import AppSplash from './components/AppSplash'
 import Navigation from './components/Navigation'
 import ScrollNavigator from './components/ScrollNavigator'
 import Footer from './components/Footer'
@@ -20,6 +21,50 @@ const CoachAthleteDetailsPage = lazy(() => import('./components/CoachAthleteDeta
 const ProfilePage = lazy(() => import('./components/ProfilePage'))
 
 function App() {
+  const [isBooting, setIsBooting] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const startedAt = Date.now()
+    const minSplashMs = 450
+    const maxSplashMs = 2500
+
+    const logoReady = new Promise<void>((resolve) => {
+      const img = new Image()
+      img.onload = () => resolve()
+      img.onerror = () => resolve()
+      img.src = '/logo-mark-white-384.png'
+    })
+
+    const homeChunkReady = import('./components/HomePage')
+
+    const hardTimeout = window.setTimeout(() => {
+      if (!cancelled) {
+        setIsBooting(false)
+      }
+    }, maxSplashMs)
+
+    Promise.allSettled([logoReady, homeChunkReady]).then(() => {
+      window.clearTimeout(hardTimeout)
+      const elapsed = Date.now() - startedAt
+      const remaining = Math.max(0, minSplashMs - elapsed)
+      window.setTimeout(() => {
+        if (!cancelled) {
+          setIsBooting(false)
+        }
+      }, remaining)
+    })
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(hardTimeout)
+    }
+  }, [])
+
+  if (isBooting) {
+    return <AppSplash />
+  }
+
   return (
     <div className="App">
       <ScrollNavigator />

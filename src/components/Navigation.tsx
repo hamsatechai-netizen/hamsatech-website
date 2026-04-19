@@ -91,12 +91,12 @@ function Navigation() {
         <Link to="/" className="nav-logo">
           <span className="logo-icon" aria-hidden="true">
             <img
-              src="/logo.png"
-              srcSet="/logo-mark-128.png 1x, /logo-mark-256.png 2x, /logo-mark-384.png 3x"
-              sizes="40px"
+              src="/logo-mark-white-256.png"
+              srcSet="/logo-mark-white-128.png 1x, /logo-mark-white-256.png 2x, /logo-mark-white-384.png 3x"
+              sizes="56px"
               alt="HamsaTech"
-              width={40}
-              height={40}
+              width={56}
+              height={56}
               decoding="async"
               fetchPriority="high"
             />
@@ -128,20 +128,20 @@ function Navigation() {
           </li>
           <li>
             <NavLink
-              to="/platform"
-              onClick={closeMenu}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-            >
-              Platform
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
               to="/usecases"
               onClick={closeMenu}
               className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
             >
               Use Cases
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/platform"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              Platform
             </NavLink>
           </li>
           <li>

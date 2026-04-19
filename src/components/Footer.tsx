@@ -14,10 +14,10 @@ function Footer() {
           <h4>Sections</h4>
           <ul>
             <li>
-              <Link to="/platform">Platform</Link>
+              <Link to="/usecases">Use Cases</Link>
             </li>
             <li>
-              <Link to="/usecases">Use Cases</Link>
+              <Link to="/platform">Platform</Link>
             </li>
             <li>
               <Link to="/howitworks">How It Works</Link>

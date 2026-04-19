@@ -4,7 +4,10 @@ function Hero() {
   return (
     <section className="hero" id="home">
       <div className="hero-content">
-        <h1 className="hero-title">Unified intelligence for better decisions and outcomes</h1>
+        <h1 className="hero-title">
+          <span>Unified intelligence for better decisions</span>
+          <span>and outcomes</span>
+        </h1>
         <p className="hero-subtitle">
           Combining data, behavior, and performance signals — so you can understand, act, and improve with clarity.
         </p>
@@ -14,3 +17,4 @@ function Hero() {
 }
 
 export default Hero
+

@@ -14,7 +14,7 @@
 .hero-content {
   text-align: center;
   z-index: 2;
-  max-width: 800px;
+  max-width: 1120px;
   animation: fadeInUp 0.8s ease-out;
 }
 
@@ -28,6 +28,16 @@
   text-wrap: balance;
 }
 
+.hero-title span {
+  display: block;
+}
+
+@media (min-width: 900px) {
+  .hero-title span:first-child {
+    white-space: nowrap;
+  }
+}
+
 .hero-subtitle {
   font-size: 1.3rem;
   color: rgba(255, 255, 255, 0.86);
@@ -35,6 +45,12 @@
   font-weight: 400;
   line-height: 1.6;
   text-wrap: pretty;
+}
+
+@media (min-width: 1000px) {
+  .hero-subtitle {
+    white-space: nowrap;
+  }
 }
 
 .btn {
