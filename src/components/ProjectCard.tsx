@@ -19,7 +19,7 @@ function ProjectCard({ title, description, image, tags }: ProjectCardProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="card-image-wrapper">
-        <div className="card-image">{image}</div>
+        <div className="card-image">{logo}</div>
       </div>
       
       <div className="card-content">
