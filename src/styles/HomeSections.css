@@ -3,31 +3,6 @@
   border-top: 1px solid rgba(47, 138, 160, 0.12);
 }
 
-.home-section--problem {
-  background: rgba(247, 252, 251, 0.72);
-}
-
-.home-section--problem .section-kicker {
-  font-size: clamp(1.45rem, 2.2vw, 1.8rem);
-}
-
-.home-section--problem .section-title {
-  font-size: clamp(1.15rem, 2.1vw, 1.45rem);
-  margin-top: 12px;
-  line-height: 1.25;
-}
-
-.features-section .section-eyebrow {
-  font-size: clamp(1.2rem, 1.8vw, 1.5rem);
-}
-
-.features-section .section-title {
-  font-size: clamp(1.02rem, 1.7vw, 1.22rem);
-  margin-top: 12px;
-  margin-bottom: 26px;
-  line-height: 1.25;
-}
-
 .home-section--solution {
   background:
     radial-gradient(circle at 12% 10%, rgba(154, 214, 194, 0.26), transparent 32%),
@@ -48,34 +23,26 @@
   text-align: center;
 }
 
-.section-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(11, 59, 80, 0.78);
-  font-style: italic;
-}
-
+/* 👇 Unified kicker (used everywhere now) */
 .section-kicker {
   margin: 0;
-  font-size: 1.02rem;
+  font-size: clamp(2rem, 3vw, 2.6rem);   /* 🔥 BIG */
   font-weight: 700;
   letter-spacing: 0.02em;
   color: rgba(11, 59, 80, 0.82);
   font-style: italic;
 }
 
+/* 👇 Unified title */
 .section-title {
-  margin-top: 18px;
-  font-size: clamp(2.2rem, 3.5vw, 3.1rem);
-  line-height: 1.12;
+  margin-top: 12px;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);  /* ✅ smaller */
+  line-height: 1.4;
   color: var(--text-main);
   text-wrap: balance;
 }
 
+/* 👇 Subtitle (unchanged but consistent spacing) */
 .section-subtitle {
   margin-top: 16px;
   font-size: 1.12rem;
@@ -85,12 +52,28 @@
   font-style: italic;
 }
 
+/* =========================
+   GRID SPACING (FIXED)
+========================= */
+
 .problem-grid {
   margin-top: 44px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 22px;
 }
+
+/* ✅ FIX YOU ASKED FOR */
+.features-grid {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+/* =========================
+   CARDS
+========================= */
 
 .problem-block {
   padding: 26px 24px;
@@ -136,8 +119,13 @@
   line-height: 1.7;
 }
 
+/* =========================
+   RESPONSIVE
+========================= */
+
 @media (max-width: 900px) {
   .problem-grid,
+  .features-grid,
   .solution-grid {
     grid-template-columns: 1fr;
   }

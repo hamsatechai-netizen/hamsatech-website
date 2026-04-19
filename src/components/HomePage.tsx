@@ -97,7 +97,7 @@ function HomePage() {
       <section className="features-section" id="capabilities">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-eyebrow">How HamsaTech helps you move forward</p>
+            <p className="section-kicker">How HamsaTech helps you move forward</p>
             <h2 className="section-title">Understanding you and your body is where we start</h2>
           </header>
 
@@ -112,9 +112,8 @@ function HomePage() {
       <section className="about-section" id="usecases">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-eyebrow">Use Cases</p>
-            <h2 className="section-title">Where HamsaTech creates impact</h2>
-            <p className="section-subtitle">From performance to personal life — understanding what drives outcomes across every area.</p>
+            <p className="section-kicker">Where HamsaTech creates impact</p>
+            <h2 className="section-title">From performance to personal life — understanding what drives outcomes across every area.</h2>
           </header>
 
           <div className="features-grid" style={{ marginTop: '40px' }}>
@@ -140,9 +139,13 @@ function HomePage() {
       <section className="about-section home-section--system" id="system">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-eyebrow">Behind the intelligence — how it works</p>
-            <h2 className="section-title">Powered by AI, grounded in psychology, and guided by deeper human insight.</h2>
-            <p className="section-subtitle">A lightweight loop that keeps you aligned — so improvements compound over time.</p>
+            <p className="section-kicker">Behind the intelligence — how it works</p>
+            <h2 className="section-title">
+              Powered by AI, grounded in psychology, and guided by deeper human insight.
+            </h2>
+            <p className="section-subtitle">
+              A lightweight loop that keeps you aligned — so improvements compound over time.
+            </p>
           </header>
 
           <div className="features-grid" style={{ marginTop: '40px' }}>
@@ -162,4 +165,3 @@ function HomePage() {
 }
 
 export default HomePage
-
