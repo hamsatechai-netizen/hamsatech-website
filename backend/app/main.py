@@ -19,7 +19,7 @@ from .security import (
 )
 from .supabase_client import get_supabase_admin_client
 
-
+#new schema updated
 app = FastAPI(title="HamsaTech Auth API", version="1.0.0")
 
 app.add_middleware(
