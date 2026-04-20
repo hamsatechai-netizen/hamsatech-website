@@ -3,12 +3,15 @@ from __future__ import annotations
 import os
 
 from fastapi import HTTPException, status
-from supabase import Client, create_client
+from supabase import Cient, create_client, ClientOptions
+
+
 
 
 def get_supabase_admin_client() -> Client:
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
+    options=ClientOptions(schema="hamsatech") 
 
     if not url or not key:
         raise HTTPException(
@@ -16,4 +19,5 @@ def get_supabase_admin_client() -> Client:
             detail="Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
         )
 
+  
     return create_client(url, key)
