@@ -1,12 +1,11 @@
 from __future__ import annotations
-
 import os
-
 from fastapi import HTTPException, status
 from supabase import Cient, create_client, ClientOptions
+from dotenv import load_dotenv
 
-
-
+# Load env
+load_dotenv()
 
 def get_supabase_admin_client() -> Client:
     url = os.getenv("SUPABASE_URL")
@@ -18,6 +17,5 @@ def get_supabase_admin_client() -> Client:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
         )
-
   
     return create_client(url, key)
