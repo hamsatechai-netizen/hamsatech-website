@@ -4,9 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 80px 20px;
-  background:
-    radial-gradient(circle at top right, rgba(154, 214, 194, 0.22), transparent 20%),
-    linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-mid) 55%, var(--brand-mid-2) 100%);
+  background: linear-gradient(135deg, #0a1e4d 0%, #1a3a6b 50%, #0d2551 100%);
   position: relative;
   overflow: hidden;
 }
@@ -14,7 +12,7 @@
 .hero-content {
   text-align: center;
   z-index: 2;
-  max-width: 1120px;
+  max-width: 800px;
   animation: fadeInUp 0.8s ease-out;
 }
 
@@ -24,33 +22,14 @@
   margin-bottom: 20px;
   color: #ffffff;
   line-height: 1.2;
-  font-family: 'IBM Plex Serif', Georgia, serif;
-  text-wrap: balance;
-}
-
-.hero-title span {
-  display: block;
-}
-
-@media (min-width: 900px) {
-  .hero-title span:first-child {
-    white-space: nowrap;
-  }
 }
 
 .hero-subtitle {
   font-size: 1.3rem;
-  color: rgba(255, 255, 255, 0.86);
+  color: #d0d0d0;
   margin-bottom: 40px;
   font-weight: 400;
   line-height: 1.6;
-  text-wrap: pretty;
-}
-
-@media (min-width: 1000px) {
-  .hero-subtitle {
-    white-space: nowrap;
-  }
 }
 
 .btn {
@@ -66,15 +45,15 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--brand-mid) 0%, var(--brand-gold) 100%);
-  color: var(--text-main);
-  box-shadow: 0 8px 22px rgba(var(--shadow-color), 0.24);
+  background-color: #ffd700;
+  color: #000000;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.2);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, var(--brand-mid-2) 0%, var(--brand-gold) 100%);
+  background-color: #ffed4e;
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(var(--shadow-color), 0.3);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
 }
 
 .btn-secondary {
@@ -97,12 +76,12 @@
 }
 
 .hero-buttons .btn {
-  background: linear-gradient(135deg, var(--brand-mid) 0%, var(--brand-gold) 100%);
-  color: var(--text-main);
+  background-color: #ffd700;
+  color: #000000;
 }
 
 .hero-buttons .btn:hover {
-  background: linear-gradient(135deg, var(--brand-mid-2) 0%, var(--brand-gold) 100%);
+  background-color: #ffed4e;
 }
 
 @keyframes fadeInUp {

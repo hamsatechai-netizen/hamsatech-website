@@ -1,11 +1,10 @@
 .feature-card {
   padding: 40px 30px;
-  background: var(--surface-bg);
-  border-radius: 18px;
+  background: #ffffff;
+  border-radius: 4px;
   transition: all 0.3s ease;
   border-bottom: 4px solid transparent;
   animation: fadeInUp 0.6s ease-out;
-  border: 1px solid rgba(47, 138, 160, 0.12);
 }
 
 @keyframes fadeInUp {
@@ -16,12 +15,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .feature-card {
-    animation: none;
   }
 }
 
@@ -40,24 +33,23 @@
 .feature-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  border-color: rgba(47, 138, 160, 0.18);
 }
 
 .feature-title {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 15px;
-  color: var(--text-main);
+  color: #1a1a1a;
   transition: color 0.3s ease;
 }
 
 .feature-card:hover .feature-title {
-  color: var(--brand-deep);
+  color: #0a1e4d;
 }
 
 .feature-description {
   font-size: 1rem;
-  color: var(--text-soft);
+  color: #555555;
   line-height: 1.6;
   margin: 0;
 }

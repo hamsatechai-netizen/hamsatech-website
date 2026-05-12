@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import '../styles/About.css'
 import '../styles/FeatureCard.css'
 import image4 from '../images/image4.jpg'
@@ -9,29 +10,50 @@ const useCasesItems = [
     id: 1,
     title: 'Athlete Performance',
     description: 'Personalized training plans based on AI analytics for athletes.',
-    image: image4,
+    image: image4
   },
   {
     id: 2,
     title: 'Wellness Optimization',
     description: 'Behavioral insights to improve recovery, sleep, and mindfulness.',
-    image: image5,
+    image: image5
   },
   {
     id: 3,
     title: 'Decision Intelligence',
     description: 'Data-backed decisions for coaching, career, and life strategy.',
-    image: image6,
-  },
+    image: image6
+  }
 ]
 
 function UseCasesPage() {
+  const navigate = useNavigate()
+
+  const goBack = () => {
+    navigate(-1)
+  }
+
   return (
     <section className="about-section">
       <div className="container">
+        <button
+          onClick={goBack}
+          style={{
+            border: 'none',
+            background: 'transparent',
+            color: '#021d39',
+            fontSize: '1.4rem',
+            marginBottom: '20px',
+            cursor: 'pointer'
+          }}
+          aria-label="Go back"
+        >
+          {'<-'} Back
+        </button>
         <h2 className="about-title">Use Cases</h2>
         <p className="about-description">
-          Explore complete use-case paths designed for sports professionals, wellness seekers, and high performers.
+          Explore complete use-case paths designed for sports professionals,
+          wellness seekers, and high performers.
         </p>
 
         <div className="features-grid" style={{ marginTop: '40px' }}>
@@ -51,4 +73,3 @@ function UseCasesPage() {
 }
 
 export default UseCasesPage
-

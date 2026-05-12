@@ -1,13 +1,188 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/logo-mark-256.png?v=20260412" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HamsaTech.ai - Application Showcase</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HamsaTech AI- AI with Empathy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="container nav">
+    <div class="logo">HamsaTech</div>
+    <nav>
+      <a href="#">Platform</a>
+      <a href="#">Use Cases</a>
+      <a href="#">How It Works</a>
+      <a href="#">About</a>
+    </nav>
+    <button class="btn-primary">Get Started</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-text">
+      <h1>Human-centered AI<br>for personal intelligence<br>and measurable growth</h1>
+      <p>
+        HamsaTech combines performance optimization, self-discovery,
+        and data-driven guidance to help individuals improve in sports,
+        wellness, and life decisions.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary">Explore the Platform</button>
+        <button class="btn-outline">See How It Works</button>
+      </div>
+    </div>
+
+    <div class="hero-dashboard">
+      <img src="assets/images/dashboard.png" class="dashboard-img" alt="HamsaTech Dashboard">
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT HELPS -->
+<section class="section light">
+  <div class="container center">
+    <h2>How HamsaTech Helps You Grow</h2>
+    <p class="subtitle">
+      A human-centered AI platform focused on personal intelligence and measurable growth.
+    </p>
+
+    <div class="cards-3">
+      <div class="card">
+        <div class="card-icon">⚡</div>
+        <h3>Performance Optimization</h3>
+        <p>Improve how you train, recover, and perform with AI-powered insights tailored to your body.</p>
+        <img src="https://images.unsplash.com/photo-1546483875-ad9014c88eba?w=600&q=80" alt="Performance"/>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <h3>Self-Discovery</h3>
+        <p>Understand your patterns, strengths, and blind spots through deep behavioral analysis.</p>
+        <img src="https://images.unsplash.com/photo-1526378722484-bd91ca387e72?w=600&q=80" alt="Self Discovery"/>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">📊</div>
+        <h3>Data-Driven Guidance</h3>
+        <p>Make better decisions in sports, wellness, and life backed by real data and evidence.</p>
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80" alt="Data Guidance"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AREAS -->
+<section class="section">
+  <div class="container center">
+    <h2>Areas of Focus</h2>
+    <p class="subtitle">
+      Designed for individuals who want to improve in sports, wellness, and life decisions.
+    </p>
+
+    <div class="cards-3">
+      <div class="card large">
+        <img src="https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=600&q=80" alt="Sports"/>
+        <h3>Sports</h3>
+        <ul>
+          <li>Performance metrics tracking</li>
+          <li>Training optimization</li>
+          <li>Accountability and progress</li>
+        </ul>
+      </div>
+
+      <div class="card large">
+        <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&q=80" alt="Wellness"/>
+        <h3>Wellness</h3>
+        <ul>
+          <li>Recovery tracking</li>
+          <li>Stress management</li>
+          <li>Daily habit optimization</li>
+        </ul>
+      </div>
+
+      <div class="card large">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80" alt="Life Decisions"/>
+        <h3>Life Decisions</h3>
+        <ul>
+          <li>Personal intelligence insights</li>
+          <li>Decision support</li>
+          <li>Life coaching guidance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS -->
+<section class="section light">
+  <div class="container center">
+    <h2>Human-Centered AI, Built Around You</h2>
+    <p class="subtitle">
+      A three-step approach to understanding, guiding, and measuring your growth.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="number">1</div>
+        <h3>Understand You</h3>
+        <p>HamsaTech learns from your goals, context, and patterns to build a comprehensive understanding of who you are.</p>
+      </div>
+
+      <div class="step">
+        <div class="number">2</div>
+        <h3>Guide You</h3>
+        <p>It offers data-driven guidance tailored to your sports, wellness, and life decisions with personalized recommendations.</p>
+      </div>
+
+      <div class="step">
+        <div class="number">3</div>
+        <h3>Measure Growth</h3>
+        <p>You see measurable growth through clear insights, feedback, and progress indicators.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section">
+  <div class="container center narrow">
+    <h2>About HamsaTech</h2>
+    <p>
+      HamsaTech is built on the belief that personal intelligence combined with AI creates transformative outcomes.
+      We focus on the human element—understanding your unique patterns, goals, and potential—while leveraging advanced
+      technology to provide actionable, data-driven guidance that helps you achieve measurable growth in every aspect of your life.
+    </p>
+    <p style="margin-top: 16px;">
+      Whether you're optimizing athletic performance, improving your wellness, or making important life decisions,
+      HamsaTech is your partner in growth.
+    </p>
+    <div style="margin-top: 32px;">
+      <button class="btn-primary" style="font-size: 16px; padding: 14px 28px;">Get Started with HamsaTech</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-logo">HamsaTech</div>
+    <nav class="footer-nav">
+      <a href="#">Platform</a>
+      <a href="#">Use Cases</a>
+      <a href="#">How It Works</a>
+      <a href="#">About</a>
+    </nav>
+    <p class="footer-copy">© 2025 HamsaTech. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
 </html>

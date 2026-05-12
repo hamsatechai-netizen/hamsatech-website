@@ -1,34 +1,12 @@
 .App {
   width: 100%;
   min-height: 100vh;
-  background: transparent;
-}
-
-.app-main {
-  flex: 1 1 auto;
-  animation: appFadeIn 0.25s ease-out;
-}
-
-@keyframes appFadeIn {
-  from {
-    opacity: 0.7;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-main {
-    animation: none;
-  }
+  background: #ffffff;
 }
 
 .features-section {
   padding: 80px 0;
-  background: rgba(247, 252, 251, 0.72);
+  background: #ffffff;
 }
 
 .features-grid {
