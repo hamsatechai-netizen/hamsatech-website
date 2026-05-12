@@ -5,11 +5,11 @@ function Hero() {
     <section className="hero" id="home">
       <div className="hero-content">
         <h1 className="hero-title">
-          <span>Intelligence platform for performance,wellbeing</span>
+          <span>Intelligence platform for performance, peace, and progress</span>
           <span>and better decisions</span>
         </h1>
         <p className="hero-subtitle">
-          Combining data, behavior, and performance signals — so you can understand, act, and improve with clarity.
+         Unifying psychology, biosignals, and outcomes into actionable  insights
         </p>
       </div>
     </section>
