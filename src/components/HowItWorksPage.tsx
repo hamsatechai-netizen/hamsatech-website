@@ -5,18 +5,18 @@ import '../styles/FeatureCard.css'
 const howItWorksItems = [
   {
     id: 1,
-    title: 'Understand You',
-    description: 'Collect performance and behavior data to create a personalized intelligence profile.'
+    title: 'We Listen to You',
+    description: 'A psychology assessment, biometric sensors (Polar H10), and daily check-ins capture the full picture — your emotional state, your body\'s signals, and your performance data.'
   },
   {
     id: 2,
-    title: 'Guide You',
-    description: 'Recommend training, wellness, and decision actions that align with your goals.'
+    title: 'We Understand You',
+    description: 'AI triangulates psychology, biometrics, and performance to surface root causes — not surface symptoms. Deterministic scoring. No guesswork.'
   },
   {
     id: 3,
-    title: 'Measure Growth',
-    description: 'Track progress with data-driven metrics and continuous feedback loops.'
+    title: 'We Help You Grow',
+    description: 'Personalized, culturally-grounded guidance delivered to athletes, coaches, parents, students, and professionals — in language that heals and empowers.'
   }
 ]
 
@@ -24,7 +24,7 @@ function HowItWorksPage() {
   const navigate = useNavigate()
 
   const handleStart = () => {
-    navigate('/')
+    navigate('/signup')
   }
 
   const goBack = () => {
@@ -50,8 +50,7 @@ function HowItWorksPage() {
         </button>
         <h2 className="about-title">How It Works</h2>
         <p className="about-description">
-          A simplified, compelling execution path to start using HamsaTech right
-          away.
+          Three steps. One continuous loop of empathy, intelligence, and growth.
         </p>
         <div className="features-grid" style={{ marginTop: '40px' }}>
           {howItWorksItems.map((item) => (
@@ -67,18 +66,17 @@ function HowItWorksPage() {
         style={{ background: '#021d39', color: '#fff', textAlign: 'center', padding: '80px 20px' }}
       >
         <h2 style={{ fontSize: '3rem', marginBottom: '20px' }}>
-          Start Building Your Personal Intelligence
+          Ready to begin your journey?
         </h2>
         <p style={{ fontSize: '1.2rem', marginBottom: '35px' }}>
-          Use human-centered AI to drive measurable growth in sports, wellness,
-          and life decisions.
+          Join HamsaTech and let AI-powered empathy guide you toward clarity, calm, and peak performance.
         </p>
         <button
           className="btn btn-primary"
           onClick={handleStart}
           style={{ backgroundColor: '#ffd700', color: '#000', border: 'none', padding: '16px 34px', fontSize: '1.1rem' }}
         >
-          Get Started
+          Get Started — It's Free
         </button>
       </div>
     </section>

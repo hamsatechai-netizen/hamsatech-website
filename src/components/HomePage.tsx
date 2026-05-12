@@ -9,40 +9,40 @@ import image6 from '../images/image6.png'
 const capabilityCards = [
   {
     id: 1,
-    title: 'Inner Awareness',
+    title: ‘Empathetic AI’,
     description:
-      'Make your internal state visible — understand what your body, behavior, and emotions are really telling you.',
+      ‘AI that listens to your emotional pulse and responds with wisdom — not just data. We understand context, culture, and the human behind every signal.’,
   },
   {
     id: 2,
-    title: 'Meaningful Interpretation',
+    title: ‘Spiritual + Psychological Intelligence’,
     description:
-      'Decode patterns across signals to identify root causes — whether it’s stress, habits, or emotional imbalance.',
+      ‘Inspired by the Bhagavad Gita, yoga, and mindfulness — blended with modern behavioral science to decode stress, identity, and relationships.’,
   },
   {
     id: 3,
-    title: 'Guided with Empathy',
-    description: 'Turn insights into meaningful action with guidance that understands your context.',
+    title: ‘Personalized Guidance’,
+    description: ‘Recommendations that fit your life — your sport, your study pressure, your relationships, your daily wellness — not a generic template.’,
   },
 ]
 
 const useCasesItems = [
   {
     id: 1,
-    title: 'Performance',
-    description: 'Improve outcomes by understanding what’s affecting focus, energy, and consistency.',
+    title: ‘Athletes & Performers’,
+    description: ‘Precision mental and physiological coaching for shooters, and young athletes pushing for peak performance.’,
     image: image4,
   },
   {
     id: 2,
-    title: 'Relationships & Compatibility',
-    description: 'Gain clarity in relationships by understanding emotional patterns, communication, and behavior.',
+    title: ‘Students & Families’,
+    description: ‘Calm academic pressure, build focus, and give families the tools to support their child’s emotional growth.’,
     image: image5,
   },
   {
     id: 3,
-    title: 'Work, Parenting & Wellbeing',
-    description: 'Make better decisions by recognizing stress, habits, and energy patterns across daily life.',
+    title: ‘Professionals & Women’,
+    description: ‘Address workplace burnout, chronic anxiety, and the unique mental load carried by working women across India.’,
     image: image6,
   },
 ]
@@ -50,18 +50,18 @@ const useCasesItems = [
 const systemItems = [
   {
     id: 1,
-    title: 'Collect Data',
-    description: 'Capture signals across your body, mind, behavior, and context.',
+    title: ‘Listen’,
+    description: ‘Capture emotional, behavioral, and physiological signals through assessments, sensors, and daily check-ins.’,
   },
   {
     id: 2,
-    title: 'Decode Patterns',
-    description: 'Use AI to uncover patterns and root causes.',
+    title: ‘Understand’,
+    description: ‘AI triangulates psychology, bio-data, and performance to reveal root causes — not surface symptoms.’,
   },
   {
     id: 3,
-    title: 'Guide',
-    description: 'Deliver insights that are psychologically grounded and actionable.',
+    title: ‘Heal & Grow’,
+    description: ‘Deliver personalized, culturally-grounded guidance that uplifts, empowers, and compounds over time.’,
   },
 ]
 
@@ -73,22 +73,22 @@ function HomePage() {
       <section className="home-section home-section--problem" id="problem">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-kicker">Why you feel stuck — in performance, relationships, and life</p>
-            <h2 className="section-title">Performance isn’t limited by effort — it’s limited by visibility</h2>
+            <p className="section-kicker">The emotional crisis India can no longer ignore</p>
+            <h2 className="section-title">Technology connects us — but rarely understands us</h2>
           </header>
 
           <div className="problem-grid">
             <div className="problem-block">
-              <h3>Signals Without Clarity</h3>
-              <p>You feel changes — in energy, focus, or mood — but don’t always understand what they mean.</p>
+              <h3>80% of Indian Youth</h3>
+              <p>experience academic stress — with no unified, tech-enabled ecosystem for early detection and emotional guidance.</p>
             </div>
             <div className="problem-block">
-              <h3>Hidden Influences</h3>
-              <p>Stress, habits, and emotions quietly shape your outcomes — often without you realizing it.</p>
+              <h3>1 in 7 Indians</h3>
+              <p>suffers from mental wellness challenges (NIMHANS 2023). Stigma, lack of access, and digital fatigue block early intervention.</p>
             </div>
             <div className="problem-block">
-              <h3>Unclear Decisions</h3>
-              <p>Without clear understanding, it’s hard to know what to change, when to act, or what actually works.</p>
+              <h3>70% of Employees</h3>
+              <p>face productivity loss due to mental strain, while 60% of working women report chronic anxiety and fatigue (WHO).</p>
             </div>
           </div>
         </div>
@@ -97,8 +97,8 @@ function HomePage() {
       <section className="features-section" id="capabilities">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-kicker">How HamsaTech helps you move forward</p>
-            <h2 className="section-title">Understanding you and your body is where we start</h2>
+            <p className="section-kicker">How HamsaTech heals, connects, and awakens</p>
+            <h2 className="section-title">Understanding you — mind, body, and spirit — is where we start</h2>
           </header>
 
           <div className="features-grid">
@@ -113,7 +113,7 @@ function HomePage() {
         <div className="container">
           <header className="section-header section-header--center">
             <p className="section-kicker">Where HamsaTech creates impact</p>
-            <h2 className="section-title">From performance to personal life — understanding what drives outcomes across every area.</h2>
+            <h2 className="section-title">From the shooting range to the classroom to the boardroom — one platform, five transformations.</h2>
           </header>
 
           <div className="features-grid" style={{ marginTop: '40px' }}>
@@ -141,10 +141,10 @@ function HomePage() {
           <header className="section-header section-header--center">
             <p className="section-kicker">Behind the intelligence — how it works</p>
             <h2 className="section-title">
-              Powered by AI, grounded in psychology, and guided by deeper human insight.
+              Powered by AI, grounded in psychology, inspired by Indian wisdom.
             </h2>
             <p className="section-subtitle">
-              A lightweight loop that keeps you aligned — so improvements compound over time.
+              A continuous loop of listening, understanding, and healing — so growth compounds over time.
             </p>
           </header>
 

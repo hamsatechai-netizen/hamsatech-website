@@ -7,7 +7,7 @@ function Footer() {
       <div className="container site-footer-content">
         <div className="site-footer-brand">
           <h3>HamsaTech</h3>
-          <p>Unified intelligence for better decisions and outcomes.</p>
+          <p>Technology that heals, connects, and awakens.</p>
         </div>
 
         <div className="site-footer-column">
