@@ -8,6 +8,9 @@ function AboutPage() {
     <p className="about-description">
       We triangulate psychology, biosignals, and performance data—enhanced by music therapy and spiritual wisdom—into emotional intelligence you can act on
     </p>
+     <p className="about-description">
+      <strong>Astra</strong> is our flagship app—starting with elite shooting sports, expanding to parenting, relationships, and student wellness.
+    </p>
 
  <div className="philosophy-grid">
   <div className="card">
@@ -22,7 +25,7 @@ function AboutPage() {
     <h3>Mission</h3>
     <p>Building technology that listens, heals, and empowers.</p>
   </div>
-</div>
+
 </section>
   )
 }
