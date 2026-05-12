@@ -98,7 +98,7 @@ function HomePage() {
         <div className="container">
           <header className="section-header section-header--center">
             <p className="section-kicker">How HamsaTech helps you move forward</p>
-            <h2 className="section-title">Understanding you and your body is where we start</h2>
+            <h2 className="section-title">Introducing Astra - Our flagship Model</h2>
           </header>
 
           <div className="features-grid">
@@ -112,7 +112,7 @@ function HomePage() {
       <section className="about-section" id="usecases">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-kicker">Where HamsaTech creates impact</p>
+            <p className="section-kicker">Experience Hamsatech's Astra</p>
             <h2 className="section-title">From performance to personal life — understanding what drives outcomes across every area.</h2>
           </header>
 
