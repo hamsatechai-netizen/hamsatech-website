@@ -10,6 +10,7 @@ import PlatformPage from './components/PlatformPage'
 import UseCasesPage from './components/UseCasesPage'
 import HowItWorksPage from './components/HowItWorksPage'
 import ScrollToHash from './components/ScrollToHash'
+import SaarthiBot from './components/SaarthiBot'
 
 function App() {
   const features = [
@@ -65,6 +66,7 @@ function App() {
         <Route path="/howitworks" element={<HowItWorksPage />} />
         <Route path="/about" element={<AboutPage />} />
       </Routes>
+      <SaarthiBot />
     </div>
   )
 }
