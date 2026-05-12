@@ -73,21 +73,21 @@ function HomePage() {
       <section className="home-section home-section--problem" id="problem">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-kicker">Why you feel stuck — in performance, relationships, and life</p>
-            <h2 className="section-title">Performance isn’t limited by effort — it’s limited by visibility</h2>
+            <p className="section-kicker">What's holding you back</p>
+            <h2 className="section-title">Performance isn’t limited by effort —it's limited by insights</h2>
           </header>
 
           <div className="problem-grid">
             <div className="problem-block">
               <h3>Signals Without Clarity</h3>
-              <p>You feel changes — in energy, focus, or mood — but don’t always understand what they mean.</p>
+              <p>You feel low — in energy, focus, or mood — but don’t know why</p>
             </div>
             <div className="problem-block">
-              <h3>Hidden Influences</h3>
+              <h3>Invisible patterns driving your results</h3>
               <p>Stress, habits, and emotions quietly shape your outcomes — often without you realizing it.</p>
             </div>
             <div className="problem-block">
-              <h3>Unclear Decisions</h3>
+              <h3>Guessing instead of knowing what works</h3>
               <p>Without clear understanding, it’s hard to know what to change, when to act, or what actually works.</p>
             </div>
           </div>
