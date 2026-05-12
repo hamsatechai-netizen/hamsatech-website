@@ -5,7 +5,7 @@ function Hero() {
     <section className="hero" id="home">
       <div className="hero-content">
         <h1 className="hero-title">
-          <span>Intelligence platform for performance,wellbeing/span>
+          <span>Intelligence platform for performance,wellbeing</span>
           <span>and better decisions</span>
         </h1>
         <p className="hero-subtitle">
