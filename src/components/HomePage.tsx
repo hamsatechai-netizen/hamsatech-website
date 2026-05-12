@@ -112,9 +112,12 @@ function HomePage() {
       <section className="about-section" id="usecases">
         <div className="container">
           <header className="section-header section-header--center">
-            <p className="section-kicker">Experience Hamsatech's Astra</p>
-            <h2 className="section-title">From performance to personal life — understanding what drives outcomes across every area.</h2>
+            <p className="section-kicker">Meet - Astra</p>
+            <h2 className="section-title">Understanding what drives outcomes—from performance to relationships to daily life</h2>
           </header>
+          <div className="app-mockup-container">
+      <img src="/images/astra-app-mockup.png" alt="Astra App Interface" />
+    </div>
 
           <div className="features-grid" style={{ marginTop: '40px' }}>
             {useCasesItems.map((item) => (
