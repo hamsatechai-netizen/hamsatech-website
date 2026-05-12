@@ -16,10 +16,6 @@ function Hero() {
     navigate('/howitworks')
   }
 
-  const goToAbout = () => {
-    navigate('/about')
-  }
-
   return (
     <section className="hero" id="home">
       <div className="hero-content">
