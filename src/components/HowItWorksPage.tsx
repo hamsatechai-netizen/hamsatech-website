@@ -21,22 +21,34 @@ const systemItems = [
 
 function HowItWorksPage() {
   return (
-    <section className="about-section">
-      <div className="container">
-        <h2 className="about-title">How it Works</h2>
-        <p className="about-description">
-          A simple, repeatable loop that keeps you aligned and compounding improvements over time.
-        </p>
-        <div className="features-grid" style={{ marginTop: '40px' }}>
-          {systemItems.map((item) => (
-            <div key={item.id} className="feature-card">
-              <h3 className="feature-title">{item.title}</h3>
-              <p className="feature-description">{item.description}</p>
-            </div>
-          ))}
+    <>
+      <section className="about-section">
+        <div className="container">
+          <h2 className="about-title">How it Works</h2>
+          <p className="about-description">
+            A simple, repeatable loop that keeps you aligned and compounding improvements over time.
+          </p>
+          <div className="features-grid" style={{ marginTop: '40px' }}>
+            {systemItems.map((item) => (
+              <div key={item.id} className="feature-card">
+                <h3 className="feature-title">{item.title}</h3>
+                <p className="feature-description">{item.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section className="astra-section">
+        <div className="container">
+          <h2>Experience it in Astra</h2>
+          <p>
+            Our flagship app brings HamsaTech's intelligence to life. Starting with shooting sports—where athletes track biosignals, psychology, and performance—we're expanding to parenting, relationships, and student wellness.
+          </p>
+          <button className="cta-button">Get Early Access</button>
+        </div>
+      </section>
+    </>
   )
 }
 
