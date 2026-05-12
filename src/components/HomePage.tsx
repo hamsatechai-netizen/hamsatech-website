@@ -116,7 +116,7 @@ function HomePage() {
             <h2 className="section-title">Understanding what drives outcomes—from performance to relationships to daily life</h2>
           </header>
           <div className="app-mockup-container">
-      <img src="/images/astra-app-mockup.png" alt="Astra App Interface" />
+      <img src="/images/astra.png" alt="Astra App Interface" />
     </div>
 
           <div className="features-grid" style={{ marginTop: '40px' }}>
