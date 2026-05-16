@@ -15,7 +15,7 @@ function HomePage() {
           </p>
           <div className="hero-cta-buttons">
             <button className="btn-primary-large">Get Early Access</button>
-            <button className="btn-secondary-large">Watch Demo</button>
+            <button className="btn-secondary-large">See How It Works</button>
           </div>
         </div>
       </section>
@@ -165,7 +165,7 @@ function HomePage() {
               </div>
             </div>
 
-            <button className="cta-large">Get Early Access to Astra</button>
+            <button className="cta-large">Learn More About Performance</button>
 
           </div>
         </div>
@@ -174,6 +174,8 @@ function HomePage() {
       {/* Trust Section */}
       <section className="trust-section-simple">
         <div className="container">
+          
+          <h2 className="trust-section-title">Why trust HamsaTech</h2>
           
           <div className="trust-item-horizontal">
             <div className="trust-icon-circle">✓</div>
@@ -206,7 +208,7 @@ function HomePage() {
       <section className="final-cta-section">
         <div className="container">
           <h2>Ready to see what you can't see?</h2>
-          <button className="cta-large white">Sign Up for Early Access</button>
+          <button className="cta-large">Get Early Access</button>
         </div>
       </section>
 
