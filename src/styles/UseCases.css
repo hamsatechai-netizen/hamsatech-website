@@ -174,6 +174,56 @@
   box-shadow: 0 8px 28px rgba(78, 205, 196, 0.4);
 }
 
+/* Add to UseCases.css */
+
+/* Featured Secondary Use Case (Pre-Marriage) */
+.usecase-detail.featured-secondary {
+  background: linear-gradient(135deg, #F9F0FF 0%, #FFF5F9 100%);
+}
+
+.usecase-label.mvp-secondary {
+  background: #F9F0FF;
+  color: #9B59B6;
+  font-weight: 600;
+}
+
+.usecase-cta.secondary {
+  background: #9B59B6;
+}
+
+.usecase-cta.secondary:hover {
+  box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
+}
+
+/* CTA Buttons Side by Side */
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.secondary-cta {
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+}
+
+.secondary-cta:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #FFFFFF;
+}
+
+@media (max-width: 767px) {
+  .cta-buttons {
+    flex-direction: column;
+  }
+  
+  .cta-large {
+    width: 100%;
+    max-width: 320px;
+  }
+}
 /* Tablet and Desktop */
 @media (min-width: 768px) {
   .usecase-content {
