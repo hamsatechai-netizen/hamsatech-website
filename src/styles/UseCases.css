@@ -1,0 +1,247 @@
+/* src/styles/UseCases.css */
+
+.usecases-page {
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Hero */
+.usecases-hero {
+  background: linear-gradient(135deg, #E8F5FF 0%, #F0F9FF 100%);
+  padding: 100px 20px 80px;
+  text-align: center;
+}
+
+.usecases-hero h1 {
+  font-size: 52px;
+  font-weight: 500;
+  color: #1A3D5C;
+  margin-bottom: 20px;
+}
+
+.usecases-hero p {
+  font-size: 20px;
+  color: #5A7A9C;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Use Case Detail Sections */
+.usecase-detail {
+  padding: 80px 20px;
+  background: #FFFFFF;
+}
+
+.usecase-detail.alternate {
+  background: #F8FAFB;
+}
+
+.usecase-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.usecase-content.reverse {
+  direction: rtl;
+}
+
+.usecase-content.reverse .usecase-image,
+.usecase-content.reverse .usecase-text {
+  direction: ltr;
+}
+
+.usecase-image {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.usecase-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.usecase-text {
+  max-width: 600px;
+}
+
+.usecase-label {
+  display: inline-block;
+  background: #E8F9F7;
+  color: #4ECDC4;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.usecase-text h2 {
+  font-size: 36px;
+  font-weight: 500;
+  color: #1A3D5C;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.scenario {
+  font-size: 18px;
+  color: #5A7A9C;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.what-astra-sees {
+  background: #F8FAFB;
+  padding: 24px;
+  border-radius: 12px;
+  border-left: 4px solid #4ECDC4;
+}
+
+.what-astra-sees h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2D5B8F;
+  margin-bottom: 12px;
+}
+
+.what-astra-sees ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.what-astra-sees li {
+  font-size: 15px;
+  color: #5A7A9C;
+  padding: 8px 0;
+  padding-left: 24px;
+  position: relative;
+}
+
+.what-astra-sees li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4ECDC4;
+  font-weight: 500;
+}
+
+/* CTA Section */
+.usecases-cta {
+  padding: 100px 20px;
+  background: linear-gradient(135deg, #2D5B8F 0%, #1A3D5C 100%);
+  text-align: center;
+}
+
+.usecases-cta h2 {
+  font-size: 42px;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-bottom: 16px;
+}
+
+.usecases-cta p {
+  font-size: 18px;
+  color: #FFFFFF;
+  opacity: 0.95;
+  margin-bottom: 40px;
+}
+
+.cta-large {
+  background: #4ECDC4;
+  color: #FFFFFF;
+  border: none;
+  padding: 18px 48px;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cta-large:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(78, 205, 196, 0.4);
+}
+
+/* Add to UseCases.css */
+
+/* Featured Secondary Use Case (Pre-Marriage) */
+.usecase-detail.featured-secondary {
+  background: linear-gradient(135deg, #F9F0FF 0%, #FFF5F9 100%);
+}
+
+.usecase-label.mvp-secondary {
+  background: #F9F0FF;
+  color: #9B59B6;
+  font-weight: 600;
+}
+
+.usecase-cta.secondary {
+  background: #9B59B6;
+}
+
+.usecase-cta.secondary:hover {
+  box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
+}
+
+/* CTA Buttons Side by Side */
+.cta-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.secondary-cta {
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+}
+
+.secondary-cta:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #FFFFFF;
+}
+
+@media (max-width: 767px) {
+  .cta-buttons {
+    flex-direction: column;
+  }
+  
+  .cta-large {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+/* Tablet and Desktop */
+@media (min-width: 768px) {
+  .usecase-content {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .usecases-hero h1 {
+    font-size: 36px;
+  }
+
+  .usecase-text h2 {
+    font-size: 28px;
+  }
+
+  .usecases-cta h2 {
+    font-size: 32px;
+  }
+}

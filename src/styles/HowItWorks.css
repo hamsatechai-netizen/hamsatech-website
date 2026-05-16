@@ -1,0 +1,308 @@
+/* src/styles/HowItWorks.css */
+
+.howitworks-page {
+  min-height: 100vh;
+  background: #FAFBFC;
+}
+
+/* Hero Section */
+.howitworks-hero {
+  background: linear-gradient(135deg, #E8F5FF 0%, #F0F9FF 100%);
+  padding: 100px 20px 60px;
+  text-align: center;
+}
+
+.howitworks-hero h1 {
+  font-size: 48px;
+  font-weight: 500;
+  color: #1A3D5C;
+  margin-bottom: 20px;
+}
+
+.howitworks-hero p {
+  font-size: 20px;
+  color: #5A7A9C;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Timeline */
+.timeline-container {
+  position: relative;
+  margin: 60px 0;
+}
+
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #4ECDC4, #3DB3A9);
+  transform: translateX(-50%);
+}
+
+/* Steps Section */
+.steps-section {
+  padding: 40px 20px 80px;
+  position: relative;
+}
+
+.step-card {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 30px;
+  margin-bottom: 80px;
+  position: relative;
+}
+
+.step-number-badge {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  background: #4ECDC4;
+  color: #FFFFFF;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
+  z-index: 2;
+}
+
+.step-content {
+  background: #FFFFFF;
+  padding: 100px 40px 40px;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.step-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.step-header h2 {
+  font-size: 28px;
+  font-weight: 500;
+  color: #1A3D5C;
+  margin: 0;
+}
+
+.time-badge {
+  background: #E8F9F7;
+  color: #4ECDC4;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.step-content h3 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #2D5B8F;
+  margin-bottom: 16px;
+}
+
+.step-description {
+  font-size: 16px;
+  color: #5A7A9C;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+.step-list,
+.step-examples {
+  margin-bottom: 24px;
+}
+
+.step-list h4,
+.step-examples h4 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2D5B8F;
+  margin-bottom: 12px;
+}
+
+.step-list ul,
+.step-examples ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.step-list li,
+.step-examples li {
+  font-size: 15px;
+  color: #5A7A9C;
+  padding: 8px 0 8px 28px;
+  position: relative;
+  line-height: 1.6;
+}
+
+.step-list li::before {
+  content: "✓";
+  position: absolute;
+  left: 8px;
+  color: #4ECDC4;
+  font-weight: 500;
+}
+
+.step-examples li::before {
+  content: "→";
+  position: absolute;
+  left: 8px;
+  color: #FFB366;
+  font-weight: 500;
+}
+
+/* Visual Placeholder */
+.step-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.visual-placeholder {
+  width: 100%;
+  max-width: 400px;
+  height: 280px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 500;
+  color: #FFFFFF;
+}
+
+.visual-placeholder.onboarding {
+  background: linear-gradient(135deg, #4F89D8, #6BA3E8);
+}
+
+.visual-placeholder.sensor {
+  background: linear-gradient(135deg, #FF6B8A, #FF8FA3);
+}
+
+.visual-placeholder.training {
+  background: linear-gradient(135deg, #4ECDC4, #6EDDD5);
+}
+
+.visual-placeholder.insights {
+  background: linear-gradient(135deg, #FFB366, #FFC580);
+}
+
+.visual-placeholder.action {
+  background: linear-gradient(135deg, #7BC9BA, #91D9CC);
+}
+
+.visual-placeholder.progress {
+  background: linear-gradient(135deg, #9B59B6, #B07CC6);
+}
+
+/* CTA Section */
+.howitworks-cta {
+  background: linear-gradient(135deg, #1A3D5C, #2D5B8F);
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.howitworks-cta h2 {
+  font-size: 36px;
+  font-weight: 500;
+  color: #FFFFFF;
+  margin-bottom: 16px;
+}
+
+.howitworks-cta p {
+  font-size: 18px;
+  color: #FFFFFF;
+  opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto 40px;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primary-cta,
+.secondary-cta {
+  padding: 16px 32px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+}
+
+.primary-cta {
+  background: #4ECDC4;
+  color: #FFFFFF;
+}
+
+.primary-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(78, 205, 196, 0.4);
+}
+
+.secondary-cta {
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #FFFFFF;
+}
+
+.secondary-cta:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Tablet and Desktop */
+@media (min-width: 768px) {
+  .step-card {
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .step-card.right {
+    direction: rtl;
+  }
+
+  .step-card.right .step-content,
+  .step-card.right .step-visual {
+    direction: ltr;
+  }
+
+  .step-number-badge {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .howitworks-hero h1 {
+    font-size: 56px;
+  }
+}

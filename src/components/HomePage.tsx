@@ -1,166 +1,222 @@
-import '../styles/HomeSections.css'
-import Hero from './Hero'
-import FeatureCard from './FeatureCard'
-import About from './About'
-import image4 from '../images/image4.jpg'
-import image5 from '../images/image5.jpg'
-import image6 from '../images/image6.png'
+// src/pages/Home.jsx
 
-const capabilityCards = [
-  {
-    id: 1,
-    title: 'Inner Awareness',
-    description:
-      'Make your internal state visible — understand what your body, behavior, and emotions are really telling you.',
-  },
-  {
-    id: 2,
-    title: 'Meaningful Interpretation',
-    description:
-      'Decode patterns across signals to identify root causes — whether it’s stress, habits, or emotional imbalance.',
-  },
-  {
-    id: 3,
-    title: 'Guided with Empathy',
-    description: 'Turn insights into meaningful action with guidance that understands your context.',
-  },
-]
-
-const useCasesItems = [
-  {
-    id: 1,
-    title: 'Performance',
-    description: 'Improve outcomes by understanding what’s affecting focus, energy, and consistency.',
-    image: image4,
-  },
-  {
-    id: 2,
-    title: 'Relationships & Compatibility',
-    description: 'Gain clarity in relationships by understanding emotional patterns, communication, and behavior.',
-    image: image5,
-  },
-  {
-    id: 3,
-    title: 'Work, Parenting & Wellbeing',
-    description: 'Make better decisions by recognizing stress, habits, and energy patterns across daily life.',
-    image: image6,
-  },
-]
-
-const systemItems = [
-  {
-    id: 1,
-    title: 'Collect Data',
-    description: 'Capture signals across your body, mind, behavior, and context.',
-  },
-  {
-    id: 2,
-    title: 'Decode Patterns',
-    description: 'Use AI to uncover patterns and root causes.',
-  },
-  {
-    id: 3,
-    title: 'Guide',
-    description: 'Deliver insights that are psychologically grounded and actionable.',
-  },
-]
+import '../styles/Home.css'
+// Import images at the top
+import performanceModule from '../images/performance.jpg'
+import relationshipsModule from '../images/relationships.jpg'
+import wellbeingModule from '../images/wellbeing.jpg'
 
 function HomePage() {
   return (
-    <>
-      <Hero />
-
-      <section className="home-section home-section--problem" id="problem">
+    <div className="home-page">
+      
+      {/* Hero Section */}
+      <section className="hero-minimal">
         <div className="container">
-          <header className="section-header section-header--center">
-            <p className="section-kicker">What's holding you back</p>
-            <h2 className="section-title">Performance isn’t limited by effort —it's limited by insights</h2>
-          </header>
+          <h1>Your personal intelligence platform</h1>
+          <p className="hero-tagline">
+            Understanding what drives outcomes—from performance to relationships to daily life
+          </p>
+          <div className="hero-cta-buttons">
+            <button className="btn-primary-large">Get Early Access</button>
+            <button className="btn-secondary-large">See How It Works</button>
+          </div>
+        </div>
+      </section>
 
+      {/* Problem Section */}
+      <section className="problem-section">
+        <div className="container">
+          <h2 className="section-title">What's holding you back</h2>
+          <p className="section-subtitle">Performance isn't limited by effort—it's limited by insights</p>
+          
           <div className="problem-grid">
-            <div className="problem-block">
-              <h3>Signals Without Clarity</h3>
-              <p>You feel low — in energy, focus, or mood — but don’t know why</p>
+            <div className="problem-card">
+              <h3>You feel off, but don't know why</h3>
+              <p>Energy drops. Focus breaks. Mood shifts. You know something's wrong, but can't pinpoint what's causing it.</p>
             </div>
-            <div className="problem-block">
+
+            <div className="problem-card">
               <h3>Invisible patterns driving your results</h3>
-              <p>Stress, habits, and emotions quietly shape your outcomes — often without you realizing it.</p>
+              <p>Stress, habits, and emotions quietly shape your outcomes—often without you realizing it.</p>
             </div>
-            <div className="problem-block">
+
+            <div className="problem-card">
               <h3>Guessing instead of knowing what works</h3>
-              <p>Without clear understanding, it’s hard to know what to change, when to act, or what actually works.</p>
+              <p>Without clear understanding, it's hard to know what to change, when to act, or what actually moves the needle.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="features-section" id="capabilities">
+      {/* Meet Astra Section */}
+      <section className="astra-intro-section">
         <div className="container">
-          <header className="section-header section-header--center">
-            <p className="section-kicker">How HamsaTech helps you move forward</p>
-            <h2 className="section-title">Understanding you and your body is where we start</h2>
-          </header>
+          <h2 className="section-title">Meet Astra</h2>
+          <p className="section-subtitle">
+            Understanding what drives outcomes—from performance to relationships to daily life
+          </p>
 
-          <div className="features-grid">
-            {capabilityCards.map((feature) => (
-              <FeatureCard key={feature.id} {...feature} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="about-section" id="usecases">
-        <div className="container">
-          <header className="section-header section-header--center">
-            <p className="section-kicker">Where HamsaTech creates impact</p>
-            <h2 className="section-title">From performance to personal life — understanding what drives outcomes across every area.</h2>
-          </header>
-
-          <div className="features-grid" style={{ marginTop: '40px' }}>
-            {useCasesItems.map((item) => (
-              <div key={item.id} className="feature-card" style={{ padding: '0', overflow: 'hidden' }}>
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  style={{ width: '100%', height: '220px', objectFit: 'cover' }}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <div style={{ padding: '20px' }}>
-                  <h3 className="feature-title">{item.title}</h3>
-                  <p className="feature-description">{item.description}</p>
+          <div className="modules-grid">
+            
+            {/* Performance Module */}
+            <div className="module-card">
+              <div className="module-image">
+                <img src={performanceModule} alt="Performance Module" />
+              </div>
+              <div className="module-content">
+                <div className="module-header">
+                  <h3>Performance</h3>
+                  <span className="badge available">Available Now</span>
                 </div>
+                <p>Track biosignals, psychology, and performance. See what's blocking your peak.</p>
               </div>
-            ))}
+            </div>
+
+            {/* Relationships Module */}
+            <div className="module-card">
+              <div className="module-image">
+                <img src={relationshipsModule} alt="Relationships Module" />
+              </div>
+              <div className="module-content">
+                <div className="module-header">
+                  <h3>Relationships & Compatibility</h3>
+                  <span className="badge coming-soon">Coming Soon</span>
+                </div>
+                <p>Understand emotional patterns, communication, and compatibility.</p>
+              </div>
+            </div>
+
+            {/* Life & Wellbeing Module */}
+            <div className="module-card">
+              <div className="module-image">
+                 <img src={wellbeingModule} alt="Life & Wellbeing Module" />
+              </div>
+              <div className="module-content">
+                <div className="module-header">
+                  <h3>Life & Wellbeing</h3>
+                  <span className="badge coming-soon">Coming Soon</span>
+                </div>
+                <p>Navigate work, parenting, and wellness with clarity.</p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
-      <section className="about-section home-section--system" id="system">
+      {/* How We Help Section */}
+      <section className="how-we-help-section">
         <div className="container">
-          <header className="section-header section-header--center">
-            <p className="section-kicker">Behind the intelligence — how it works</p>
-            <h2 className="section-title">
-              Powered by AI, grounded in psychology, and guided by deeper human insight.
-            </h2>
-            <p className="section-subtitle">
-              A lightweight loop that keeps you aligned — so improvements compound over time.
-            </p>
-          </header>
+          <h2 className="section-title">How HamsaTech helps you move forward</h2>
+          <p className="section-subtitle">Understanding you and your body is where we start</p>
 
-          <div className="features-grid" style={{ marginTop: '40px' }}>
-            {systemItems.map((item) => (
-              <div key={item.id} className="feature-card">
-                <h3 className="feature-title">{item.title}</h3>
-                <p className="feature-description">{item.description}</p>
-              </div>
-            ))}
+          <div className="help-cards-container">
+            
+            <div className="help-card-large">
+              <h3>See what's really happening inside</h3>
+              <p>
+                We triangulate psychology, biosignals, and performance—giving you the full picture of what's driving your outcomes.
+              </p>
+            </div>
+
+            <div className="help-card-large">
+              <h3>Understand the patterns</h3>
+              <p>
+                AI decodes connections between your mental state, body signals, and results—revealing what you couldn't see before.
+              </p>
+            </div>
+
+            <div className="help-card-large">
+              <h3>Get your next move</h3>
+              <p>
+                Not just data—specific action steps. Breathing exercises when stress peaks. Recovery protocols when HRV drops. Guidance that fits your life.
+              </p>
+            </div>
+
           </div>
         </div>
       </section>
 
-      <About />
-    </>
+      {/* Astra Performance Section */}
+      <section className="astra-performance-section">
+        <div className="container">
+          <div className="performance-content">
+            
+            <div className="performance-header">
+              <h2>Start with Astra Performance</h2>
+              <p>
+                Our first module focuses on shooting sports—athletes, coaches, and academies use Astra to understand what's blocking peak performance. Connect your Polar H10 sensor, complete a psychology assessment, and see what you couldn't see before.
+              </p>
+            </div>
+
+            <div className="performance-features">
+              <div className="feature-row">
+                <span className="checkmark">✓</span>
+                <span>Real-time heart rate and HRV tracking</span>
+              </div>
+              <div className="feature-row">
+                <span className="checkmark">✓</span>
+                <span>Psychology-to-performance mapping</span>
+              </div>
+              <div className="feature-row">
+                <span className="checkmark">✓</span>
+                <span>Power Card ability scoring</span>
+              </div>
+              <div className="feature-row">
+                <span className="checkmark">✓</span>
+                <span>Personalized guidance and insights</span>
+              </div>
+            </div>
+
+            <button className="cta-large">Learn More About Performance</button>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="trust-section-simple">
+        <div className="container">
+          
+          <h2 className="trust-section-title">Why trust HamsaTech</h2>
+          
+          <div className="trust-item-horizontal">
+            <div className="trust-icon-circle">✓</div>
+            <div className="trust-text">
+              <h4>Expert systems, not guesswork</h4>
+              <p>Validated psychology + proven HRV science</p>
+            </div>
+          </div>
+
+          <div className="trust-item-horizontal">
+            <div className="trust-icon-circle">✓</div>
+            <div className="trust-text">
+              <h4>Your data, your control</h4>
+              <p>Secure storage. You own it. Delete anytime.</p>
+            </div>
+          </div>
+
+          <div className="trust-item-horizontal">
+            <div className="trust-icon-circle">✓</div>
+            <div className="trust-text">
+              <h4>Built for real people</h4>
+              <p>Child-friendly for athletes. Clear for parents. Deep for professionals.</p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="final-cta-section">
+        <div className="container">
+          <h2>Ready to see what you can't see?</h2>
+          <button className="cta-large">Get Early Access</button>
+        </div>
+      </section>
+
+    </div>
   )
 }
 

@@ -1,54 +1,199 @@
-import '../styles/About.css'
-import '../styles/FeatureCard.css'
-import image4 from '../images/image4.jpg'
-import image5 from '../images/image5.jpg'
-import image6 from '../images/image6.png'
+// src/components/UseCases.tsx (or wherever your file is)
 
-const useCasesItems = [
-  {
-    id: 1,
-    title: 'Athlete Performance',
-    description: 'Personalized training plans based on AI analytics for athletes.',
-    image: image4,
-  },
-  {
-    id: 2,
-    title: 'Wellness Optimization',
-    description: 'Behavioral insights to improve recovery, sleep, and mindfulness.',
-    image: image5,
-  },
-  {
-    id: 3,
-    title: 'Decision Intelligence',
-    description: 'Data-backed decisions for coaching, career, and life strategy.',
-    image: image6,
-  },
-]
+import '../styles/UseCases.css'
+
+// Import all use case images
+import athletePlateauImg from '../images/athlete.png'
+import preMarriageImg from '../images/compat.png'
+import managerDismissalImg from '../images/manager-dismissal.png'
+import milCommentImg from '../images/mil-comment.png'
+import teenFineImg from '../images/teen-fine.png'
+import examPressureImg from '../images/exam-pressure.png'
 
 function UseCasesPage() {
   return (
-    <section className="about-section">
-      <div className="container">
-        <h2 className="about-title">Use Cases</h2>
-        <p className="about-description">
-          Explore complete use-case paths designed for sports professionals, wellness seekers, and high performers.
-        </p>
+    <div className="usecases-page">
+      
+      {/* Hero */}
+      <section className="usecases-hero">
+        <div className="container">
+          <h1>The moments that change everything</h1>
+          <p>Small triggers. Big biological impact. Invisible—until now.</p>
+        </div>
+      </section>
 
-        <div className="features-grid" style={{ marginTop: '40px' }}>
-          {useCasesItems.map((item) => (
-            <div key={item.id} className="feature-card" style={{ padding: '0', overflow: 'hidden' }}>
-              <img src={item.image} alt={item.title} style={{ width: '100%', height: '220px', objectFit: 'cover' }} />
-              <div style={{ padding: '20px' }}>
-                <h3 className="feature-title">{item.title}</h3>
-                <p className="feature-description">{item.description}</p>
+      {/* Use Case 1 - Athletes */}
+      <section className="usecase-detail featured">
+        <div className="container">
+          <div className="usecase-content">
+            <div className="usecase-image">
+              <img src={athletePlateauImg} alt="Athlete performance plateau" loading="lazy" />
+            </div>
+            <div className="usecase-text">
+              <span className="usecase-label mvp">Performance • Available Now</span>
+              <h2>Stuck at your plateau?</h2>
+              <p className="scenario">
+                You're training harder than ever. Your technique is solid. Your scores won't budge. What you can't see: your heart rate spikes 18bpm right before low-scoring shots. Your body knows what's blocking you—your mind doesn't.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra reveals:</h4>
+                <ul>
+                  <li>When your heart rate destabilizes before poor shots</li>
+                  <li>How pre-session mental state predicts performance</li>
+                  <li>Which breathing patterns keep you in the zone</li>
+                  <li>Your unique Power Card: Steady Heart, Eagle Eye, Brain Boss scores</li>
+                </ul>
+              </div>
+              <button className="usecase-cta">Start with Astra Performance →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Use Case 2 - Pre-Marriage */}
+      <section className="usecase-detail featured-secondary">
+        <div className="container">
+          <div className="usecase-content reverse">
+            <div className="usecase-image">
+              <img src={preMarriageImg} alt="Pre-marriage compatibility" loading="lazy" />
+            </div>
+            <div className="usecase-text">
+              <span className="usecase-label mvp-secondary">Relationships • Coming Q3 2026</span>
+              <h2>Beyond attraction—do you actually align?</h2>
+              <p className="scenario">
+                You're in love. But love doesn't predict compatibility. When stress hits, does your heart rate sync or spike? Do your communication patterns complement or clash? Can you recover together—or do conflicts compound?
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>How your stress responses interact during disagreements</li>
+                  <li>Whether your emotional regulation patterns complement each other</li>
+                  <li>Which conflict styles lead to resolution vs. escalation</li>
+                  <li>Your combined compatibility score across psychology, biology, and behavior</li>
+                </ul>
+              </div>
+              <button className="usecase-cta secondary">Join Waitlist →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Continue with other use cases using imported images... */}
+      
+      <section className="usecase-detail alternate">
+        <div className="container">
+          <div className="usecase-content">
+            <div className="usecase-image">
+              <img src={managerDismissalImg} alt="Workplace dismissal stress" loading="lazy" />
+            </div>
+           <div className="usecase-text">
+              <span className="usecase-label coming-soon">Work Life • Coming Soon</span>
+              <h2>The invisible toll of being dismissed</h2>
+              <p className="scenario">
+                Your manager scrolls through emails during your presentation. In 30 seconds, your heart rate spikes 30bpm. Your confidence drops. You carry this home—but you don't know why you feel "off" tonight.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>The exact moment your stress peaked</li>
+                  <li>How long the physiological impact lasted</li>
+                  <li>Which recovery protocols work for you</li>
+                </ul>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <section className="usecase-detail">
+        <div className="container">
+          <div className="usecase-content reverse">
+            <div className="usecase-image">
+              <img src={milCommentImg} alt="Family conflict trigger" loading="lazy" />
+            </div>
+           <div className="usecase-text">
+              <span className="usecase-label coming-soon">Family • Coming Soon</span>
+              <h2>One comment, hours of impact</h2>
+              <p className="scenario">
+                One comment from your mother-in-law. Your heart rate jumps 30bpm. The tension lasts for hours, affecting your sleep, your patience with your kids, your entire evening.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>How family dynamics affect your physiology</li>
+                  <li>When your body goes into defense mode</li>
+                  <li>Which interventions help you reset fastest</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="usecase-detail alternate">
+        <div className="container">
+          <div className="usecase-content">
+            <div className="usecase-image">
+              <img src={teenFineImg} alt="Teen withdrawal signals" loading="lazy" />
+            </div>
+            <div className="usecase-text">
+              <span className="usecase-label coming-soon">Parenting • Coming Soon</span>
+              <h2>When "I'm fine" isn't fine</h2>
+              <p className="scenario">
+                Your child says "I'm fine"—but their sleep is disrupted, meals are skipped, grades are slipping. You know something's wrong. You just can't prove it.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>Sleep pattern disruptions over weeks</li>
+                  <li>Stress markers rising before behavioral changes</li>
+                  <li>When intervention timing is most effective</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="usecase-detail">
+        <div className="container">
+          <div className="usecase-content reverse">
+            <div className="usecase-image">
+              <img src={examPressureImg} alt="Student exam stress" loading="lazy" />
+            </div>
+           <div className="usecase-text">
+              <span className="usecase-label coming-soon">Student Life • Coming Soon</span>
+              <h2>The cost of "just one exam"</h2>
+              <p className="scenario">
+                It's just one exam. But your body counts the cost: 10 hours awake, 46bpm spike, zero recovery time. By morning, you're physiologically depleted before you even sit down.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>Cumulative fatigue building over days</li>
+                  <li>When your recovery capacity hits zero</li>
+                  <li>Optimal study-rest ratios for your body</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="usecases-cta">
+        <div className="container">
+          <h2>Ready to see what you can't see?</h2>
+          <p>Start with Astra Performance—or join the waitlist for relationship compatibility</p>
+          <div className="cta-buttons">
+            <button className="cta-large">Get Early Access to Performance</button>
+            <button className="cta-large secondary-cta">Join Compatibility Waitlist</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
   )
 }
 
 export default UseCasesPage
-
