@@ -6,6 +6,7 @@ import Navigation from './components/Navigation'
 import ScrollNavigator from './components/ScrollNavigator'
 import Footer from './components/Footer'
 import PageLoader from './components/PageLoader'
+import SaarthiBot from './components/SaarthiBot'
 
 const HomePage = lazy(() => import('./components/HomePage'))
 const AboutPage = lazy(() => import('./components/AboutPage'))
@@ -89,6 +90,7 @@ function App() {
         </Suspense>
       </main>
       <Footer />
+      <SaarthiBot />
     </div>
   )
 }
