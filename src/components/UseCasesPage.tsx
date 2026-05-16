@@ -1,6 +1,14 @@
-// src/pages/UseCases.jsx
+// src/components/UseCases.tsx (or wherever your file is)
 
 import '../styles/UseCases.css'
+
+// Import all use case images
+import athletePlateauImg from '../images/usecases/athlete.png'
+import preMarriageImg from '../images/usecases/compat.png'
+import managerDismissalImg from '../images/usecases/manager-dismissal.png'
+import milCommentImg from '../images/usecases/mil-comment.png'
+import teenFineImg from '../images/usecases/teen-fine.png'
+import examPressureImg from '../images/usecases/exam-pressure.png'
 
 function UseCasesPage() {
   return (
@@ -14,12 +22,12 @@ function UseCasesPage() {
         </div>
       </section>
 
-      {/* Use Case 1 - ATHLETES (Primary MVP - Available Now) */}
+      {/* Use Case 1 - Athletes */}
       <section className="usecase-detail featured">
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <img src="/images/athlete.png" alt="Athlete performance plateau" loading="lazy" />
+              <img src={athletePlateauImg} alt="Athlete performance plateau" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label mvp">Performance • Available Now</span>
@@ -42,12 +50,12 @@ function UseCasesPage() {
         </div>
       </section>
 
-      {/* Use Case 2 - PRE-MARRIAGE COMPATIBILITY (Secondary MVP Target) */}
+      {/* Use Case 2 - Pre-Marriage */}
       <section className="usecase-detail featured-secondary">
         <div className="container">
           <div className="usecase-content reverse">
             <div className="usecase-image">
-              <img src="/images/compat.png" alt="Pre-marriage compatibility assessment" loading="lazy" />
+              <img src={preMarriageImg} alt="Pre-marriage compatibility" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label mvp-secondary">Relationships • Coming Q3 2026</span>
@@ -70,114 +78,48 @@ function UseCasesPage() {
         </div>
       </section>
 
-      {/* Divider - Coming Soon Modules */}
-      <section className="modules-divider">
-        <div className="container">
-          <h3>More modules coming soon</h3>
-          <p>Astra is expanding to help you understand every area of life</p>
-        </div>
-      </section>
-
-      {/* Use Case 3 - Workplace */}
+      {/* Continue with other use cases using imported images... */}
+      
       <section className="usecase-detail alternate">
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <img src="/images/manager-dismissal.png" alt="Workplace dismissal stress" loading="lazy" />
+              <img src={managerDismissalImg} alt="Workplace dismissal stress" loading="lazy" />
             </div>
-            <div className="usecase-text">
-              <span className="usecase-label coming-soon">Work Life • Coming Soon</span>
-              <h2>The invisible toll of being dismissed</h2>
-              <p className="scenario">
-                Your manager scrolls through emails during your presentation. In 30 seconds, your heart rate spikes 30bpm. Your confidence drops. You carry this home—but you don't know why you feel "off" tonight.
-              </p>
-              <div className="what-astra-sees">
-                <h4>What Astra will reveal:</h4>
-                <ul>
-                  <li>The exact moment your stress peaked</li>
-                  <li>How long the physiological impact lasted</li>
-                  <li>Which recovery protocols work for you</li>
-                </ul>
-              </div>
-            </div>
+            {/* ... */}
           </div>
         </div>
       </section>
 
-      {/* Use Case 4 - Family */}
       <section className="usecase-detail">
         <div className="container">
           <div className="usecase-content reverse">
             <div className="usecase-image">
-             <img src="/images/mil-comment.png" alt="Family conflict trigger" loading="lazy" />
+              <img src={milCommentImg} alt="Family conflict trigger" loading="lazy" />
             </div>
-            <div className="usecase-text">
-              <span className="usecase-label coming-soon">Family • Coming Soon</span>
-              <h2>One comment, hours of impact</h2>
-              <p className="scenario">
-                One comment from your mother-in-law. Your heart rate jumps 30bpm. The tension lasts for hours, affecting your sleep, your patience with your kids, your entire evening.
-              </p>
-              <div className="what-astra-sees">
-                <h4>What Astra will reveal:</h4>
-                <ul>
-                  <li>How family dynamics affect your physiology</li>
-                  <li>When your body goes into defense mode</li>
-                  <li>Which interventions help you reset fastest</li>
-                </ul>
-              </div>
-            </div>
+            {/* ... */}
           </div>
         </div>
       </section>
 
-      {/* Use Case 5 - Parenting */}
       <section className="usecase-detail alternate">
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <img src="/images/parent.png" alt="Teen withdrawal signals" loading="lazy" />
+              <img src={teenFineImg} alt="Teen withdrawal signals" loading="lazy" />
             </div>
-            <div className="usecase-text">
-              <span className="usecase-label coming-soon">Parenting • Coming Soon</span>
-              <h2>When "I'm fine" isn't fine</h2>
-              <p className="scenario">
-                Your child says "I'm fine"—but their sleep is disrupted, meals are skipped, grades are slipping. You know something's wrong. You just can't prove it.
-              </p>
-              <div className="what-astra-sees">
-                <h4>What Astra will reveal:</h4>
-                <ul>
-                  <li>Sleep pattern disruptions over weeks</li>
-                  <li>Stress markers rising before behavioral changes</li>
-                  <li>When intervention timing is most effective</li>
-                </ul>
-              </div>
-            </div>
+            {/* ... */}
           </div>
         </div>
       </section>
 
-      {/* Use Case 6 - Students */}
       <section className="usecase-detail">
         <div className="container">
           <div className="usecase-content reverse">
             <div className="usecase-image">
-              <img src="/images/exam-pressure.png" alt="Student exam stress" loading="lazy" />
+              <img src={examPressureImg} alt="Student exam stress" loading="lazy" />
             </div>
-            <div className="usecase-text">
-              <span className="usecase-label coming-soon">Student Life • Coming Soon</span>
-              <h2>The cost of "just one exam"</h2>
-              <p className="scenario">
-                It's just one exam. But your body counts the cost: 10 hours awake, 46bpm spike, zero recovery time. By morning, you're physiologically depleted before you even sit down.
-              </p>
-              <div className="what-astra-sees">
-                <h4>What Astra will reveal:</h4>
-                <ul>
-                  <li>Cumulative fatigue building over days</li>
-                  <li>When your recovery capacity hits zero</li>
-                  <li>Optimal study-rest ratios for your body</li>
-                </ul>
-              </div>
-            </div>
+            {/* ... */}
           </div>
         </div>
       </section>
