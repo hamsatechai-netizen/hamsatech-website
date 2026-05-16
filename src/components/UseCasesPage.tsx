@@ -3,12 +3,12 @@
 import '../styles/UseCases.css'
 
 // Import all use case images
-import athletePlateauImg from '../images/usecases/athlete.png'
-import preMarriageImg from '../images/usecases/compat.png'
-import managerDismissalImg from '../images/usecases/manager-dismissal.png'
-import milCommentImg from '../images/usecases/mil-comment.png'
-import teenFineImg from '../images/usecases/teen-fine.png'
-import examPressureImg from '../images/usecases/exam-pressure.png'
+import athletePlateauImg from '../images/athlete.png'
+import preMarriageImg from '../images/compat.png'
+import managerDismissalImg from '../images/manager-dismissal.png'
+import milCommentImg from '../images/mil-comment.png'
+import teenFineImg from '../images/teen-fine.png'
+import examPressureImg from '../images/exam-pressure.png'
 
 function UseCasesPage() {
   return (
