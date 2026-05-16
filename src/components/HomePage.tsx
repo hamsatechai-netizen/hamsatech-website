@@ -206,4 +206,12 @@ function HomePage() {
       <section className="final-cta-section">
         <div className="container">
           <h2>Ready to see what you can't see?</h2>
-          <button className="cta-large white">Sign Up for Early A
+          <button className="cta-large white">Sign Up for Early Access</button>
+        </div>
+      </section>
+
+    </div>
+  )
+}
+
+export default HomePage
