@@ -1,6 +1,10 @@
 // src/pages/Home.jsx
 
 import '../styles/Home.css'
+// Import images at the top
+import performanceModule from '../images/performance.jpg'
+import relationshipsModule from '../images/relationships.jpg'
+import wellbeingModule from '../images/wellbeing.jpg'
 
 function HomePage() {
   return (
@@ -58,7 +62,7 @@ function HomePage() {
             {/* Performance Module */}
             <div className="module-card">
               <div className="module-image">
-                <img src="/images/performance.jpg" alt="Performance Module" />
+                <img src={performanceModule} alt="Performance Module" />
               </div>
               <div className="module-content">
                 <div className="module-header">
@@ -72,7 +76,7 @@ function HomePage() {
             {/* Relationships Module */}
             <div className="module-card">
               <div className="module-image">
-                <img src="/images/relationships.jpg" alt="Relationships Module" />
+                <img src={relationshipsModule} alt="Relationships Module" />
               </div>
               <div className="module-content">
                 <div className="module-header">
@@ -86,7 +90,7 @@ function HomePage() {
             {/* Life & Wellbeing Module */}
             <div className="module-card">
               <div className="module-image">
-                <img src="/images/wellbeing.jpg" alt="Life & Wellbeing Module" />
+                 <img src={wellbeingModule} alt="Life & Wellbeing Module" />
               </div>
               <div className="module-content">
                 <div className="module-header">
