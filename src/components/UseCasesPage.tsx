@@ -111,7 +111,21 @@ function UseCasesPage() {
             <div className="usecase-image">
               <img src={milCommentImg} alt="Family conflict trigger" loading="lazy" />
             </div>
-            {/* ... */}
+           <div className="usecase-text">
+              <span className="usecase-label coming-soon">Family • Coming Soon</span>
+              <h2>One comment, hours of impact</h2>
+              <p className="scenario">
+                One comment from your mother-in-law. Your heart rate jumps 30bpm. The tension lasts for hours, affecting your sleep, your patience with your kids, your entire evening.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>How family dynamics affect your physiology</li>
+                  <li>When your body goes into defense mode</li>
+                  <li>Which interventions help you reset fastest</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -122,7 +136,21 @@ function UseCasesPage() {
             <div className="usecase-image">
               <img src={teenFineImg} alt="Teen withdrawal signals" loading="lazy" />
             </div>
-            {/* ... */}
+            <div className="usecase-text">
+              <span className="usecase-label coming-soon">Parenting • Coming Soon</span>
+              <h2>When "I'm fine" isn't fine</h2>
+              <p className="scenario">
+                Your child says "I'm fine"—but their sleep is disrupted, meals are skipped, grades are slipping. You know something's wrong. You just can't prove it.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>Sleep pattern disruptions over weeks</li>
+                  <li>Stress markers rising before behavioral changes</li>
+                  <li>When intervention timing is most effective</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -133,7 +161,21 @@ function UseCasesPage() {
             <div className="usecase-image">
               <img src={examPressureImg} alt="Student exam stress" loading="lazy" />
             </div>
-            {/* ... */}
+           <div className="usecase-text">
+              <span className="usecase-label coming-soon">Student Life • Coming Soon</span>
+              <h2>The cost of "just one exam"</h2>
+              <p className="scenario">
+                It's just one exam. But your body counts the cost: 10 hours awake, 46bpm spike, zero recovery time. By morning, you're physiologically depleted before you even sit down.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>Cumulative fatigue building over days</li>
+                  <li>When your recovery capacity hits zero</li>
+                  <li>Optimal study-rest ratios for your body</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
