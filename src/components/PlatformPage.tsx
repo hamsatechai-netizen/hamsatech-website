@@ -8,20 +8,20 @@ import image3 from '../images/image3.png'
 const platformItems = [
   {
     id: 1,
-    title: 'Performance Optimization',
-    description: 'Improve how you train, recover, and perform.',
+    title: 'Psychology Assessment',
+    description: 'Structured questionnaires co-designed with behavioral experts to map emotional patterns, stress triggers, arousal levels, and identity across every life domain.',
     image: image1
   },
   {
     id: 2,
-    title: 'Self-Discovery',
-    description: 'Understand your patterns, strengths, and blind spots.',
+    title: 'Biometric Intelligence',
+    description: 'Real-time heart rate, HRV (RMSSD), and movement analysis from Polar H10 — revealing what your body is doing beneath the surface during performance and recovery.',
     image: image2
   },
   {
     id: 3,
-    title: 'Data-Driven Guidance',
-    description: 'Make better decisions in sports, wellness, and life.',
+    title: 'AI Insight Engine',
+    description: 'Deterministic scoring — stability, fatigue, stress, recovery — combined with empathetic AI that converts structured findings into athlete-friendly, coach-friendly, and parent-friendly language.',
     image: image3
   }
 ]
@@ -50,12 +50,11 @@ function PlatformPage() {
         >
           {'<-'} Back
         </button>
-        <h2 className="about-title">Platform</h2>
+        <h2 className="about-title">The Platform</h2>
         <p className="about-description">
-          Our platform delivers AI-driven insights, performance metrics, and
-          personalized training recommendations. Explore real-time analytics,
-          training programs, and adaptive coaching designed to help you reach
-          peak potential.
+          HamsaTech triangulates three intelligence layers — Psychology, Biometrics, and Performance — to
+          build a complete picture of who you are and what you need. Not a generic dashboard. A personal
+          intelligence system built around you.
         </p>
         <div className="features-grid" style={{ marginTop: '40px' }}>
           {platformItems.map((item) => (

@@ -1,0 +1,136 @@
+.home-section {
+  padding: 86px 0;
+  border-top: 1px solid rgba(47, 138, 160, 0.12);
+}
+
+.home-section--solution {
+  background:
+    radial-gradient(circle at 12% 10%, rgba(154, 214, 194, 0.26), transparent 32%),
+    radial-gradient(circle at 86% 24%, rgba(47, 138, 160, 0.18), transparent 30%),
+    rgba(247, 252, 251, 0.82);
+}
+
+.home-section--system {
+  background: rgba(247, 252, 251, 0.72);
+}
+
+.section-header {
+  max-width: 880px;
+}
+
+.section-header--center {
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* 👇 Unified kicker (used everywhere now) */
+.section-kicker {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 2.6rem);   /* 🔥 BIG */
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(11, 59, 80, 0.82);
+  font-style: italic;
+}
+
+/* 👇 Unified title */
+.section-title {
+  margin-top: 12px;
+  font-size: clamp(1.1rem, 1.8vw, 1.4rem);  /* ✅ smaller */
+  line-height: 1.4;
+  color: var(--text-main);
+  text-wrap: balance;
+}
+
+/* 👇 Subtitle (unchanged but consistent spacing) */
+.section-subtitle {
+  margin-top: 16px;
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: var(--text-soft);
+  text-wrap: pretty;
+  font-style: italic;
+}
+
+/* =========================
+   GRID SPACING (FIXED)
+========================= */
+
+.problem-grid {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+/* ✅ FIX YOU ASKED FOR */
+.features-grid {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.problem-block {
+  padding: 26px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(47, 138, 160, 0.16);
+  box-shadow: 0 18px 30px rgba(var(--shadow-color), 0.08);
+}
+
+.problem-block h3 {
+  font-size: 1.35rem;
+  margin-bottom: 10px;
+  color: var(--brand-deep);
+}
+
+.problem-block p {
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+.solution-grid {
+  margin-top: 44px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.solution-item {
+  padding: 26px 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(47, 138, 160, 0.14);
+}
+
+.solution-item h3 {
+  color: var(--brand-deep);
+  margin-bottom: 8px;
+  font-size: 1.35rem;
+}
+
+.solution-item p {
+  color: var(--text-soft);
+  line-height: 1.7;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .problem-grid,
+  .features-grid,
+  .solution-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-section {
+    padding: 70px 0;
+  }
+}

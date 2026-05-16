@@ -16,20 +16,16 @@ function Hero() {
     navigate('/howitworks')
   }
 
-  const goToAbout = () => {
-    navigate('/about')
-  }
-
   return (
     <section className="hero" id="home">
       <div className="hero-content">
-        <h1 className="hero-title">Unified intelligence for better decisions and outcomes</h1>
-        <p className="hero-subtitle">Combining data, behavior, and performance signals — so you can understand, act, and improve with clarity</p>
+        <h1 className="hero-title">Where Empathy Meets Innovation</h1>
+        <p className="hero-subtitle">AI-driven companions that guide, calm, and uplift — helping India's athletes, students, couples, and professionals navigate stress with emotional intelligence and mindfulness.</p>
         <div className="hero-buttons">
-          <button className="btn btn-primary" onClick={goToPlatform}>Platform</button>
-          <button className="btn btn-primary" onClick={goToUseCases}>Use Cases</button>
-          <button className="btn btn-primary" onClick={goToHowItWorks}>How It Works</button>
-          <button className="btn btn-primary" onClick={goToAbout}>About</button>
+          <button className="btn btn-primary" onClick={() => navigate('/signup')}>Get Started</button>
+          <button className="btn btn-secondary" onClick={goToPlatform}>Explore Platform</button>
+          <button className="btn btn-secondary" onClick={goToUseCases}>Use Cases</button>
+          <button className="btn btn-secondary" onClick={goToHowItWorks}>How It Works</button>
         </div>
       </div>
     </section>

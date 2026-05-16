@@ -38,6 +38,21 @@ function Navigation() {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/platform" onClick={closeMenu}>
+              Platform
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/usecases" onClick={closeMenu}>
+              Use Cases
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/howitworks" onClick={closeMenu}>
+              How It Works
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/about" onClick={closeMenu}>
               About
             </NavLink>
