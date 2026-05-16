@@ -86,7 +86,21 @@ function UseCasesPage() {
             <div className="usecase-image">
               <img src={managerDismissalImg} alt="Workplace dismissal stress" loading="lazy" />
             </div>
-            {/* ... */}
+           <div className="usecase-text">
+              <span className="usecase-label coming-soon">Work Life • Coming Soon</span>
+              <h2>The invisible toll of being dismissed</h2>
+              <p className="scenario">
+                Your manager scrolls through emails during your presentation. In 30 seconds, your heart rate spikes 30bpm. Your confidence drops. You carry this home—but you don't know why you feel "off" tonight.
+              </p>
+              <div className="what-astra-sees">
+                <h4>What Astra will reveal:</h4>
+                <ul>
+                  <li>The exact moment your stress peaked</li>
+                  <li>How long the physiological impact lasted</li>
+                  <li>Which recovery protocols work for you</li>
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </section>
