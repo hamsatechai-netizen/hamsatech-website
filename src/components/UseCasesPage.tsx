@@ -19,7 +19,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <<img src="/images/usecases/athlete.png" alt="Athlete performance plateau" loading="lazy" />
+              <img src="/images/usecases/athlete.png" alt="Athlete performance plateau" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label mvp">Performance • Available Now</span>
