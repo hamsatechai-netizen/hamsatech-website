@@ -1,89 +1,69 @@
-.footer-section {
-  background: #0a1628;
-  color: #ffffff;
-  padding: 60px 20px 30px;
-  border-top: 1px solid #1a2a3a;
+.site-footer {
+  padding: 72px 0 26px;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(154, 214, 194, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(11, 59, 80, 0.98), rgba(8, 34, 44, 0.98));
+  color: rgba(255, 255, 255, 0.86);
+  border-top: 1px solid rgba(154, 214, 194, 0.14);
 }
 
-.footer-content {
+.site-footer-content {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 1200px;
-  margin: 0 auto 40px;
-  gap: 40px;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 34px;
+  align-items: start;
 }
 
-.footer-column {
-  text-align: left;
+.site-footer-brand h3 {
+  font-size: 1.65rem;
+  margin-bottom: 10px;
+  color: #fff8ef;
 }
 
-.footer-column h3 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 15px;
-  color: #ffffff;
+.site-footer-brand p {
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.7;
+  max-width: 420px;
 }
 
-.footer-column h4 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 15px;
-  color: #ffffff;
+.site-footer-column h4 {
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.86);
+  margin-bottom: 14px;
 }
 
-.footer-column p {
-  font-size: 0.95rem;
-  color: #a0a8b2;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.footer-column ul {
+.site-footer-column ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  gap: 10px;
 }
 
-.footer-column ul li {
-  margin-bottom: 10px;
-}
-
-.footer-column ul li a {
-  color: #a0a8b2;
+.site-footer a {
+  color: rgba(255, 255, 255, 0.76);
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.site-footer a:hover {
+  color: var(--brand-gold);
+}
+
+.site-footer-bottom {
+  margin-top: 54px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(154, 214, 194, 0.18);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.95rem;
-  transition: color 0.3s ease;
 }
 
-.footer-column ul li a:hover {
-  color: #ffd700;
-}
-
-.footer-bottom {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding-top: 30px;
-  border-top: 1px solid #1a2a3a;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
-  color: #808080;
-}
-
-.footer-bottom p {
-  margin: 0;
-}
-
-@media (max-width: 768px) {
-  .footer-content {
+@media (max-width: 900px) {
+  .site-footer-content {
     grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  .footer-bottom {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
   }
 }
+

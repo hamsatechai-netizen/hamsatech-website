@@ -1,7 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:wght@500;600;700&display=swap');
+
 :root {
   color-scheme: light;
-  color: #1a1a1a;
-  background-color: #ffffff;
+  color: #08222c;
+  background-color: #eef9f7;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --surface-bg: #f7fcfb;
+  --surface-border: #cfe6e1;
+  --text-main: #08222c;
+  --text-soft: #496a74;
+  --text-invert: #ffffff;
+  --brand-deep: #0b3b50;
+  --brand-mid: #2f8aa0;
+  --brand-mid-2: #1d6f86;
+  --brand-gold: #9ad6c2;
+  --brand-sand: #d7f0ea;
+  --brand-cream: #f7fcfb;
+  --accent-warm: #f5b7ad;
+  --accent-sun: #f5a345;
+  --success-bg: #e7f7f1;
+  --warning-bg: #e8f5ff;
+  --danger-bg: #ffe9ec;
+  --danger-border: #e296a0;
+  --shadow-color: 3, 40, 56;
 }
 
 * {
@@ -16,13 +37,35 @@ html {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Source Sans Pro',
-    sans-serif;
+  font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #ffffff;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(154, 214, 194, 0.32), transparent 34%),
+    radial-gradient(circle at 86% 14%, rgba(47, 138, 160, 0.2), transparent 30%),
+    linear-gradient(180deg, #eef9f7 0%, #d9f0ec 100%);
   min-height: 100vh;
+  color: var(--text-main);
+}
+
+a {
+  color: inherit;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(47, 138, 160, 0.65);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  letter-spacing: -0.01em;
 }
 
 code {

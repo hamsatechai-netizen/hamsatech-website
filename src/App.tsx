@@ -1,70 +1,94 @@
-import { Routes, Route } from 'react-router-dom'
+import { Suspense, lazy, useEffect, useState } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import './App.css'
-import Hero from './components/Hero'
-import FeatureCard from './components/FeatureCard'
+import AppSplash from './components/AppSplash'
 import Navigation from './components/Navigation'
-import About from './components/About'
-import AboutPage from './components/AboutPage'
-import NextPage from './components/NextPage'
-import PlatformPage from './components/PlatformPage'
-import UseCasesPage from './components/UseCasesPage'
-import HowItWorksPage from './components/HowItWorksPage'
-import ScrollToHash from './components/ScrollToHash'
+import ScrollNavigator from './components/ScrollNavigator'
+import Footer from './components/Footer'
+import PageLoader from './components/PageLoader'
+
+const HomePage = lazy(() => import('./components/HomePage'))
+const AboutPage = lazy(() => import('./components/AboutPage'))
+const PlatformPage = lazy(() => import('./components/PlatformPage'))
+const UseCasesPage = lazy(() => import('./components/UseCasesPage'))
+const HowItWorksPage = lazy(() => import('./components/HowItWorksPage'))
+const SignInPage = lazy(() => import('./components/SignInPage'))
+const SignUpPage = lazy(() => import('./components/SignUpPage'))
+const SignOutPage = lazy(() => import('./components/SignOutPage'))
+const DashboardPage = lazy(() => import('./components/DashboardPage'))
+const AthleteIntakePage = lazy(() => import('./components/AthleteIntakePage'))
+const CoachAthleteDetailsPage = lazy(() => import('./components/CoachAthleteDetailsPage'))
+const ProfilePage = lazy(() => import('./components/ProfilePage'))
 
 function App() {
-  const features = [
-    {
-      id: 1,
-      title: 'AI Coaching',
-      description: 'Data-driven performance insights for athletes.'
-    },
-    {
-      id: 2,
-      title: 'Smart Analytics',
-      description: 'Track, analyze, and improve every move.'
-    },
-    {
-      id: 3,
-      title: 'Elite Training',
-      description: 'Olympic-level precision training systems.'
+  const [isBooting, setIsBooting] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    const startedAt = Date.now()
+    const minSplashMs = 450
+    const maxSplashMs = 2500
+
+    const logoReady = new Promise<void>((resolve) => {
+      const img = new Image()
+      img.onload = () => resolve()
+      img.onerror = () => resolve()
+      img.src = '/logo-mark-white-384.png'
+    })
+
+    const homeChunkReady = import('./components/HomePage')
+
+    const hardTimeout = window.setTimeout(() => {
+      if (!cancelled) {
+        setIsBooting(false)
+      }
+    }, maxSplashMs)
+
+    Promise.allSettled([logoReady, homeChunkReady]).then(() => {
+      window.clearTimeout(hardTimeout)
+      const elapsed = Date.now() - startedAt
+      const remaining = Math.max(0, minSplashMs - elapsed)
+      window.setTimeout(() => {
+        if (!cancelled) {
+          setIsBooting(false)
+        }
+      }, remaining)
+    })
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(hardTimeout)
     }
-  ]
+  }, [])
+
+  if (isBooting) {
+    return <AppSplash />
+  }
 
   return (
     <div className="App">
-      <ScrollToHash />
+      <ScrollNavigator />
       <Navigation />
-      <Routes>
-        <Route path="/" element={<NextPage />} />
-        <Route
-          path="/home"
-          element={
-            <>
-              <Hero />
-              <section id="platform" className="features-section">
-                <div className="container">
-                  <div className="features-grid">
-                    {features.map((feature) => (
-                      <FeatureCard key={feature.id} {...feature} />
-                    ))}
-                  </div>
-                </div>
-              </section>
-              <About />
-              <section id="contact" className="about-section">
-                <div className="container">
-                  <h2>Contact</h2>
-                  <p>Reach us at contact@hamsatech.ai</p>
-                </div>
-              </section>
-            </>
-          }
-        />
-        <Route path="/platform" element={<PlatformPage />} />
-        <Route path="/usecases" element={<UseCasesPage />} />
-        <Route path="/howitworks" element={<HowItWorksPage />} />
-        <Route path="/about" element={<AboutPage />} />
-      </Routes>
+      <main className="app-main">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/home" element={<Navigate to="/" replace />} />
+            <Route path="/platform" element={<PlatformPage />} />
+            <Route path="/usecases" element={<UseCasesPage />} />
+            <Route path="/howitworks" element={<HowItWorksPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/signout" element={<SignOutPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/athlete-intake" element={<AthleteIntakePage />} />
+            <Route path="/coach/athletes/:athleteId" element={<CoachAthleteDetailsPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Routes>
+        </Suspense>
+      </main>
+      <Footer />
     </div>
   )
 }

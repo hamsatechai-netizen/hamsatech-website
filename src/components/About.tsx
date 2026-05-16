@@ -6,9 +6,9 @@ function About() {
       <div className="container">
         <h2 className="about-title">About HamsaTech</h2>
         <p className="about-description">
-          HamsaTech delivers AI-powered solutions for elite sports training and human performance optimization. 
-          Our platform combines cutting-edge artificial intelligence with sports science to help athletes 
-          achieve unprecedented levels of precision, intelligence, and performance.
+          HamsaTech builds AI-powered behavioral intelligence systems that transform personal data into 
+          actionable guidance, helping individuals improve performance, make better decisions, 
+          and achieve stability in high-pressure moments.
         </p>
       </div>
     </section>

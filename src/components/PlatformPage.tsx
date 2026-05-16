@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import '../styles/About.css'
 import '../styles/FeatureCard.css'
 import image1 from '../images/image1.jpg'
@@ -10,52 +9,30 @@ const platformItems = [
     id: 1,
     title: 'Performance Optimization',
     description: 'Improve how you train, recover, and perform.',
-    image: image1
+    image: image1,
   },
   {
     id: 2,
     title: 'Self-Discovery',
     description: 'Understand your patterns, strengths, and blind spots.',
-    image: image2
+    image: image2,
   },
   {
     id: 3,
     title: 'Data-Driven Guidance',
     description: 'Make better decisions in sports, wellness, and life.',
-    image: image3
-  }
+    image: image3,
+  },
 ]
 
 function PlatformPage() {
-  const navigate = useNavigate()
-
-  const goBack = () => {
-    navigate(-1)
-  }
-
   return (
     <section className="about-section">
       <div className="container">
-        <button
-          onClick={goBack}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            color: '#021d39',
-            fontSize: '1.4rem',
-            marginBottom: '20px',
-            cursor: 'pointer'
-          }}
-          aria-label="Go back"
-        >
-          {'<-'} Back
-        </button>
-        <h2 className="about-title">Platform</h2>
+        <h2 className="about-title">A unified intelligence platform that understands you — and guides better decisions</h2>
         <p className="about-description">
-          Our platform delivers AI-driven insights, performance metrics, and
-          personalized training recommendations. Explore real-time analytics,
-          training programs, and adaptive coaching designed to help you reach
-          peak potential.
+         HamsaTech brings together data, behavior, and context into a continuous system — helping you understand what’s happening, 
+          make better decisions, and improve over time.
         </p>
         <div className="features-grid" style={{ marginTop: '40px' }}>
           {platformItems.map((item) => (
@@ -74,3 +51,4 @@ function PlatformPage() {
 }
 
 export default PlatformPage
+

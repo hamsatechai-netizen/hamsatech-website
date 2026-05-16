@@ -1,21 +1,105 @@
-import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import '../styles/Navigation.css'
+import { useAuth } from '../context/AuthContext'
+import { getStoredProfile, saveStoredProfile, subscribeToStoredProfile } from '../lib/profileStorage'
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+  const [displayName, setDisplayName] = useState('')
+  const [profileSport, setProfileSport] = useState('')
+  const { user, isLoading } = useAuth()
+  const location = useLocation()
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const profileMenuRef = useRef<HTMLDivElement | null>(null)
   const closeMenu = () => setIsOpen(false)
+  const authReturnState = { from: { pathname: location.pathname, search: location.search, hash: location.hash } }
+
+  useEffect(() => {
+    if (!user?.email) {
+      setProfileImage(null)
+      setDisplayName('')
+      setProfileSport('')
+      return
+    }
+
+    const syncProfile = () => {
+      const storedProfile = getStoredProfile(user.email)
+      setProfileImage(storedProfile.photoDataUrl ?? null)
+      setDisplayName(storedProfile.displayName?.trim() || user.fullName)
+      setProfileSport(storedProfile.sport ?? user.sport ?? '')
+    }
+
+    syncProfile()
+    return subscribeToStoredProfile((email) => {
+      if (!email || email === user.email.toLowerCase()) {
+        syncProfile()
+      }
+    })
+  }, [user?.email, user?.fullName, user?.sport])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node)) {
+        setIsProfileOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const openPhotoPicker = () => {
+    fileInputRef.current?.click()
+  }
+
+  const renderAvatarFallback = () => (
+    <svg viewBox="0 0 64 64" aria-hidden="true" className="profile-avatar-icon">
+      <circle cx="32" cy="20" r="11" fill="currentColor" opacity="0.92" />
+      <path d="M14 54c2.8-9 10.2-14 18-14s15.2 5 18 14" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    </svg>
+  )
+
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !user?.email) {
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : null
+      if (!result) {
+        return
+      }
+
+      saveStoredProfile(user.email, {
+        ...getStoredProfile(user.email),
+        photoDataUrl: result,
+        displayName: displayName || user.fullName,
+      })
+      setProfileImage(result)
+    }
+    reader.readAsDataURL(file)
+  }
 
   return (
     <nav className="navbar">
       <div className="nav-container">
         <Link to="/" className="nav-logo">
           <span className="logo-icon" aria-hidden="true">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-              <circle cx="50" cy="50" r="48" fill="#29a0bc" stroke="#fff" strokeWidth="3" />
-              <path d="M28 55 C32 45, 40 35, 50 36 C60 37, 68 47, 72 55 C68 62, 57 72, 50 77 C43 72, 32 62, 28 55 Z" fill="#fff" />
-              <path d="M50 28 C46 28, 44 32, 44 36 C44 39, 46 42, 50 42 C54 42, 56 39, 56 36 C56 32, 54 28, 50 28 Z" fill="#ffc107" />
-            </svg>
+            <img
+              src="/logo-mark-white-256.png"
+              srcSet="/logo-mark-white-128.png 1x, /logo-mark-white-256.png 2x, /logo-mark-white-384.png 3x"
+              sizes="56px"
+              alt="HamsaTech"
+              width={56}
+              height={56}
+              decoding="async"
+              fetchPriority="high"
+            />
           </span>
           <span className="logo-text">HamsaTech</span>
         </Link>
@@ -33,21 +117,156 @@ function Navigation() {
 
         <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
           <li>
-            <NavLink to="/" onClick={closeMenu}>
+            <NavLink
+              to="/"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              end
+            >
               Home
             </NavLink>
           </li>
           <li>
-            <NavLink to="/about" onClick={closeMenu}>
-              About
+            <NavLink
+              to="/usecases"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              Use Cases
             </NavLink>
           </li>
           <li>
-            <NavLink to="/home#contact" onClick={closeMenu}>
-              Contact
+            <NavLink
+              to="/platform"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              Platform
             </NavLink>
           </li>
+          <li>
+            <NavLink
+              to="/howitworks"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              How It Works
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/about"
+              onClick={closeMenu}
+              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+            >
+              About
+            </NavLink>
+          </li>
+          {user ? (
+            <li>
+              <NavLink to="/dashboard" onClick={closeMenu}>
+                Dashboard
+              </NavLink>
+            </li>
+          ) : null}
+          {user ? (
+            <li>
+              <NavLink to="/athlete-intake" onClick={closeMenu}>
+                {user.role === 'coach' ? 'Intake' : 'My Intake'}
+              </NavLink>
+            </li>
+          ) : null}
         </ul>
+
+        <div className="nav-auth">
+          {isLoading ? (
+            <span className="auth-loading">Loading...</span>
+          ) : user ? (
+            <div className="profile-menu" ref={profileMenuRef}>
+              <button
+                type="button"
+                className="profile-trigger"
+                onClick={() => setIsProfileOpen((current) => !current)}
+                aria-expanded={isProfileOpen}
+                aria-label="Open profile menu"
+              >
+                <span className="profile-avatar">
+                  {profileImage ? <img src={profileImage} alt={`${user.fullName} profile`} /> : renderAvatarFallback()}
+                </span>
+                <span className="profile-name">{displayName || user.fullName}</span>
+              </button>
+
+              {isProfileOpen ? (
+                <div className="profile-dropdown">
+                  <div className="profile-dropdown-header">
+                    <button type="button" className="profile-avatar profile-avatar-large" onClick={openPhotoPicker}>
+                      {profileImage ? <img src={profileImage} alt={`${user.fullName} profile`} /> : renderAvatarFallback()}
+                    </button>
+                    <div>
+                      <p className="profile-role">{user.role === 'coach' ? 'Coach' : 'Student'}</p>
+                      <h3>{displayName || user.fullName}</h3>
+                      <p className="profile-email">{user.email}</p>
+                    </div>
+                  </div>
+
+                  <dl className="profile-details">
+                    <div>
+                      <dt>Username</dt>
+                      <dd>{displayName || user.fullName}</dd>
+                    </div>
+                    <div>
+                      <dt>Role</dt>
+                      <dd>{user.role === 'coach' ? 'Coach' : 'Student'}</dd>
+                    </div>
+                    {profileSport ? (
+                      <div>
+                        <dt>Sport</dt>
+                        <dd>{profileSport}</dd>
+                      </div>
+                    ) : null}
+                  </dl>
+
+                  <button type="button" className="profile-photo-link" onClick={openPhotoPicker}>
+                    Set profile photo
+                  </button>
+                  <NavLink to="/profile" className="profile-link-card" onClick={() => setIsProfileOpen(false)}>
+                    View profile
+                  </NavLink>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="profile-file-input"
+                    onChange={handlePhotoChange}
+                  />
+
+                  <NavLink to="/signout" className="logout-btn profile-logout" onClick={closeMenu}>
+                    Sign Out
+                  </NavLink>
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <>
+              <NavLink
+                to="/signup"
+                state={authReturnState}
+                className={({ isActive }) => `auth-btn ${isActive ? 'auth-btn--primary' : 'auth-btn--secondary'}`}
+                onClick={closeMenu}
+              >
+                Sign Up
+              </NavLink>
+              <NavLink
+                to="/signin"
+                state={authReturnState}
+                className={({ isActive }) => `auth-btn ${isActive ? 'auth-btn--primary' : 'auth-btn--secondary'}`}
+                onClick={closeMenu}
+              >
+                Sign In
+              </NavLink>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   )

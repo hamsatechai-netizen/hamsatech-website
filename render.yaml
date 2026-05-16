@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: hamsatech-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: HAMSA_DEFAULT_EMAIL
+        value: coach@hamsatech.ai
+      - key: HAMSA_DEFAULT_FULL_NAME
+        value: HamsaTech Coach
+      - key: HAMSA_DEFAULT_COACH_CODE
+        value: HAMSA-COACH-001
+      - key: HAMSA_COOKIE_SECURE
+        value: true
+      - key: HAMSA_COOKIE_SAMESITE
+        value: none
+      - key: HAMSA_FRONTEND_ORIGIN
+        sync: false
+      - key: HAMSA_FRONTEND_ORIGINS
+        sync: false
+      - key: HAMSA_FRONTEND_ORIGIN_REGEX
+        sync: false
+      - key: HAMSA_DEFAULT_PASSWORD
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
