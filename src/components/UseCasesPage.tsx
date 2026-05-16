@@ -1,7 +1,4 @@
 import '../styles/UseCases.css'
-import image4 from '../images/image4.jpg'
-import image5 from '../images/image5.jpg'
-import image6 from '../images/image6.png'
 
 // src/pages/UseCases.jsx
 
