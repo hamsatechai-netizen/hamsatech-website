@@ -100,7 +100,7 @@
 
 /* Problem Section */
 .problem-section {
-  padding: 80px 20px;
+  padding: 100px 20px;
   background: #E8F5F7;
 }
 
@@ -135,7 +135,7 @@
 
 /* Astra Intro Section */
 .astra-intro-section {
-  padding: 80px 20px;
+  padding: 100px 20px;
   background: #FFFFFF;
 }
 
@@ -220,7 +220,7 @@
 
 /* How We Help Section */
 .how-we-help-section {
-  padding: 80px 20px;
+  padding: 100px 20px;
   background: #E8F9F7;
 }
 
@@ -256,7 +256,7 @@
 
 /* Astra Performance Section */
 .astra-performance-section {
-  padding: 80px 20px;
+  padding: 100px 20px;
   background: #FFFFFF;
 }
 
@@ -283,17 +283,18 @@
 }
 
 .performance-features {
-  background: #F8FAFB;
-  padding: 32px;
+  background: linear-gradient(135deg, #F8FAFB 0%, #FFFFFF 100%);
+  padding: 40px;
   border-radius: 12px;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  border: 1px solid #E8EAED;
 }
 
 .feature-row {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 0;
+  padding: 16px 0;
   font-size: 16px;
   color: #2D5B8F;
   border-bottom: 1px solid #E8EAED;
@@ -331,14 +332,9 @@
   box-shadow: 0 8px 24px rgba(78, 205, 196, 0.4);
 }
 
-.cta-large.white {
-  background: #FFFFFF;
-  color: #2D5B8F;
-}
-
 /* Trust Section */
 .trust-section-simple {
-  padding: 60px 20px;
+  padding: 80px 20px;
   background: #F8FAFB;
 }
 
@@ -346,7 +342,7 @@
   display: flex;
   align-items: flex-start;
   gap: 20px;
-  padding: 24px 0;
+  padding: 32px 0;
   border-bottom: 1px solid #E8EAED;
   max-width: 800px;
   margin: 0 auto;
@@ -357,14 +353,14 @@
 }
 
 .trust-icon-circle {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   background: #E8F9F7;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
+  font-size: 28px;
   color: #4ECDC4;
   font-weight: 500;
   flex-shrink: 0;
@@ -390,7 +386,7 @@
 
 /* Final CTA Section */
 .final-cta-section {
-  padding: 80px 20px;
+  padding: 100px 20px;
   background: linear-gradient(135deg, #2D5B8F 0%, #1A3D5C 100%);
   text-align: center;
 }
@@ -400,6 +396,17 @@
   font-weight: 500;
   color: #FFFFFF;
   margin-bottom: 40px;
+}
+
+.final-cta-section .cta-large {
+  background: #4ECDC4;
+  color: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
+}
+
+.final-cta-section .cta-large:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(78, 205, 196, 0.5);
 }
 
 /* Tablet */
