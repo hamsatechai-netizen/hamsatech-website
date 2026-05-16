@@ -19,7 +19,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <img src="/images/usecases/athlete.png" alt="Athlete performance plateau" loading="lazy" />
+              <img src="/images/athlete.png" alt="Athlete performance plateau" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label mvp">Performance • Available Now</span>
@@ -47,7 +47,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content reverse">
             <div className="usecase-image">
-              <img src="/images/usecases/compat.png" alt="Pre-marriage compatibility assessment" loading="lazy" />
+              <img src="/images/compat.png" alt="Pre-marriage compatibility assessment" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label mvp-secondary">Relationships • Coming Q3 2026</span>
@@ -83,7 +83,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <img src="/images/usecases/manager-dismissal.png" alt="Workplace dismissal stress" loading="lazy" />
+              <img src="/images/manager-dismissal.png" alt="Workplace dismissal stress" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label coming-soon">Work Life • Coming Soon</span>
@@ -109,7 +109,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content reverse">
             <div className="usecase-image">
-             <img src="/images/usecases/mil-comment.png" alt="Family conflict trigger" loading="lazy" />
+             <img src="/images/mil-comment.png" alt="Family conflict trigger" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label coming-soon">Family • Coming Soon</span>
@@ -135,7 +135,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content">
             <div className="usecase-image">
-              <img src="/images/usecases/teen-fine.png" alt="Teen withdrawal signals" loading="lazy" />
+              <img src="/images/parent.png" alt="Teen withdrawal signals" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label coming-soon">Parenting • Coming Soon</span>
@@ -161,7 +161,7 @@ function UseCasesPage() {
         <div className="container">
           <div className="usecase-content reverse">
             <div className="usecase-image">
-              <img src="/images/usecases/exam-pressure.png" alt="Student exam stress" loading="lazy" />
+              <img src="/images/exam-pressure.png" alt="Student exam stress" loading="lazy" />
             </div>
             <div className="usecase-text">
               <span className="usecase-label coming-soon">Student Life • Coming Soon</span>
