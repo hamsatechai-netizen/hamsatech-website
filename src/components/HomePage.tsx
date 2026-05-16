@@ -58,7 +58,7 @@ function HomePage() {
             {/* Performance Module */}
             <div className="module-card">
               <div className="module-image">
-                <img src="/images/performance-module.jpg" alt="Performance Module" />
+                <img src="/images/performance.jpg" alt="Performance Module" />
               </div>
               <div className="module-content">
                 <div className="module-header">
@@ -72,7 +72,7 @@ function HomePage() {
             {/* Relationships Module */}
             <div className="module-card">
               <div className="module-image">
-                <img src="/images/relationships-module.jpg" alt="Relationships Module" />
+                <img src="/images/relationships.jpg" alt="Relationships Module" />
               </div>
               <div className="module-content">
                 <div className="module-header">
@@ -86,7 +86,7 @@ function HomePage() {
             {/* Life & Wellbeing Module */}
             <div className="module-card">
               <div className="module-image">
-                <img src="/images/wellbeing-module.jpg" alt="Life & Wellbeing Module" />
+                <img src="/images/wellbeing.jpg" alt="Life & Wellbeing Module" />
               </div>
               <div className="module-content">
                 <div className="module-header">
