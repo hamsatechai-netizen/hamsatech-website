@@ -1,5 +1,3 @@
-/* src/styles/UseCases.css */
-
 .usecases-page {
   min-height: 100vh;
 }
@@ -10,9 +8,8 @@
   padding: 0 20px;
 }
 
-/* Hero */
 .usecases-hero {
-  background: linear-gradient(135deg, #E8F5FF 0%, #F0F9FF 100%);
+  background: linear-gradient(135deg, #e8f5ff 0%, #f0f9ff 100%);
   padding: 100px 20px 80px;
   text-align: center;
 }
@@ -20,25 +17,28 @@
 .usecases-hero h1 {
   font-size: 52px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 20px;
 }
 
 .usecases-hero p {
   font-size: 20px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   max-width: 700px;
   margin: 0 auto;
 }
 
-/* Use Case Detail Sections */
 .usecase-detail {
   padding: 80px 20px;
-  background: #FFFFFF;
+  background: #ffffff;
 }
 
 .usecase-detail.alternate {
-  background: #F8FAFB;
+  background: #f8fafb;
+}
+
+.usecase-detail.featured-secondary {
+  background: linear-gradient(135deg, #f9f0ff 0%, #fff5f9 100%);
 }
 
 .usecase-content {
@@ -76,8 +76,8 @@
 
 .usecase-label {
   display: inline-block;
-  background: #E8F9F7;
-  color: #4ECDC4;
+  background: #e8f9f7;
+  color: #4ecdc4;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 14px;
@@ -85,32 +85,38 @@
   margin-bottom: 16px;
 }
 
+.usecase-label.mvp-secondary {
+  background: #f9f0ff;
+  color: #9b59b6;
+  font-weight: 600;
+}
+
 .usecase-text h2 {
   font-size: 36px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 20px;
   line-height: 1.2;
 }
 
 .scenario {
   font-size: 18px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
   margin-bottom: 32px;
 }
 
 .what-astra-sees {
-  background: #F8FAFB;
+  background: #f8fafb;
   padding: 24px;
   border-radius: 12px;
-  border-left: 4px solid #4ECDC4;
+  border-left: 4px solid #4ecdc4;
 }
 
 .what-astra-sees h4 {
   font-size: 16px;
   font-weight: 500;
-  color: #2D5B8F;
+  color: #2d5b8f;
   margin-bottom: 12px;
 }
 
@@ -122,51 +128,78 @@
 
 .what-astra-sees li {
   font-size: 15px;
-  color: #5A7A9C;
-  padding: 8px 0;
-  padding-left: 24px;
+  color: #5a7a9c;
+  padding: 8px 0 8px 24px;
   position: relative;
 }
 
 .what-astra-sees li::before {
-  content: "✓";
+  content: '+';
   position: absolute;
   left: 0;
-  color: #4ECDC4;
-  font-weight: 500;
+  color: #4ecdc4;
+  font-weight: 700;
 }
 
-/* CTA Section */
+.usecase-cta,
+.cta-large {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.usecase-cta {
+  margin-top: 24px;
+  padding: 16px 28px;
+  background: #4ecdc4;
+  color: #ffffff;
+  box-shadow: 0 8px 24px rgba(78, 205, 196, 0.22);
+}
+
+.usecase-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(78, 205, 196, 0.34);
+}
+
+.usecase-cta.secondary {
+  background: #9b59b6;
+}
+
+.usecase-cta.secondary:hover {
+  box-shadow: 0 10px 26px rgba(155, 89, 182, 0.3);
+}
+
 .usecases-cta {
   padding: 100px 20px;
-  background: linear-gradient(135deg, #2D5B8F 0%, #1A3D5C 100%);
+  background: linear-gradient(135deg, #2d5b8f 0%, #1a3d5c 100%);
   text-align: center;
 }
 
 .usecases-cta h2 {
   font-size: 42px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 16px;
 }
 
 .usecases-cta p {
   font-size: 18px;
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.95;
   margin-bottom: 40px;
 }
 
 .cta-large {
-  background: #4ECDC4;
-  color: #FFFFFF;
-  border: none;
+  background: #4ecdc4;
+  color: #ffffff;
   padding: 18px 48px;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .cta-large:hover {
@@ -174,28 +207,6 @@
   box-shadow: 0 8px 28px rgba(78, 205, 196, 0.4);
 }
 
-/* Add to UseCases.css */
-
-/* Featured Secondary Use Case (Pre-Marriage) */
-.usecase-detail.featured-secondary {
-  background: linear-gradient(135deg, #F9F0FF 0%, #FFF5F9 100%);
-}
-
-.usecase-label.mvp-secondary {
-  background: #F9F0FF;
-  color: #9B59B6;
-  font-weight: 600;
-}
-
-.usecase-cta.secondary {
-  background: #9B59B6;
-}
-
-.usecase-cta.secondary:hover {
-  box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
-}
-
-/* CTA Buttons Side by Side */
 .cta-buttons {
   display: flex;
   gap: 20px;
@@ -205,34 +216,31 @@
 
 .secondary-cta {
   background: transparent;
-  color: #FFFFFF;
-  border: 2px solid #FFFFFF;
+  color: #ffffff;
+  border: 2px solid #ffffff;
 }
 
 .secondary-cta:hover {
   background: rgba(255, 255, 255, 0.15);
-  border-color: #FFFFFF;
+  border-color: #ffffff;
 }
 
-@media (max-width: 767px) {
-  .cta-buttons {
-    flex-direction: column;
-  }
-  
-  .cta-large {
-    width: 100%;
-    max-width: 320px;
-  }
-}
-/* Tablet and Desktop */
 @media (min-width: 768px) {
   .usecase-content {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-/* Mobile */
 @media (max-width: 767px) {
+  .cta-buttons {
+    flex-direction: column;
+  }
+
+  .cta-large {
+    width: 100%;
+    max-width: 320px;
+  }
+
   .usecases-hero h1 {
     font-size: 36px;
   }

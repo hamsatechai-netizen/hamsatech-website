@@ -1,19 +1,15 @@
-/* src/styles/About.css */
-
 .about-page {
   min-height: 100vh;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* About Hero Section */
 .about-hero {
-  background: linear-gradient(135deg, #E8F5FF 0%, #F0F9FF 100%);
+  background: linear-gradient(135deg, #e8f5ff 0%, #f0f9ff 100%);
   padding: 100px 20px 80px;
   text-align: center;
 }
@@ -21,23 +17,23 @@
 .about-hero h1 {
   font-size: 52px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 28px;
   line-height: 1.2;
 }
 
 .about-intro {
   font-size: 20px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   max-width: 900px;
   margin: 0 auto;
   line-height: 1.7;
 }
 
-/* Astra Section */
-.astra-section {
+.astra-section,
+.team-section {
   padding: 80px 20px;
-  background: #FFFFFF;
+  background: #ffffff;
 }
 
 .astra-content {
@@ -49,25 +45,25 @@
 .astra-content h2 {
   font-size: 36px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 20px;
 }
 
-.astra-content p {
+.astra-content p,
+.team-description {
   font-size: 18px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
 }
 
 .astra-content strong {
-  color: #2D5B8F;
-  font-weight: 500;
+  color: #2d5b8f;
+  font-weight: 600;
 }
 
-/* Values Section */
 .values-section {
   padding: 80px 20px;
-  background: #F8FAFB;
+  background: #f8fafb;
 }
 
 .values-grid {
@@ -79,68 +75,62 @@
 }
 
 .value-card {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 48px 40px;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   text-align: center;
-  border-top: 4px solid #4ECDC4;
+  border-top: 4px solid #4ecdc4;
 }
 
 .value-card h3 {
   font-size: 24px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 16px;
 }
 
 .value-card p {
   font-size: 16px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
   margin: 0;
-}
-
-/* Team Section */
-.team-section {
-  padding: 80px 20px;
-  background: #FFFFFF;
 }
 
 .section-title {
   font-size: 36px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   text-align: center;
   margin-bottom: 24px;
 }
 
 .team-description {
-  font-size: 18px;
-  color: #5A7A9C;
   text-align: center;
   max-width: 800px;
   margin: 0 auto;
-  line-height: 1.7;
 }
 
-/* CTA Section */
 .about-cta-section {
   padding: 80px 20px;
-  background: linear-gradient(135deg, #2D5B8F 0%, #1A3D5C 100%);
+  background: linear-gradient(135deg, #2d5b8f 0%, #1a3d5c 100%);
   text-align: center;
 }
 
 .about-cta-section h2 {
   font-size: 38px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 40px;
 }
 
 .cta-large {
-  background: #4ECDC4;
-  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #4ecdc4;
+  color: #ffffff;
   border: none;
   padding: 18px 48px;
   border-radius: 8px;
@@ -155,31 +145,24 @@
   box-shadow: 0 8px 28px rgba(78, 205, 196, 0.4);
 }
 
-/* Tablet */
 @media (min-width: 768px) {
   .values-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Mobile */
 @media (max-width: 767px) {
   .about-hero h1 {
     font-size: 36px;
   }
 
-  .about-intro {
+  .about-intro,
+  .team-description {
     font-size: 18px;
   }
 
-  .astra-content h2 {
-    font-size: 28px;
-  }
-
-  .section-title {
-    font-size: 28px;
-  }
-
+  .astra-content h2,
+  .section-title,
   .about-cta-section h2 {
     font-size: 28px;
   }

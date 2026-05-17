@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
+import logging
 from uuid import uuid4
 from typing import Annotated, Any
 from typing import Literal
@@ -18,6 +19,9 @@ from .security import (
     verify_password,
 )
 from .supabase_client import get_supabase_admin_client
+
+
+logger = logging.getLogger(__name__)
 
 
 app = FastAPI(title="HamsaTech Auth API", version="1.0.0")
@@ -842,8 +846,12 @@ def seed_psychology_questions() -> None:
             DEFAULT_PSYCHOLOGY_QUESTIONS,
             on_conflict="question_id",
         ).execute()
-    except HTTPException:
+    except HTTPException as exception:
         # Keep intake usable even before Supabase is configured.
+        logger.warning("Skipping psychology question seed because Supabase is not configured: %s", exception.detail)
+        return
+    except Exception as exception:
+        logger.warning("Skipping psychology question seed because Supabase is unavailable: %s", exception)
         return
 
 
@@ -852,8 +860,12 @@ def seed_application_data() -> None:
     try:
         ensure_seed_data()
         seed_psychology_questions()
-    except HTTPException:
+    except HTTPException as exception:
         # Allow the API to boot even before local env vars are configured.
+        logger.warning("Skipping startup seed because Supabase is not configured: %s", exception.detail)
+        return
+    except Exception as exception:
+        logger.warning("Skipping startup seed because Supabase is unavailable: %s", exception)
         return
 
 

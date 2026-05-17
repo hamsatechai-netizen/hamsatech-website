@@ -51,6 +51,11 @@ function Navigation() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    setIsOpen(false)
+    setIsProfileOpen(false)
+  }, [location.pathname, location.search, location.hash])
+
   const openPhotoPicker = () => {
     fileInputRef.current?.click()
   }
@@ -164,14 +169,22 @@ function Navigation() {
           </li>
           {user ? (
             <li>
-              <NavLink to="/dashboard" onClick={closeMenu}>
+              <NavLink
+                to="/dashboard"
+                onClick={closeMenu}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              >
                 Dashboard
               </NavLink>
             </li>
           ) : null}
           {user ? (
             <li>
-              <NavLink to="/athlete-intake" onClick={closeMenu}>
+              <NavLink
+                to="/athlete-intake"
+                onClick={closeMenu}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              >
                 {user.role === 'coach' ? 'Intake' : 'My Intake'}
               </NavLink>
             </li>

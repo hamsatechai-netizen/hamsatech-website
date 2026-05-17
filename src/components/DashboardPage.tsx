@@ -147,7 +147,7 @@ function DashboardPage() {
     }
 
     if (!filteredStudents.some((student) => student.email === selectedStudentEmail)) {
-      setSelectedStudentEmail('')
+      setSelectedStudentEmail(filteredStudents[0]?.email ?? '')
     }
   }, [filteredStudents, selectedStudentEmail, user?.role])
 
@@ -158,7 +158,7 @@ function DashboardPage() {
     }
 
     if (!assignmentRequests.some((request) => request.email === selectedRequestEmail)) {
-      setSelectedRequestEmail('')
+      setSelectedRequestEmail(assignmentRequests[0]?.email ?? '')
     }
   }, [assignmentRequests, selectedRequestEmail, user?.role])
 
