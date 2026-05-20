@@ -4,11 +4,13 @@ import os
 
 from fastapi import HTTPException, status
 from supabase import Client, create_client
+from supabase.lib.client_options import SyncClientOptions
 
 
 def get_supabase_admin_client() -> Client:
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
+    schema = os.getenv("SUPABASE_SCHEMA", "hamsatech").strip() or "hamsatech"
 
     if not url or not key:
         raise HTTPException(
@@ -16,4 +18,4 @@ def get_supabase_admin_client() -> Client:
             detail="Supabase is not configured. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
         )
 
-    return create_client(url, key)
+    return create_client(url, key, options=SyncClientOptions(schema=schema))

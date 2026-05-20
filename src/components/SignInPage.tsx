@@ -21,6 +21,10 @@ function sanitizeReturnTo(value: ReturnLocation | string | null | undefined) {
   return trimmed
 }
 
+function getRoleDashboardPath(role: 'coach' | 'student') {
+  return role === 'coach' ? '/coach/dashboard' : '/dashboard'
+}
+
 function SignInPage() {
   const { user, signIn } = useAuth()
   const navigate = useNavigate()
@@ -43,7 +47,7 @@ function SignInPage() {
   }, [location.search, location.state])
 
   if (user) {
-    return <Navigate to={from} replace />
+    return <Navigate to={from === '/dashboard' ? getRoleDashboardPath(user.role) : from} replace />
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -52,8 +56,8 @@ function SignInPage() {
     setIsSubmitting(true)
 
     try {
-      await signIn(email, password)
-      navigate(from, { replace: true })
+      const signedInUser = await signIn(email, password)
+      navigate(from === '/dashboard' ? getRoleDashboardPath(signedInUser.role) : from, { replace: true })
     } catch (submissionError) {
       setError(submissionError instanceof Error ? submissionError.message : 'Unable to sign in')
     } finally {

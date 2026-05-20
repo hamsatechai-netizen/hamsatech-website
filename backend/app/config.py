@@ -33,6 +33,9 @@ class Settings:
         origins = [origin.strip() for origin in self.frontend_origins_raw.split(",") if origin.strip()]
         if self.frontend_origin and self.frontend_origin not in origins:
             origins.append(self.frontend_origin)
+        for local_origin in ("http://127.0.0.1:5174", "http://localhost:5174"):
+            if local_origin not in origins:
+                origins.append(local_origin)
         return origins
 
     @property

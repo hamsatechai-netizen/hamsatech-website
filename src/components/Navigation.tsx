@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import '../styles/Navigation.css'
 import { useAuth } from '../context/AuthContext'
 import { getStoredProfile, saveStoredProfile, subscribeToStoredProfile } from '../lib/profileStorage'
+import NotificationBell from './coach/NotificationBell'
 
 function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -167,10 +168,10 @@ function Navigation() {
               About
             </NavLink>
           </li>
-          {user ? (
+          {user?.role === 'coach' ? (
             <li>
               <NavLink
-                to="/dashboard"
+                to="/coach/dashboard"
                 onClick={closeMenu}
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
               >
@@ -178,20 +179,21 @@ function Navigation() {
               </NavLink>
             </li>
           ) : null}
-          {user ? (
+          {user?.role === 'coach' ? (
             <li>
               <NavLink
-                to="/athlete-intake"
+                to="/coach/assignments/pending"
                 onClick={closeMenu}
                 className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
               >
-                {user.role === 'coach' ? 'Intake' : 'My Intake'}
+                Assignments
               </NavLink>
             </li>
           ) : null}
         </ul>
 
         <div className="nav-auth">
+          {user?.role === 'coach' ? <NotificationBell /> : null}
           {isLoading ? (
             <span className="auth-loading">Loading...</span>
           ) : user ? (
@@ -262,20 +264,12 @@ function Navigation() {
           ) : (
             <>
               <NavLink
-                to="/signup"
+                to="/coach/login"
                 state={authReturnState}
                 className={({ isActive }) => `auth-btn ${isActive ? 'auth-btn--primary' : 'auth-btn--secondary'}`}
                 onClick={closeMenu}
               >
-                Sign Up
-              </NavLink>
-              <NavLink
-                to="/signin"
-                state={authReturnState}
-                className={({ isActive }) => `auth-btn ${isActive ? 'auth-btn--primary' : 'auth-btn--secondary'}`}
-                onClick={closeMenu}
-              >
-                Sign In
+                Coach Sign In
               </NavLink>
             </>
           )}

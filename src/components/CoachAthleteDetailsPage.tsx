@@ -1,10 +1,12 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
   createCoachAthleteFeedback,
   getCoachAthleteDetails,
   getCoachAthleteFeedback,
+  getCoachAthleteScores,
+  type AthleteScoreRecord,
   type CoachAthleteDetail,
   type CoachFeedbackRecord,
 } from '../lib/authApi'
@@ -26,20 +28,26 @@ function clampPercent(value: number) {
   return Math.max(0, Math.min(100, Math.round(value)))
 }
 
+function buildMiniSeries(value: number, points = 8) {
+  const clamped = clampPercent(value)
+  const base = Math.max(10, clamped - 22)
+  return Array.from({ length: points }, (_, index) => Math.max(8, Math.min(100, base + index * 4 + ((index % 2) * 7 - 3))))
+}
+
 function CoachAthleteDetailsPage() {
   const { athleteId } = useParams()
   const { user, isLoading } = useAuth()
   const [athlete, setAthlete] = useState<CoachAthleteDetail | null>(null)
   const [feedback, setFeedback] = useState<CoachFeedbackRecord[]>([])
+  const [scores, setScores] = useState<AthleteScoreRecord[]>([])
   const [error, setError] = useState('')
-  const [feedbackError, setFeedbackError] = useState('')
   const [isFetching, setIsFetching] = useState(false)
-  const [isSavingFeedback, setIsSavingFeedback] = useState(false)
   const [feedbackForm, setFeedbackForm] = useState({
     note: '',
     recommendation: '',
-    status: 'Progressing' as CoachFeedbackRecord['status'],
+    status: 'Progressing' as 'Needs Attention' | 'Progressing' | 'Strong',
   })
+  const [feedbackState, setFeedbackState] = useState({ loading: false, error: '', success: '' })
 
   useEffect(() => {
     if (!user || user.role !== 'coach' || !athleteId) {
@@ -51,12 +59,14 @@ function CoachAthleteDetailsPage() {
       setError('')
 
       try {
-        const [details, feedbackItems] = await Promise.all([
+        const [details, feedbackItems, scoreItems] = await Promise.all([
           getCoachAthleteDetails(athleteId),
           getCoachAthleteFeedback(athleteId),
+          getCoachAthleteScores(athleteId),
         ])
         setAthlete(details)
         setFeedback(feedbackItems)
+        setScores(scoreItems.length > 0 ? scoreItems : details.scores ?? [])
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : 'Unable to load athlete details')
       } finally {
@@ -113,28 +123,35 @@ function CoachAthleteDetailsPage() {
   }, [athlete, latestPhysiology])
 
   const weakestAreas = useMemo(() => insightMetrics.slice(0, 3), [insightMetrics])
+  const overallScore = useMemo(
+    () => scores.find((score) => score.scoreType === 'overall') ?? scores[0] ?? null,
+    [scores],
+  )
+  const powerCard = useMemo(() => {
+    const get = (name: string, fallback: number) => scores.find((item) => item.scoreType === name)?.scoreValue ?? fallback
+    return [
+      { label: 'Focus', emoji: '🦅', value: clampPercent(get('focus', 72)) },
+      { label: 'Baseline Arousal', emoji: '💚', value: clampPercent(get('arousal', 66)) },
+      { label: 'Mental Resilience', emoji: '🧠', value: clampPercent(get('resilience', 70)) },
+      { label: 'Motivation', emoji: '⚡', value: clampPercent(get('motivation', 75)) },
+    ]
+  }, [scores])
 
-  const handleSubmitFeedback = async (event: FormEvent<HTMLFormElement>) => {
+  const handleFeedbackSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!athleteId) {
-      return
-    }
-
-    setIsSavingFeedback(true)
-    setFeedbackError('')
-
+    if (!athleteId) return
+    setFeedbackState({ loading: true, error: '', success: '' })
     try {
-      const created = await createCoachAthleteFeedback(athleteId, feedbackForm)
-      setFeedback((current) => [created, ...current])
-      setFeedbackForm({
-        note: '',
-        recommendation: '',
-        status: 'Progressing',
+      const saved = await createCoachAthleteFeedback(athleteId, feedbackForm)
+      setFeedback((current) => [saved, ...current])
+      setFeedbackForm({ note: '', recommendation: '', status: 'Progressing' })
+      setFeedbackState({ loading: false, error: '', success: 'Feedback saved.' })
+    } catch (submitError) {
+      setFeedbackState({
+        loading: false,
+        error: submitError instanceof Error ? submitError.message : 'Unable to save feedback.',
+        success: '',
       })
-    } catch (submissionError) {
-      setFeedbackError(submissionError instanceof Error ? submissionError.message : 'Unable to save coach feedback')
-    } finally {
-      setIsSavingFeedback(false)
     }
   }
 
@@ -160,7 +177,7 @@ function CoachAthleteDetailsPage() {
         </div>
 
         <div className="dashboard-links">
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/coach/dashboard">Dashboard</Link>
         </div>
 
         {isFetching ? <p className="dashboard-message">Loading athlete...</p> : null}
@@ -196,10 +213,49 @@ function CoachAthleteDetailsPage() {
                   <dt>Latest Session</dt>
                   <dd>{latestSession ? formatDate(latestSession.sessionDate) : 'Not added'}</dd>
                 </div>
+                <div>
+                  <dt>Overall Score</dt>
+                  <dd>{overallScore ? `${overallScore.scoreValue} (${overallScore.category})` : 'Not added'}</dd>
+                </div>
               </dl>
             </aside>
 
             <div className="athlete-detail-sections">
+              <section className="athlete-detail-card power-card-surface">
+                <h2>Power Card</h2>
+                <div className="power-card-grid">
+                  {powerCard.map((item) => (
+                    <article key={item.label} className="power-badge">
+                      <span>{item.emoji}</span>
+                      <strong>{item.value}</strong>
+                      <small>{item.label}</small>
+                    </article>
+                  ))}
+                </div>
+              </section>
+
+              <section className="athlete-detail-card">
+                <h2>Performance & HRV Trends</h2>
+                <div className="mini-chart-grid">
+                  <article className="mini-chart-card">
+                    <strong>Performance Trend</strong>
+                    <div className="mini-series">
+                      {buildMiniSeries(overallScore?.scoreValue ?? 70).map((point, index) => (
+                        <span key={`perf-${index}`} style={{ height: `${point}%` }} />
+                      ))}
+                    </div>
+                  </article>
+                  <article className="mini-chart-card">
+                    <strong>HRV Trend</strong>
+                    <div className="mini-series">
+                      {buildMiniSeries(100 - (latestPhysiology?.stressScore ?? 36)).map((point, index) => (
+                        <span key={`hrv-${index}`} style={{ height: `${point}%` }} />
+                      ))}
+                    </div>
+                  </article>
+                </div>
+              </section>
+
               <section className="athlete-detail-card">
                 <h2>Weak Area Snapshot</h2>
                 <p className="dashboard-footnote">A quick comparison of the latest intake against coach-friendly target bands.</p>
@@ -233,18 +289,33 @@ function CoachAthleteDetailsPage() {
               </section>
 
               <section className="athlete-detail-card">
+                <h2>Calculated Scores</h2>
+                {scores.length > 0 ? (
+                  <div className="score-history-list">
+                    {scores.map((score) => (
+                      <article key={score.scoreId} className="score-history-item">
+                        <div>
+                          <strong>{score.scoreType}</strong>
+                          <span>{formatDate(score.calculatedAt)} | {score.category}</span>
+                        </div>
+                        <b>{score.scoreValue}</b>
+                      </article>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="dashboard-footnote">No calculated scores available yet.</p>
+                )}
+              </section>
+
+              <section className="athlete-detail-card">
                 <h2>Coach Feedback</h2>
-                <form className="coach-feedback-form" onSubmit={handleSubmitFeedback}>
+                <p className="dashboard-footnote">Feedback is saved to the shared backend and is visible to the athlete app feed.</p>
+                <form className="feedback-form" onSubmit={handleFeedbackSubmit}>
                   <label>
                     <span>Status</span>
                     <select
                       value={feedbackForm.status}
-                      onChange={(event) =>
-                        setFeedbackForm((current) => ({
-                          ...current,
-                          status: event.target.value as CoachFeedbackRecord['status'],
-                        }))
-                      }
+                      onChange={(event) => setFeedbackForm((current) => ({ ...current, status: event.target.value as typeof feedbackForm.status }))}
                     >
                       <option>Needs Attention</option>
                       <option>Progressing</option>
@@ -252,35 +323,29 @@ function CoachAthleteDetailsPage() {
                     </select>
                   </label>
                   <label>
-                    <span>Observation</span>
+                    <span>Note</span>
                     <textarea
-                      value={feedbackForm.note}
-                      onChange={(event) =>
-                        setFeedbackForm((current) => ({ ...current, note: event.target.value }))
-                      }
                       minLength={2}
                       maxLength={500}
+                      value={feedbackForm.note}
+                      onChange={(event) => setFeedbackForm((current) => ({ ...current, note: event.target.value }))}
                       required
                     />
                   </label>
                   <label>
                     <span>Recommendation</span>
                     <textarea
-                      value={feedbackForm.recommendation}
-                      onChange={(event) =>
-                        setFeedbackForm((current) => ({
-                          ...current,
-                          recommendation: event.target.value,
-                        }))
-                      }
                       minLength={2}
                       maxLength={500}
+                      value={feedbackForm.recommendation}
+                      onChange={(event) => setFeedbackForm((current) => ({ ...current, recommendation: event.target.value }))}
                       required
                     />
                   </label>
-                  {feedbackError ? <p className="dashboard-message dashboard-error">{feedbackError}</p> : null}
-                  <button type="submit" className="dashboard-action-button" disabled={isSavingFeedback}>
-                    {isSavingFeedback ? 'Saving feedback...' : 'Save Feedback'}
+                  {feedbackState.error ? <p className="dashboard-message dashboard-error">{feedbackState.error}</p> : null}
+                  {feedbackState.success ? <p className="dashboard-message dashboard-success">{feedbackState.success}</p> : null}
+                  <button type="submit" className="dashboard-inline-link" disabled={feedbackState.loading}>
+                    {feedbackState.loading ? 'Saving...' : 'Save Feedback'}
                   </button>
                 </form>
 

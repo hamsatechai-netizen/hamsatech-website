@@ -43,7 +43,7 @@ function CoachIntakePage() {
       setError('')
 
       try {
-        const athleteRecords = await getCoachAthletes(intakeSearchTerm)
+        const athleteRecords = await getCoachAthletes({ search: intakeSearchTerm, includePending: true })
         if (isCancelled) {
           return
         }
@@ -169,20 +169,20 @@ function CoachIntakePage() {
                       <p className="student-role">Submitted Intake</p>
                       <h2>{selectedAthlete.name}</h2>
                     </div>
-                    <span className="student-score">{selectedAthlete.age}</span>
+                    <span className="student-score">{selectedAthlete.age ?? '-'}</span>
                   </div>
                   <dl className="student-meta">
                     <div>
                       <dt>Email</dt>
-                      <dd>{selectedAthlete.email}</dd>
+                      <dd>{selectedAthlete.email || 'Not provided'}</dd>
                     </div>
                     <div>
                       <dt>Gender</dt>
-                      <dd>{selectedAthlete.gender}</dd>
+                      <dd>{selectedAthlete.gender || 'Not provided'}</dd>
                     </div>
                     <div>
                       <dt>Academy</dt>
-                      <dd>{selectedAthlete.academyId}</dd>
+                      <dd>{selectedAthlete.academyId || 'Not provided'}</dd>
                     </div>
                     <div>
                       <dt>Latest Session</dt>
@@ -224,7 +224,7 @@ function CoachIntakePage() {
         </section>
 
         <div className="dashboard-links">
-          <Link to="/dashboard">Dashboard</Link>
+          <Link to="/coach/dashboard">Dashboard</Link>
           <Link to="/profile">Profile</Link>
         </div>
       </div>

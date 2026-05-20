@@ -1,0 +1,20 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1024" fill="#F6F4FF"/>
+  <rect x="40" y="28" width="1360" height="76" rx="18" fill="#2A1B5A"/>
+  <text x="76" y="76" fill="#FFFFFF" font-size="28" font-family="Manrope" font-weight="700">Session Notifications + Feedback</text>
+  <rect x="40" y="130" width="480" height="854" rx="18" fill="#FFFFFF" stroke="#E2D9FF"/>
+  <text x="64" y="176" fill="#111827" font-size="24" font-family="Manrope" font-weight="700">Notifications</text>
+  <circle cx="205" cy="168" r="14" fill="#EF4444"/><text x="200" y="173" fill="#FFFFFF" font-size="12" font-family="Manrope" font-weight="700">6</text>
+  <rect x="64" y="200" width="432" height="94" rx="12" fill="#DBEAFE"/><text x="84" y="236" fill="#1E3A8A" font-size="16" font-family="Manrope">Anita completed session #S103</text><text x="84" y="262" fill="#1E3A8A" font-size="14" font-family="Manrope">Needs coach feedback</text>
+  <rect x="64" y="308" width="432" height="94" rx="12" fill="#F8FAFC"/><text x="84" y="344" fill="#111827" font-size="16" font-family="Manrope">Arjun completed session #S104</text>
+  <rect x="540" y="130" width="860" height="854" rx="18" fill="#FFFFFF" stroke="#E2D9FF"/>
+  <text x="564" y="176" fill="#111827" font-size="24" font-family="Manrope" font-weight="700">Coach Feedback</text>
+  <rect x="564" y="200" width="812" height="58" rx="10" fill="#F3F4F6"/><text x="586" y="236" fill="#374151" font-size="16" font-family="Manrope">Athlete: Anita Ayyagari | Session: S103</text>
+  <rect x="564" y="278" width="812" height="220" rx="12" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="586" y="312" fill="#111827" font-size="16" font-family="Manrope">Feedback Notes</text>
+  <text x="586" y="342" fill="#6B7280" font-size="15" font-family="Manrope">Observed improved trigger discipline, but stress response is still elevated...</text>
+  <rect x="564" y="520" width="812" height="160" rx="12" fill="#F9FAFB" stroke="#E5E7EB"/>
+  <text x="586" y="554" fill="#111827" font-size="16" font-family="Manrope">Training Plan Suggestion</text>
+  <text x="586" y="584" fill="#6B7280" font-size="15" font-family="Manrope">3x breathing drill, 2x dry fire hold, 1x match simulation in low-distraction setup.</text>
+  <rect x="564" y="706" width="220" height="52" rx="12" fill="#6D44D6"/><text x="620" y="738" fill="#FFFFFF" font-size="16" font-family="Manrope" font-weight="700">Submit Feedback</text>
+</svg>

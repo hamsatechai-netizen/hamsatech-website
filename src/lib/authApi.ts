@@ -40,6 +40,100 @@ export type CoachFeedbackRecord = {
   createdAt: string
 }
 
+export type CoachProfile = {
+  coachId: string
+  name: string
+  email: string
+  phone?: string | null
+  profileImage?: string | null
+  specialization?: string | null
+  status: 'active' | 'inactive'
+  assignedAthletes: number
+  createdAt?: string | null
+  updatedAt?: string | null
+}
+
+export type AthleteScoreRecord = {
+  scoreId: string
+  athleteId: string
+  scoreType: string
+  scoreValue: number
+  percentile?: number | null
+  category: string
+  calculatedAt: string
+  sourceData?: Record<string, unknown> | null
+  createdAt?: string | null
+  updatedAt?: string | null
+}
+
+export type NotificationRecord = {
+  notificationId: string
+  recipientEmail: string
+  recipientRole: string
+  title: string
+  message: string
+  type: string
+  entityId?: string | null
+  readAt?: string | null
+  createdAt: string
+}
+
+export type CoachNotification = {
+  notificationId: string
+  type: string
+  athleteId?: string | null
+  athleteName?: string | null
+  sessionId?: string | null
+  requestId?: string | null
+  message: string
+  actionUrl?: string | null
+  createdAt: string
+  isRead: boolean
+}
+
+export type PendingAssignment = {
+  requestId: string
+  athleteId: string
+  athleteName: string
+  assignedCoachId?: string | null
+  status: 'PENDING' | 'ASSIGNED' | 'REJECTED'
+  notes?: string | null
+  requestedAt?: string | null
+}
+
+export type CoachOption = {
+  coachId: string
+  coachName: string
+  coachIdText?: string | null
+  specialization?: string | null
+}
+
+export type CoachDashboardV1Athlete = {
+  athleteId: string
+  athleteName: string
+  gender?: string | null
+  age?: number | null
+  score?: number | null
+  scoreCategory: string
+  latestStress?: number | null
+  latestRecovery?: number | null
+  lastSessionDate?: string | null
+}
+
+export type CoachDashboardV1 = {
+  coachId: string
+  totals: {
+    totalAssignedAthletes: number
+    activeAthletes: number
+    inactiveAthletes: number
+    newRegistrations: number
+  }
+  averageScore?: number | null
+  scoreDistribution: Record<string, number>
+  athletes: CoachDashboardV1Athlete[]
+  alerts: string[]
+}
+
 export type CoachAssignmentRequest = {
   email: string
   fullName: string
@@ -54,27 +148,34 @@ export type CoachAssignmentRequest = {
 export type CoachAthleteListItem = {
   athleteId: string
   name: string
-  age: number
-  gender: 'Male' | 'Female' | 'Other'
-  academyId: string
-  coachId: string
-  email: string
-  contactNumber: string
-  createdAt: string
+  age?: number | null
+  gender?: string | null
+  academyId?: string | null
+  coachId?: string | null
+  email?: string | null
+  contactNumber?: string | null
+  createdAt?: string | null
+  latestSessionDate?: string | null
+  latestTrainingType?: 'Shooting' | 'Fitness' | 'Mental' | 'Recovery' | null
+  latestRecoveryScore?: number | null
+  latestStressScore?: number | null
+  latestFatigueLevel?: number | null
+  latestSleepHours?: number | null
+  overallScore?: number | null
 }
 
 export type CoachAthleteDetail = {
   athleteMaster: {
     athleteId: string
     name: string
-    age: number
-    gender: 'Male' | 'Female' | 'Other'
-    heightCm: number
-    weightKg: number
-    academyId: string
-    coachId: string
-    contactNumber: string
-    email: string
+    age?: number | null
+    gender?: string | null
+    heightCm?: number | null
+    weightKg?: number | null
+    academyId?: string | null
+    coachId?: string | null
+    contactNumber?: string | null
+    email?: string | null
     createdAt: string
     updatedBy?: string | null
   }
@@ -107,6 +208,7 @@ export type CoachAthleteDetail = {
     reasonForShooting: string
     athleteGoal: string
   } | null
+  scores?: AthleteScoreRecord[]
   sessionsLog: Array<{
     sessionId: string
     coachId: string
@@ -259,6 +361,56 @@ type CoachFeedbackResponse = {
   feedback: CoachFeedbackRecord
 }
 
+type CoachProfileResponse = {
+  profile: CoachProfile
+}
+
+type AthleteScoresResponse = {
+  scores: AthleteScoreRecord[]
+}
+
+type NotificationsResponse = {
+  notifications: NotificationRecord[]
+}
+
+type CoachNotificationsResponse = {
+  notifications: CoachNotification[]
+  unreadCount: number
+}
+
+type PendingAssignmentsResponse = {
+  requests: PendingAssignment[]
+}
+
+type CoachOptionsResponse = {
+  coaches: CoachOption[]
+}
+
+type CoachDashboardV1Response = {
+  dashboard: CoachDashboardV1
+}
+
+type AthleteFullProfileV1Response = {
+  athlete: CoachAthleteDetail & { feedbackHistory?: CoachFeedbackRecord[] }
+}
+
+export type CoachDashboardSummary = {
+  totalAssignedAthletes: number
+  newRegistrations: number
+  activeAthletes: number
+  inactiveAthletes: number
+  averageScore?: number | null
+  highestPerforming: CoachAthleteListItem[]
+  lowestPerforming: CoachAthleteListItem[]
+  scoreDistribution: Record<string, number>
+  recentActivity: NotificationRecord[]
+  alerts: string[]
+}
+
+type CoachDashboardSummaryResponse = {
+  summary: CoachDashboardSummary
+}
+
 type CoachAssignmentRequestsResponse = {
   requests: CoachAssignmentRequest[]
 }
@@ -398,13 +550,47 @@ export async function getStudents(): Promise<StudentProfile[]> {
   return data.students
 }
 
-export async function getCoachAthletes(search = ''): Promise<CoachAthleteListItem[]> {
-  const query = search.trim() ? `?search=${encodeURIComponent(search.trim())}` : ''
+export async function getCoachAthletes(options?: {
+  search?: string
+  athleteIds?: string[]
+  includePending?: boolean
+}): Promise<CoachAthleteListItem[]> {
+  const search = options?.search?.trim() ?? ''
+  const params = new URLSearchParams()
+  if (search) params.set('search', search)
+  if (options?.athleteIds && options.athleteIds.length > 0) params.set('athleteIds', options.athleteIds.join(','))
+  if (typeof options?.includePending === 'boolean') params.set('includePending', String(options.includePending))
+  const query = params.toString() ? `?${params.toString()}` : ''
   const data = await request<CoachAthleteListResponse>(`/api/coach/athletes${query}`, {
     method: 'GET',
   })
 
   return data.athletes
+}
+
+export async function getCoachDashboardSummary(): Promise<CoachDashboardSummary> {
+  const data = await request<CoachDashboardSummaryResponse>('/api/coach/dashboard-summary', {
+    method: 'GET',
+  })
+
+  return data.summary
+}
+
+export async function getCoachProfile(): Promise<CoachProfile> {
+  const data = await request<CoachProfileResponse>('/api/coach/profile', {
+    method: 'GET',
+  })
+
+  return data.profile
+}
+
+export async function updateCoachProfile(payload: Partial<Pick<CoachProfile, 'name' | 'phone' | 'profileImage' | 'specialization' | 'status'>>): Promise<CoachProfile> {
+  const data = await request<CoachProfileResponse>('/api/coach/profile', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+
+  return data.profile
 }
 
 export async function getCoachAthleteDetails(athleteId: string): Promise<CoachAthleteDetail> {
@@ -424,6 +610,17 @@ export async function getCoachAthleteFeedback(athleteId: string): Promise<CoachF
   )
 
   return data.feedback
+}
+
+export async function getCoachAthleteScores(athleteId: string): Promise<AthleteScoreRecord[]> {
+  const data = await request<AthleteScoresResponse>(
+    `/api/coach/athletes/${encodeURIComponent(athleteId)}/scores`,
+    {
+      method: 'GET',
+    },
+  )
+
+  return data.scores
 }
 
 export async function createCoachAthleteFeedback(
@@ -469,6 +666,116 @@ export async function getStudentFeedback(): Promise<CoachFeedbackRecord[]> {
   })
 
   return data.feedback
+}
+
+export async function getNotifications(): Promise<NotificationRecord[]> {
+  const data = await request<NotificationsResponse>('/api/notifications', {
+    method: 'GET',
+  })
+
+  return data.notifications
+}
+
+export async function markNotificationRead(notificationId: string): Promise<void> {
+  await request<{ success: boolean }>(`/api/notifications/${encodeURIComponent(notificationId)}/read`, {
+    method: 'POST',
+  })
+}
+
+export async function createFeedbackRequest(payload: {
+  athleteId: string
+  sessionId: string
+  coachId: string
+}): Promise<{ requestId: string; status: 'PENDING'; message: string }> {
+  return request('/api/v1/feedback_requests', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function getCoachNotificationsV1(
+  coachId: string,
+  options?: { unreadOnly?: boolean; limit?: number },
+): Promise<CoachNotificationsResponse> {
+  const params = new URLSearchParams()
+  if (typeof options?.unreadOnly === 'boolean') params.set('unreadOnly', String(options.unreadOnly))
+  if (typeof options?.limit === 'number') params.set('limit', String(options.limit))
+  const query = params.toString() ? `?${params.toString()}` : ''
+  return request<CoachNotificationsResponse>(`/api/v1/coaches/${encodeURIComponent(coachId)}/notifications${query}`, {
+    method: 'GET',
+  })
+}
+
+export async function markCoachNotificationRead(notificationId: string): Promise<{
+  notificationId: string
+  isRead: boolean
+  readAt?: string | null
+}> {
+  return request(`/api/v1/notifications/${encodeURIComponent(notificationId)}/mark_read`, {
+    method: 'PATCH',
+  })
+}
+
+export async function createCoachFeedbackV1(payload: {
+  requestId: string
+  athleteId: string
+  note: string
+  recommendation: string
+  status: 'Needs Attention' | 'Progressing' | 'Strong'
+}): Promise<CoachFeedbackRecord> {
+  const data = await request<CoachFeedbackResponse>('/api/v1/coach_feedback', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+  return data.feedback
+}
+
+export async function getPendingAssignments(coachId: string): Promise<PendingAssignment[]> {
+  const data = await request<PendingAssignmentsResponse>(`/api/v1/coaches/${encodeURIComponent(coachId)}/pending_assignments`, {
+    method: 'GET',
+  })
+  return data.requests
+}
+
+export async function getAvailableCoaches(): Promise<CoachOption[]> {
+  const data = await request<CoachOptionsResponse>('/api/v1/coaches/available', {
+    method: 'GET',
+  })
+  return data.coaches
+}
+
+export async function assignAthlete(payload: {
+  requestId: string
+  athleteId: string
+  assignedCoachId: string
+  notes?: string
+}): Promise<void> {
+  await request('/api/v1/assignments/assign', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function getCoachDashboardV1(
+  coachId: string,
+  options?: { gender?: string; minScore?: number; maxScore?: number },
+): Promise<CoachDashboardV1> {
+  const params = new URLSearchParams()
+  if (options?.gender) params.set('gender', options.gender)
+  if (typeof options?.minScore === 'number') params.set('minScore', String(options.minScore))
+  if (typeof options?.maxScore === 'number') params.set('maxScore', String(options.maxScore))
+  const query = params.toString() ? `?${params.toString()}` : ''
+  const data = await request<CoachDashboardV1Response>(`/api/v1/coaches/${encodeURIComponent(coachId)}/dashboard${query}`, {
+    method: 'GET',
+  })
+  return data.dashboard
+}
+
+export async function getAthleteFullProfileV1(athleteId: string): Promise<CoachAthleteDetail & { feedbackHistory?: CoachFeedbackRecord[] }> {
+  const data = await request<AthleteFullProfileV1Response>(`/api/v1/athletes/${encodeURIComponent(athleteId)}/full_profile`, {
+    method: 'GET',
+  })
+  return data.athlete
 }
 
 export async function getPsychologyQuestions(): Promise<PsychologyQuestion[]> {
