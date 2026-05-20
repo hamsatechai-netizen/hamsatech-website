@@ -20,11 +20,11 @@ services:
       - key: HAMSA_COOKIE_SAMESITE
         value: none
       - key: HAMSA_FRONTEND_ORIGIN
-        sync: false
+        value: https://hamsatech-website.pages.dev
       - key: HAMSA_FRONTEND_ORIGINS
-        sync: false
+        value: https://hamsatech-website.pages.dev
       - key: HAMSA_FRONTEND_ORIGIN_REGEX
-        sync: false
+        value: https://([a-z0-9-]+\.)?hamsatech-website\.pages\.dev
       - key: HAMSA_DEFAULT_PASSWORD
         sync: false
       - key: SUPABASE_URL
