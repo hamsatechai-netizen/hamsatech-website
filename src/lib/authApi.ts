@@ -428,14 +428,18 @@ type AthleteIntakeResponse = {
 function getApiBaseUrl() {
   const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
 
-  if (configuredBaseUrl) {
-    return configuredBaseUrl
+  if (configuredBaseUrl && !configuredBaseUrl.includes('your-fastapi-api.example.com')) {
+    return configuredBaseUrl.replace(/\/+$/, '')
   }
 
   if (typeof window !== 'undefined') {
     const { hostname } = window.location
     if (hostname === '127.0.0.1' || hostname === 'localhost') {
       return 'http://127.0.0.1:8000'
+    }
+
+    if (hostname.endsWith('.hamsatech-website.pages.dev')) {
+      return 'https://hamsatech-api.onrender.com'
     }
   }
 
@@ -470,14 +474,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error('API is not configured. Set VITE_API_BASE_URL for this deployment.')
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init?.headers ?? {}),
-    },
-    ...init,
-  })
+  let response: Response
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(init?.headers ?? {}),
+      },
+      ...init,
+    })
+  } catch {
+    throw new Error(`Unable to reach the API at ${API_BASE_URL}. Check backend deployment and CORS settings.`)
+  }
 
   if (!response.ok) {
     let message = 'Request failed'
@@ -509,9 +519,15 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     throw new Error('API is not configured. Set VITE_API_BASE_URL for this deployment.')
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-    credentials: 'include',
-  })
+  let response: Response
+
+  try {
+    response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      credentials: 'include',
+    })
+  } catch {
+    throw new Error(`Unable to reach the API at ${API_BASE_URL}. Check backend deployment and CORS settings.`)
+  }
 
   if (response.status === 401) {
     return null

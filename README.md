@@ -167,7 +167,7 @@ Recommended GitHub and Cloudflare setup:
 5. Set the frontend environment variable in Cloudflare Pages:
 
 ```bash
-VITE_API_BASE_URL=https://your-fastapi-api.example.com
+VITE_API_BASE_URL=https://hamsatech-api.onrender.com
 ```
 
 6. Make sure the FastAPI backend allows every Cloudflare frontend origin you plan to use:
