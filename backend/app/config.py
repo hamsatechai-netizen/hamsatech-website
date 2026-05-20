@@ -23,7 +23,7 @@ class Settings:
     # Allow Cloudflare Pages preview URLs by default; can be overridden/disabled via env var.
     frontend_origin_regex: str | None = os.getenv(
         "HAMSA_FRONTEND_ORIGIN_REGEX",
-        r"https://.*\.hamsatech-website\.pages\.dev",
+        r"https://([a-z0-9-]+\.)?hamsatech-website\.pages\.dev",
     )
     cookie_secure_raw: str = os.getenv("HAMSA_COOKIE_SECURE", "false")
     cookie_samesite_raw: str = os.getenv("HAMSA_COOKIE_SAMESITE", "lax")

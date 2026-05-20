@@ -438,7 +438,7 @@ function getApiBaseUrl() {
       return 'http://127.0.0.1:8000'
     }
 
-    if (hostname.endsWith('.hamsatech-website.pages.dev')) {
+    if (hostname === 'hamsatech-website.pages.dev' || hostname.endsWith('.hamsatech-website.pages.dev')) {
       return 'https://hamsatech-api.onrender.com'
     }
   }
