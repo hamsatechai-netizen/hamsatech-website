@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta, timezone
 import json
 import logging
+import re
 from uuid import uuid4
 from typing import Annotated, Any
 from typing import Literal
@@ -23,6 +24,10 @@ from .supabase_client import get_supabase_admin_client
 
 
 logger = logging.getLogger(__name__)
+
+UUID_LIKE_RE = re.compile(
+    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+)
 
 
 app = FastAPI(title="HamsaTech Auth API", version="1.0.0")
@@ -199,6 +204,19 @@ class CoachAthleteListResponse(BaseModel):
 
 class CoachAthleteDetailResponse(BaseModel):
     athlete: dict[str, Any]
+
+class CoachAthleteWidgetResponse(BaseModel):
+    widget: dict[str, Any]
+
+class CoachAthleteSessionsWidgetResponse(BaseModel):
+    widget: dict[str, Any]
+
+class CoachAthleteInsightsWidgetResponse(BaseModel):
+    widget: dict[str, Any]
+
+
+class CoachAthleteProfileWidgetResponse(BaseModel):
+    widget: dict[str, Any]
 
 
 class StatusResponse(BaseModel):
@@ -1321,6 +1339,72 @@ def ensure_supabase() -> Any:
     return get_supabase_admin_client()
 
 
+def is_uuid_like(value: str) -> bool:
+    return bool(UUID_LIKE_RE.match((value or "").strip()))
+
+
+def supabase_error_code(exception: Exception) -> str | None:
+    if isinstance(exception.args, tuple) and exception.args:
+        payload = exception.args[0]
+        if isinstance(payload, dict):
+            code = payload.get("code")
+            return str(code) if code else None
+    return None
+
+
+def resolve_athlete_row_by_identifier(supabase: Any, athlete_identifier: str) -> dict[str, Any] | None:
+    identifier = (athlete_identifier or "").strip()
+    if not identifier:
+        return None
+
+    candidates = ["athlete_id"]
+    if not is_uuid_like(identifier):
+        candidates.extend(["athlete_id_text", "athlete_code"])
+
+    for column in candidates:
+        try:
+            result = supabase.table(APP_TABLES["athletes"]).select("*").eq(column, identifier).limit(1).execute()
+            row = (result.data or [None])[0]
+            if row:
+                return row
+        except Exception as exception:
+            code = supabase_error_code(exception)
+            message = str(exception)
+            # If the backend schema uses UUID athlete ids, trying to filter by a non-UUID value
+            # can trigger a Postgres cast error (22P02). In that case, keep trying alternative columns.
+            if code == "22P02" or "invalid input syntax for type uuid" in message:
+                continue
+            continue
+
+    return None
+
+
+def coach_can_access_athlete(*, supabase: Any, coach_id: str | None, athlete_row: dict[str, Any]) -> bool:
+    if not coach_id:
+        return False
+
+    athlete_coach_id = str(athlete_row.get("coach_id") or "")
+    if athlete_coach_id and athlete_coach_id == str(coach_id):
+        return True
+
+    athlete_id = str(athlete_row.get("athlete_id") or "")
+    if not athlete_id:
+        return False
+
+    # If the athlete is not assigned yet, allow access when there's a pending assignment request
+    # for this coach (default coach flow).
+    rows = safe_table_rows(
+        "assignment_requests",
+        supabase.table("assignment_requests")
+        .select("request_id")
+        .eq("athlete_id", athlete_id)
+        .eq("status", "PENDING")
+        .eq("assigned_coach_id", str(coach_id))
+        .limit(1),
+    )
+    return bool(rows)
+
+
 def is_admin_user(user: UserRecord) -> bool:
     return user.email.lower() == ADMIN_EMAIL
 
@@ -1503,7 +1587,8 @@ def fallback_scores_for_athlete(athlete_row: dict[str, Any]) -> list[AthleteScor
     if latest_physiology:
         recovery = row_float(latest_physiology.get("recovery_score"), base_score)
         stress_control = 100 - row_float(latest_physiology.get("stress_score"), 50)
-        readiness = round((recovery + stress_control + max(0, 100 - row_float(latest_physiology.get("fatigue_level"), 5) * 10)) / 3, 2)
+        fatigue = max(0, 100 - row_float(latest_physiology.get("fatigue_level"), 5) * 10)
+        readiness = round((recovery + stress_control + fatigue) / 3, 2)
         calculated_at = str(latest_physiology.get("recorded_date") or latest_physiology.get("created_at") or created_at)
         scores.extend(
             [
@@ -1521,6 +1606,13 @@ def fallback_scores_for_athlete(athlete_row: dict[str, Any]) -> list[AthleteScor
                     calculated_at=calculated_at,
                     source_data={"source": "Physiology_Data"},
                 ),
+                build_score_record(
+                    athlete_id=athlete_id,
+                    score_type="fatigue",
+                    score_value=fatigue,
+                    calculated_at=calculated_at,
+                    source_data={"source": "Physiology_Data.fatigue_level"},
+                ),
             ]
         )
     return scores
@@ -1534,7 +1626,7 @@ def get_scores_for_athlete(athlete_row: dict[str, Any]) -> list[AthleteScoreReco
         supabase.table(APP_TABLES["athlete_scores"]).select("*").eq("athlete_id", athlete_id).order("calculated_at", desc=True),
     )
     if rows:
-        return [
+        scores = [
             AthleteScoreRecord(
                 scoreId=str(row.get("score_id") or ""),
                 athleteId=str(row.get("athlete_id") or ""),
@@ -1549,6 +1641,24 @@ def get_scores_for_athlete(athlete_row: dict[str, Any]) -> list[AthleteScoreReco
             )
             for row in rows
         ]
+        score_types = {score.score_type for score in scores}
+        if "fatigue" not in score_types:
+            athlete_id = str(athlete_row["athlete_id"])
+            created_at = str(athlete_row.get("created_at") or datetime.now(timezone.utc).isoformat())
+            latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], [athlete_id], "recorded_date").get(athlete_id)
+            if latest_physiology:
+                fatigue = max(0, 100 - row_float(latest_physiology.get("fatigue_level"), 5) * 10)
+                calculated_at = str(latest_physiology.get("recorded_date") or latest_physiology.get("created_at") or created_at)
+                scores.append(
+                    build_score_record(
+                        athlete_id=athlete_id,
+                        score_type="fatigue",
+                        score_value=fatigue,
+                        calculated_at=calculated_at,
+                        source_data={"source": "Physiology_Data.fatigue_level"},
+                    )
+                )
+        return scores
     return fallback_scores_for_athlete(athlete_row)
 
 
@@ -3212,67 +3322,58 @@ def get_coach_athlete_detail(
     coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
 
-    try:
-        athlete_result = (
-            supabase.table(APP_TABLES["athletes"])
-            .select("*")
-            .eq("athlete_id", athlete_id)
-            .limit(1)
-            .execute()
-        )
-        athlete_row = (athlete_result.data or [None])[0]
-        if not athlete_row:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
-        if not coach_key or str(athlete_row.get("coach_id") or "") != str(coach_key):
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="You can only access athletes assigned to you.",
-            )
-
-        family_result = (
-            supabase.table(APP_TABLES["athlete_family"]).select("*").eq("athlete_id", athlete_id).limit(1).execute()
-        )
-        profile_result = (
-            supabase.table(APP_TABLES["athlete_details"]).select("*").eq("athlete_id", athlete_id).limit(1).execute()
-        )
-        session_result = (
-            supabase.table(APP_TABLES["shooting_session_log"]).select("*").eq("athlete_id", athlete_id).order("session_date", desc=True).execute()
-        )
-        physiology_result = (
-            supabase.table(APP_TABLES["athlete_physiology"]).select("*").eq("athlete_id", athlete_id).order("recorded_date", desc=True).execute()
-        )
-        psychology_result = (
-            supabase.table(APP_TABLES["psychology_responses"])
-            .select("*")
-            .eq("athlete_id", athlete_id)
-            .execute()
-        )
-        question_result = supabase.table(APP_TABLES["psychology_questions"]).select("*").execute()
-    except HTTPException:
-        raise
-    except Exception as exception:
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
+    if not athlete_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unable to load athlete details: {exception}",
-        ) from exception
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only access athletes assigned to you.",
+        )
+
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
+    family_rows = safe_table_rows(
+        APP_TABLES["athlete_family"],
+        supabase.table(APP_TABLES["athlete_family"]).select("*").eq("athlete_id", canonical_athlete_id).limit(1),
+    )
+    profile_rows = safe_table_rows(
+        APP_TABLES["athlete_details"],
+        supabase.table(APP_TABLES["athlete_details"]).select("*").eq("athlete_id", canonical_athlete_id).limit(1),
+    )
+    session_rows = safe_table_rows(
+        APP_TABLES["shooting_session_log"],
+        supabase.table(APP_TABLES["shooting_session_log"]).select("*").eq("athlete_id", canonical_athlete_id).order("session_date", desc=True),
+    )
+    physiology_rows = safe_table_rows(
+        APP_TABLES["athlete_physiology"],
+        supabase.table(APP_TABLES["athlete_physiology"]).select("*").eq("athlete_id", canonical_athlete_id).order("recorded_date", desc=True),
+    )
+    psychology_rows = safe_table_rows(
+        APP_TABLES["psychology_responses"],
+        supabase.table(APP_TABLES["psychology_responses"]).select("*").eq("athlete_id", canonical_athlete_id),
+    )
+    question_rows = safe_table_rows(
+        APP_TABLES["psychology_questions"],
+        supabase.table(APP_TABLES["psychology_questions"]).select("*"),
+    )
 
     question_lookup = {
         item.get("question_id"): item
-        for item in question_result.data or []
+        for item in question_rows
     }
 
     athlete = {
         "athleteMaster": serialize_athlete_master(athlete_row),
-        "familyDetails": serialize_family_details((family_result.data or [None])[0]),
-        "athleteProfile": serialize_athlete_profile((profile_result.data or [None])[0]),
+        "familyDetails": serialize_family_details((family_rows or [None])[0]),
+        "athleteProfile": serialize_athlete_profile((profile_rows or [None])[0]),
         "scores": [score.model_dump(by_alias=True) for score in get_scores_for_athlete(athlete_row)],
         "sessionsLog": [
             serialize_shooting_session(row)
-            for row in session_result.data or []
+            for row in session_rows
         ],
         "physiologyData": [
             serialize_app_physiology(row)
-            for row in physiology_result.data or []
+            for row in physiology_rows
         ],
         "psychologyResponses": [
             {
@@ -3285,10 +3386,277 @@ def get_coach_athlete_detail(
                 "answerScore": row.get("answer_score"),
                 "recordedAt": row.get("recorded_at") or row.get("created_at") or athlete_row.get("created_at"),
             }
-            for row in psychology_result.data or []
+            for row in psychology_rows
         ],
     }
     return CoachAthleteDetailResponse(athlete=athlete)
+
+
+@app.get("/api/coach/athletes/{athlete_id}/home", response_model=MobileAthleteHomeResponse)
+def get_coach_athlete_home(
+    athlete_id: str,
+    session_token: Annotated[str | None, Cookie(alias=settings.session_cookie_name)] = None,
+) -> MobileAthleteHomeResponse:
+    coach_user = ensure_coach_user(session_token)
+    coach_key = resolve_dashboard_coach_key(coach_user)
+    supabase = ensure_supabase()
+
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
+    if not athlete_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only access athletes assigned to you.")
+
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
+    return get_mobile_athlete_home(athlete_id=canonical_athlete_id)
+
+
+@app.get("/api/coach/athletes/{athlete_id}/widget", response_model=CoachAthleteWidgetResponse)
+def get_coach_athlete_widget(
+    athlete_id: str,
+    session_token: Annotated[str | None, Cookie(alias=settings.session_cookie_name)] = None,
+) -> CoachAthleteWidgetResponse:
+    coach_user = ensure_coach_user(session_token)
+    coach_key = resolve_dashboard_coach_key(coach_user)
+    supabase = ensure_supabase()
+
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
+    if not athlete_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only access athletes assigned to you.")
+
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
+    scores = get_scores_for_athlete(athlete_row)
+    score_by_type = {score.score_type: score for score in scores}
+    home = get_mobile_athlete_home(athlete_id=canonical_athlete_id).home
+    recommendations = home.get("recommendations") if isinstance(home, dict) else None
+
+    next_focus = None
+    if isinstance(recommendations, list) and recommendations:
+        first = str(recommendations[0])
+        lowered = first.lower()
+        if "breathing" in lowered or "cool-down" in lowered or "cool down" in lowered:
+            next_focus = "Hold"
+        elif "check-in" in lowered or "checkin" in lowered:
+            next_focus = "Settle"
+        elif "training" in lowered or "session" in lowered:
+            next_focus = "Shoot"
+        else:
+            next_focus = first.split(".")[0][:24]
+
+    widget = {
+        "athleteId": canonical_athlete_id,
+        "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
+        "performance": score_by_type.get("overall").score_value if score_by_type.get("overall") else None,
+        "fatigue": score_by_type.get("fatigue").score_value if score_by_type.get("fatigue") else None,
+        "nextFocus": next_focus,
+    }
+    return CoachAthleteWidgetResponse(widget=widget)
+
+
+@app.get("/api/coach/athletes/{athlete_id}/sessions-widget", response_model=CoachAthleteSessionsWidgetResponse)
+def get_coach_athlete_sessions_widget(
+    athlete_id: str,
+    session_token: Annotated[str | None, Cookie(alias=settings.session_cookie_name)] = None,
+) -> CoachAthleteSessionsWidgetResponse:
+    coach_user = ensure_coach_user(session_token)
+    coach_key = resolve_dashboard_coach_key(coach_user)
+    supabase = ensure_supabase()
+
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
+    if not athlete_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only access athletes assigned to you.")
+
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
+
+    # Use existing mobile session summary computation (derived from scoring series + session logs).
+    session_rows = safe_table_rows(
+        APP_TABLES["shooting_session_log"],
+        supabase.table(APP_TABLES["shooting_session_log"]).select("*").eq("athlete_id", canonical_athlete_id).order("session_date", desc=True).limit(3),
+    )
+    latest_session = session_rows[0] if session_rows else None
+    latest_summary = None
+    if latest_session and latest_session.get("session_id"):
+        try:
+            latest_summary = build_mobile_session_summary(latest_session)
+        except Exception:
+            latest_summary = None
+
+    scores = get_scores_for_athlete(athlete_row)
+    score_by_type = {score.score_type: score for score in scores}
+
+    def session_date(row: dict[str, Any]) -> str | None:
+        value = row.get("session_date") or row.get("created_at")
+        return str(value) if value else None
+
+    history: list[dict[str, Any]] = []
+    for row in session_rows[:2]:
+        history.append(
+            {
+                "sessionId": str(row.get("session_id") or ""),
+                "sessionDate": session_date(row),
+                # Keep these aligned to the Sessions mock: "Score", "Ready", "Fatigue"
+                "performance": score_by_type.get("overall").score_value if score_by_type.get("overall") else None,
+                "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
+                "fatigue": score_by_type.get("fatigue").score_value if score_by_type.get("fatigue") else None,
+            }
+        )
+
+    widget = {
+        "athleteId": canonical_athlete_id,
+        "lastSession": {
+            "sessionId": str((latest_session or {}).get("session_id") or ""),
+            "sessionDate": session_date(latest_session or {}),
+            "performance": (latest_summary or {}).get("score", {}).get("averagePerShot") if isinstance(latest_summary, dict) else None,
+            "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
+            "holdStability": score_by_type.get("hold_stability").score_value if score_by_type.get("hold_stability") else None,
+            "mentalScore": score_by_type.get("mental_score").score_value if score_by_type.get("mental_score") else None,
+            "fatigue": score_by_type.get("fatigue").score_value if score_by_type.get("fatigue") else None,
+            "summaryTitle": (latest_summary or {}).get("keyInsight", {}).get("title") if isinstance(latest_summary, dict) else None,
+        },
+        "history": history,
+    }
+    return CoachAthleteSessionsWidgetResponse(widget=widget)
+
+
+def list_coach_feedback_rows(*, supabase: Any, athlete_id: str, limit: int = 20) -> list[dict[str, Any]]:
+    return safe_table_rows(
+        APP_TABLES["coach_feedback"],
+        supabase.table(APP_TABLES["coach_feedback"]).select("*").eq("athlete_id", athlete_id).order("created_at", desc=True).limit(limit),
+    )
+
+
+@app.get("/api/coach/athletes/{athlete_id}/insights-widget", response_model=CoachAthleteInsightsWidgetResponse)
+def get_coach_athlete_insights_widget(
+    athlete_id: str,
+    session_token: Annotated[str | None, Cookie(alias=settings.session_cookie_name)] = None,
+) -> CoachAthleteInsightsWidgetResponse:
+    coach_user = ensure_coach_user(session_token)
+    coach_key = resolve_dashboard_coach_key(coach_user)
+    supabase = ensure_supabase()
+
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
+    if not athlete_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only access athletes assigned to you.")
+
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
+    scores = get_scores_for_athlete(athlete_row)
+    score_by_type = {score.score_type: score for score in scores}
+
+    feedback_rows = list_coach_feedback_rows(supabase=supabase, athlete_id=canonical_athlete_id, limit=20)
+    feedback_history = [
+        {
+            "createdAt": str(row.get("created_at") or ""),
+            "status": row.get("status"),
+            "note": row.get("note") or row.get("coach_observations") or "",
+            "trainingPlan": row.get("recommendation") or row.get("training_plan") or "",
+        }
+        for row in feedback_rows
+    ]
+    latest_training_plan = feedback_history[0]["trainingPlan"] if feedback_history else None
+
+    # Use mobile recommendations when no coach plan exists.
+    home = get_mobile_athlete_home(athlete_id=canonical_athlete_id).home
+    recommendations = home.get("recommendations") if isinstance(home, dict) else None
+    fallback_plan = None
+    if isinstance(recommendations, list) and recommendations:
+        fallback_plan = " / ".join([str(item) for item in recommendations[:2]])
+
+    widget = {
+        "athleteId": canonical_athlete_id,
+        "scores": {
+            "social": score_by_type.get("social").score_value if score_by_type.get("social") else None,
+            "arousal": score_by_type.get("arousal").score_value if score_by_type.get("arousal") else None,
+            "decision": score_by_type.get("decision").score_value if score_by_type.get("decision") else None,
+            "focus": score_by_type.get("focus").score_value if score_by_type.get("focus") else None,
+        },
+        "recommendation": latest_training_plan or fallback_plan,
+        "feedbackHistory": feedback_history,
+    }
+    return CoachAthleteInsightsWidgetResponse(widget=widget)
+
+
+@app.get("/api/coach/athletes/{athlete_id}/profile-widget", response_model=CoachAthleteProfileWidgetResponse)
+def get_coach_athlete_profile_widget(
+    athlete_id: str,
+    session_token: Annotated[str | None, Cookie(alias=settings.session_cookie_name)] = None,
+) -> CoachAthleteProfileWidgetResponse:
+    coach_user = ensure_coach_user(session_token)
+    coach_key = resolve_dashboard_coach_key(coach_user)
+    supabase = ensure_supabase()
+
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
+    if not athlete_row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only access athletes assigned to you.")
+
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
+    name = str(athlete_row.get("athlete_name") or athlete_row.get("name") or "Athlete")
+    initials = "".join([part[:1].upper() for part in name.split()[:2]]) or "A"
+
+    scores = get_scores_for_athlete(athlete_row)
+    score_by_type = {score.score_type: score for score in scores}
+
+    session_rows = safe_table_rows(
+        APP_TABLES["shooting_session_log"],
+        supabase.table(APP_TABLES["shooting_session_log"]).select("*").eq("athlete_id", canonical_athlete_id).order("session_date", desc=True).limit(1),
+    )
+    latest_session = session_rows[0] if session_rows else None
+    latest_summary = None
+    if latest_session:
+        try:
+            latest_summary = build_mobile_session_summary(latest_session)
+        except Exception:
+            latest_summary = None
+
+    last_session_avg = None
+    best_series_total = None
+    if isinstance(latest_summary, dict):
+        last_session_avg = latest_summary.get("score", {}).get("averagePerShot")
+        best_series = latest_summary.get("score", {}).get("bestSeries")
+        if isinstance(best_series, dict):
+            best_series_total = best_series.get("total")
+
+    feedback_rows = list_coach_feedback_rows(supabase=supabase, athlete_id=canonical_athlete_id, limit=50)
+    feedback_history = [
+        {
+            "createdAt": str(row.get("created_at") or ""),
+            "status": row.get("status"),
+            "note": row.get("note") or "",
+            "trainingPlan": row.get("recommendation") or "",
+        }
+        for row in feedback_rows
+    ]
+    latest_training_plan = feedback_history[0]["trainingPlan"] if feedback_history else None
+
+    widget = {
+        "athleteId": canonical_athlete_id,
+        "name": name,
+        "initials": initials,
+        "coachId": str(athlete_row.get("coach_id") or ""),
+        "scores": {
+            "bestAvg30d": score_by_type.get("best_avg_30d").score_value if score_by_type.get("best_avg_30d") else None,
+            "periodAvg": score_by_type.get("period_avg").score_value if score_by_type.get("period_avg") else None,
+            "bestSeries": score_by_type.get("best_series").score_value if score_by_type.get("best_series") else best_series_total,
+            "lastSession": score_by_type.get("last_session_avg").score_value if score_by_type.get("last_session_avg") else last_session_avg,
+        },
+        "psychology": {
+            "social": score_by_type.get("social").score_value if score_by_type.get("social") else None,
+            "arousal": score_by_type.get("arousal").score_value if score_by_type.get("arousal") else None,
+            "decision": score_by_type.get("decision").score_value if score_by_type.get("decision") else None,
+            "focus": score_by_type.get("focus").score_value if score_by_type.get("focus") else None,
+            "recovery": score_by_type.get("recovery").score_value if score_by_type.get("recovery") else None,
+        },
+        "trainingPlan": latest_training_plan,
+        "feedbackHistory": feedback_history,
+    }
+    return CoachAthleteProfileWidgetResponse(widget=widget)
 
 
 @app.get("/api/coach/athletes/{athlete_id}/scores", response_model=AthleteScoresResponse)
@@ -3299,11 +3667,10 @@ def list_coach_athlete_scores(
     coach_user = ensure_coach_user(session_token)
     coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
-    athlete_result = supabase.table(APP_TABLES["athletes"]).select("*").eq("athlete_id", athlete_id).limit(1).execute()
-    athlete_row = (athlete_result.data or [None])[0]
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
     if not athlete_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
-    if not coach_key or str(athlete_row.get("coach_id") or "") != str(coach_key):
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can only access scores for assigned athletes.")
     return AthleteScoresResponse(scores=get_scores_for_athlete(athlete_row))
 
@@ -3316,11 +3683,10 @@ def list_coach_athlete_feedback(
     coach_user = ensure_coach_user(session_token)
     coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
-    athlete_result = supabase.table(APP_TABLES["athletes"]).select("athlete_id,coach_id").eq("athlete_id", athlete_id).limit(1).execute()
-    athlete_row = (athlete_result.data or [None])[0]
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
     if not athlete_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
-    if not coach_key or str(athlete_row.get("coach_id") or "") != str(coach_key):
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only access feedback for athletes assigned to you.",
@@ -3329,7 +3695,7 @@ def list_coach_athlete_feedback(
     response = (
         supabase.table(APP_TABLES["coach_feedback"])
         .select("*")
-        .eq("athlete_id", athlete_id)
+        .eq("athlete_id", str(athlete_row.get("athlete_id") or athlete_id))
         .order("created_at", desc=True)
         .execute()
     )
@@ -3361,25 +3727,19 @@ def create_coach_athlete_feedback(
     coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
 
-    athlete_result = (
-        supabase.table(APP_TABLES["athletes"])
-        .select("*")
-        .eq("athlete_id", athlete_id)
-        .limit(1)
-        .execute()
-    )
-    athlete_row = (athlete_result.data or [None])[0]
+    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
     if not athlete_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
-    if not coach_key or str(athlete_row.get("coach_id") or "") != str(coach_key):
+    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only leave feedback for athletes assigned to you.",
         )
 
+    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
     feedback_item = {
         "feedback_id": str(uuid4()),
-        "athlete_id": athlete_row["athlete_id"],
+        "athlete_id": canonical_athlete_id,
         "athlete_name": athlete_row.get("athlete_name") or athlete_row.get("name") or "Athlete",
         "athlete_email": athlete_row["email"],
         "coach_email": coach_user.email,
