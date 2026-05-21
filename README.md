@@ -1,6 +1,6 @@
 # HamsaTech
 
-HamsaTech is a Vite/React frontend with a FastAPI backend for student intake, coach review, secure coach-to-student assignment, and Supabase-backed persistence.
+HamsaTech is a Vite/React frontend with a FastAPI backend for coach review, secure coach-to-student assignment, mobile-app intake data, and Supabase-backed persistence.
 
 ## What this repo contains (high level)
 
@@ -27,11 +27,15 @@ HamsaTech is a Vite/React frontend with a FastAPI backend for student intake, co
 - `/usecases` - use cases
 - `/howitworks` - process overview
 - `/about` - about page
-- `/signin` - sign in
-- `/signup` - student signup
-- `/dashboard` - coach and student dashboard
+- `/signin` - coach sign in alias
+- `/signup` - legacy alias that redirects to coach login
+- `/dashboard` - role-aware dashboard redirect
+- `/coach/login` - coach login
+- `/coach/dashboard` - coach dashboard
+- `/coach/feedback/new` - coach feedback request flow
+- `/coach/assignments/pending` - pending assignment review
+- `/coach/athletes/:athleteId` - coach athlete detail view
 - `/profile` - account profile
-- `/athlete-intake` - student intake form
 
 ## Local Development
 
@@ -60,10 +64,10 @@ VITE_API_BASE_URL=http://127.0.0.1:8000
 
 The backend owns:
 
-- student-only public signup
+- optional user seeding through environment variables
 - coach login and secure assignment approval
 - coach-only access to assigned students
-- student intake submission
+- mobile-app intake/profile data APIs
 - coach feedback persistence
 
 ### Backend setup
@@ -98,9 +102,9 @@ npm run dev
 
 The frontend expects the API URL from `.env` via `VITE_API_BASE_URL`.
 
-## Supabase Intake Storage
+## Supabase Storage
 
-The coach-facing athlete intake workflow and app user/session data are stored in Supabase through FastAPI.
+Coach workflows, mobile athlete profile data, app users, and session data are stored in Supabase through FastAPI.
 
 ### Required environment variables
 
@@ -129,12 +133,11 @@ After applying schema changes, restart FastAPI.
 
 ## Current Assignment Flow
 
-1. Student signs up without entering a coach code.
-2. Student signs in and requests coach assignment from the dashboard.
-3. The request is sent to the main coach profile `coach@hamsatech.ai`.
-4. Coach opens `Student Assignment Requests` in the dashboard.
-5. Coach enters their coach code and approves the student.
-6. Student intake unlocks after approval.
+1. Athlete profile data is created by the mobile app or backend APIs.
+2. A coach assignment request is created for unassigned athletes.
+3. The coach opens pending assignment requests from the coach dashboard.
+4. The coach approves or rejects the assignment.
+5. Approved athletes become visible in the assigned coach views.
 
 ## Quality Checks
 
@@ -241,7 +244,7 @@ HAMSA_COOKIE_SAMESITE=none
 
 ### Important production note
 
-Cloudflare Pages hosts only the frontend. Signup, signin, assignment, intake, and feedback require the FastAPI backend to be deployed separately over HTTPS.
+Cloudflare Pages hosts only the frontend. Signin, assignment, athlete detail, and feedback workflows require the FastAPI backend to be deployed separately over HTTPS.
 
 ### Production cookie settings
 
@@ -279,21 +282,22 @@ supabase/
 
 - `src/main.tsx` - app bootstrap (React root, `BrowserRouter`, `AuthProvider`)
 - `src/App.tsx` - route table (React Router) and top-level layout
-- `src/components/` - UI components + page components used by routes (ex: `Navigation.tsx`, `SignInPage.tsx`, `DashboardPage.tsx`)
+- `src/components/` - UI components + page components used by routes (ex: `Navigation.tsx`, `CoachLoginPage.tsx`, `CoachDashboardV1Page.tsx`)
 - `src/context/` - React context providers (auth/session state, etc.)
 - `src/lib/` - browser-side helpers (storage, API helpers, utilities)
 - `src/styles/` - CSS modules used by components/pages
 - `src/images/` - image assets used by the React app (keep only assets that are referenced)
 
-#### UI map (routes → components → styles)
+#### UI map (routes -> components -> styles)
 
-- Navbar: `src/components/Navigation.tsx` → `src/styles/Navigation.css`
-- Home: `/` → `src/components/Hero.tsx` + `src/components/FeatureCard.tsx` → `src/styles/Hero.css`, `src/styles/FeatureCard.css`
-- About: `/about` → `src/components/AboutPage.tsx` → `src/styles/About.css`
-- Auth: `/signin`, `/signup` → `src/components/SignInPage.tsx`, `src/components/SignUpPage.tsx` → `src/styles/Auth.css`
-- Dashboard: `/dashboard` → `src/components/DashboardPage.tsx` → `src/styles/Dashboard.css`
-- Profile: `/profile` → `src/components/ProfilePage.tsx` → `src/styles/Profile.css`
-- Intake: `/athlete-intake` → `src/components/AthleteIntakePage.tsx` → `src/styles/AthleteIntake.css`
+- Navbar: `src/components/Navigation.tsx` -> `src/styles/Navigation.css`
+- Home: `/` -> `src/components/HomePage.tsx` -> `src/styles/Home.css`
+- About: `/about` -> `src/components/AboutPage.tsx` -> `src/styles/About.css`
+- Auth: `/signin`, `/coach/login`, `/signout` -> `src/components/CoachLoginPage.tsx`, `src/components/SignOutPage.tsx` -> `src/styles/Auth.css`
+- Coach dashboard: `/coach/dashboard` -> `src/components/coach/CoachDashboardV1Page.tsx` -> `src/styles/Dashboard.css`
+- Coach details: `/coach/athletes/:athleteId` -> `src/components/CoachAthleteDetailsPage.tsx` -> `src/styles/Dashboard.css`
+- Coach workflows: `/coach/feedback/new`, `/coach/assignments/pending` -> `src/components/coach/CoachFeedbackRequestPage.tsx`, `src/components/coach/PendingAssignmentsPage.tsx` -> `src/styles/Dashboard.css`
+- Profile: `/profile` -> `src/components/ProfilePage.tsx` -> `src/styles/Profile.css`
 
 ### Backend (`backend/`)
 

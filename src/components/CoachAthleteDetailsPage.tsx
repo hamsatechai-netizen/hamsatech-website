@@ -173,7 +173,7 @@ function CoachAthleteDetailsPage() {
         <div className="dashboard-hero">
           <p className="dashboard-eyebrow">Athlete Review</p>
           <h1>{athlete?.athleteMaster.name ?? 'Athlete Profile'}</h1>
-          <p>Review this student intake, spot weak areas quickly, and share coach observations back to the student dashboard.</p>
+          <p>Review this athlete profile, spot weak areas quickly, and share coach observations back to the athlete app.</p>
         </div>
 
         <div className="dashboard-links">
