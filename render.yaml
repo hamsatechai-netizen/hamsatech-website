@@ -19,6 +19,8 @@ services:
         value: true
       - key: HAMSA_COOKIE_SAMESITE
         value: none
+      - key: HAMSA_ENABLE_STARTUP_TEST_MAPPER
+        value: false
       - key: HAMSA_FRONTEND_ORIGIN
         value: https://hamsatech-website.pages.dev
       - key: HAMSA_FRONTEND_ORIGINS
@@ -26,6 +28,10 @@ services:
       - key: HAMSA_FRONTEND_ORIGIN_REGEX
         value: https://([a-z0-9-]+\.)?hamsatech-website\.pages\.dev
       - key: HAMSA_DEFAULT_PASSWORD
+        sync: false
+      - key: HAMSA_ADMIN_PASSWORD
+        sync: false
+      - key: HAMSA_DEMO_STUDENT_PASSWORD
         sync: false
       - key: SUPABASE_URL
         sync: false

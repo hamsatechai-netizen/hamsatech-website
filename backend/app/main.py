@@ -822,58 +822,50 @@ def to_user_row(user: UserRecord) -> dict[str, Any]:
     }
 
 
-DEFAULT_DEMO_USERS = [
-    create_user_record(
-        email=settings.default_email.lower(),
-        full_name=settings.default_full_name,
-        password=settings.default_password,
-        role="coach",
-        coach_code=settings.default_coach_code,
-    ),
-    create_user_record(
-        email="admin@hamsatech.ai",
-        full_name="HamsaTech Admin",
-        password="admin@123",
-        role="coach",
-        coach_code="ADMIN-COACH-001",
-    ),
-    create_user_record(
-        email="ava.student@hamsatech.ai",
-        full_name="Ava Martinez",
-        password="Student2026!",
-        role="student",
-        assigned_coach_email=settings.default_email.lower(),
-        assigned_coach_name=settings.default_full_name,
-        sport="Air Rifle",
-        focus_area="Footwork and recovery",
-        date_of_birth="2008-04-14",
-        performance_score=91,
-    ),
-    create_user_record(
-        email="leo.student@hamsatech.ai",
-        full_name="Leo Jackson",
-        password="Student2026!",
-        role="student",
-        assigned_coach_email=settings.default_email.lower(),
-        assigned_coach_name=settings.default_full_name,
-        sport="Air Pistol",
-        focus_area="Endurance pacing",
-        date_of_birth="2006-09-02",
-        performance_score=88,
-    ),
-    create_user_record(
-        email="maya.student@hamsatech.ai",
-        full_name="Maya Chen",
-        password="Student2026!",
-        role="student",
-        assigned_coach_email=settings.default_email.lower(),
-        assigned_coach_name=settings.default_full_name,
-        sport="Air Rifle",
-        focus_area="Vertical leap and mobility",
-        date_of_birth="2007-01-27",
-        performance_score=94,
-    ),
-]
+def build_seed_users() -> list[UserRecord]:
+    users: list[UserRecord] = []
+    if settings.default_password:
+        users.append(
+            create_user_record(
+                email=settings.default_email.lower(),
+                full_name=settings.default_full_name,
+                password=settings.default_password,
+                role="coach",
+                coach_code=settings.default_coach_code,
+            )
+        )
+    if settings.admin_password:
+        users.append(
+            create_user_record(
+                email=ADMIN_EMAIL,
+                full_name="HamsaTech Admin",
+                password=settings.admin_password,
+                role="coach",
+                coach_code="ADMIN-COACH-001",
+            )
+        )
+    if settings.demo_student_password:
+        demo_students = [
+            ("ava.student@hamsatech.ai", "Ava Martinez", "Air Rifle", "Footwork and recovery", "2008-04-14", 91),
+            ("leo.student@hamsatech.ai", "Leo Jackson", "Air Pistol", "Endurance pacing", "2006-09-02", 88),
+            ("maya.student@hamsatech.ai", "Maya Chen", "Air Rifle", "Vertical leap and mobility", "2007-01-27", 94),
+        ]
+        users.extend(
+            create_user_record(
+                email=email,
+                full_name=full_name,
+                password=settings.demo_student_password,
+                role="student",
+                assigned_coach_email=settings.default_email.lower(),
+                assigned_coach_name=settings.default_full_name,
+                sport=sport,
+                focus_area=focus_area,
+                date_of_birth=date_of_birth,
+                performance_score=performance_score,
+            )
+            for email, full_name, sport, focus_area, date_of_birth, performance_score in demo_students
+        )
+    return users
 
 
 def to_public_user(user: UserRecord) -> AuthenticatedUser:
@@ -948,7 +940,9 @@ def upsert_user(user: UserRecord) -> UserRecord:
 
 def ensure_seed_data() -> None:
     supabase = ensure_supabase()
-    rows = [to_user_row(user) for user in DEFAULT_DEMO_USERS]
+    rows = [to_user_row(user) for user in build_seed_users()]
+    if not rows:
+        return
     supabase.table("App_Users").upsert(rows, on_conflict="email").execute()
 
 
@@ -2257,7 +2251,8 @@ def seed_psychology_questions() -> None:
 def seed_application_data() -> None:
     try:
         ensure_seed_data()
-        assign_existing_records_to_default_coach_for_testing()
+        if settings.enable_startup_test_mapper:
+            assign_existing_records_to_default_coach_for_testing()
         seed_psychology_questions()
     except HTTPException as exception:
         # Allow the API to boot even before local env vars are configured.
@@ -2359,12 +2354,14 @@ def create_coach_profile(
     existing = get_user_by_email(email)
     if existing and existing.role != "coach":
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="A non-coach account already uses this email.")
+    if not existing and not payload.password:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Password is required when creating a new coach.")
 
     coach_user = existing or upsert_user(
         create_user_record(
             email=email,
             full_name=payload.name,
-            password=payload.password or "Coach2026!",
+            password=payload.password,
             role="coach",
             coach_code=(payload.coach_code or f"COACH-{uuid4().hex[:8]}").upper(),
         )
