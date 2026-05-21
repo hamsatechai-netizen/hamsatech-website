@@ -43,7 +43,7 @@ function ProfilePage() {
         })
         .catch(() => undefined)
     }
-  }, [user?.dateOfBirth, user?.email, user?.focusArea, user?.fullName, user?.sport])
+  }, [user?.dateOfBirth, user?.email, user?.focusArea, user?.fullName, user?.role, user?.sport])
 
   if (!isLoading && !user) {
     return <Navigate to="/signin" replace state={{ from: { pathname: '/profile' } }} />

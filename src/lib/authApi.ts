@@ -425,22 +425,29 @@ type AthleteIntakeResponse = {
   success: boolean
 }
 
+const LOCAL_API_BASE_URL = 'http://127.0.0.1:8000'
+const RENDER_API_BASE_URL = 'https://hamsatech-api.onrender.com'
+const API_PLACEHOLDER_HOST = 'your-fastapi-api.example.com'
+const CLOUDFLARE_PAGES_HOST = 'hamsatech-website.pages.dev'
+
 function getApiBaseUrl() {
   const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
 
-  if (configuredBaseUrl && !configuredBaseUrl.includes('your-fastapi-api.example.com')) {
+  if (configuredBaseUrl && !configuredBaseUrl.includes(API_PLACEHOLDER_HOST)) {
     return configuredBaseUrl.replace(/\/+$/, '')
   }
 
   if (typeof window !== 'undefined') {
     const { hostname } = window.location
     if (hostname === '127.0.0.1' || hostname === 'localhost') {
-      return 'http://127.0.0.1:8000'
+      return LOCAL_API_BASE_URL
     }
 
-    if (hostname === 'hamsatech-website.pages.dev' || hostname.endsWith('.hamsatech-website.pages.dev')) {
-      return 'https://hamsatech-api.onrender.com'
+    if (hostname === CLOUDFLARE_PAGES_HOST || hostname.endsWith(`.${CLOUDFLARE_PAGES_HOST}`)) {
+      return RENDER_API_BASE_URL
     }
+
+    return RENDER_API_BASE_URL
   }
 
   return ''
