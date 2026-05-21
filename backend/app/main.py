@@ -464,6 +464,8 @@ class MobileAthleteRegistrationInput(BaseModel):
     sport: str | None = Field(default=None, max_length=50)
     focus_area: str | None = Field(default=None, alias="focusArea", max_length=80)
     assigned_coach_email: EmailStr | None = Field(default=None, alias="assignedCoachEmail")
+    assigned_coach_id: str | None = Field(default=None, alias="assignedCoachId", min_length=1, max_length=80)
+    selected_coach_id: str | None = Field(default=None, alias="selectedCoachId", min_length=1, max_length=80)
     profile_completion_status: Literal["incomplete", "partial", "complete"] = Field(default="partial", alias="profileCompletionStatus")
 
 
@@ -1035,6 +1037,134 @@ def ensure_coach_owns_coach_id(coach_user: UserRecord, coach_id: str) -> str:
     return mapped
 
 
+def resolve_domain_coach_id_for_email(email: str | None) -> str | None:
+    if not email:
+        return None
+    coach = get_user_by_email(email.lower())
+    if coach and coach.role == "coach":
+        return resolve_dashboard_coach_key(coach)
+    if email.lower() == settings.default_email.lower():
+        return get_default_domain_coach_id()
+    if email.lower() == ADMIN_EMAIL:
+        return get_secondary_domain_coach_id()
+    return None
+
+
+def get_domain_coach_email(coach_id: str | None) -> str | None:
+    if not coach_id:
+        return None
+    if str(coach_id) == str(get_default_domain_coach_id()):
+        return settings.default_email.lower()
+    if str(coach_id) == str(get_secondary_domain_coach_id()):
+        return ADMIN_EMAIL
+    return None
+
+
+def get_assignment_target_for_registration(payload: MobileAthleteRegistrationInput) -> tuple[str | None, str | None]:
+    selected_coach_id = payload.selected_coach_id or payload.assigned_coach_id
+    if selected_coach_id:
+        return selected_coach_id, get_domain_coach_email(selected_coach_id)
+    if payload.assigned_coach_email:
+        coach_id = resolve_domain_coach_id_for_email(payload.assigned_coach_email)
+        if coach_id:
+            return coach_id, payload.assigned_coach_email.lower()
+    default_coach_id = get_default_domain_coach_id()
+    return default_coach_id, settings.default_email.lower() if default_coach_id else None
+
+
+def create_assignment_request_for_athlete(
+    *,
+    athlete_id: str,
+    athlete_name: str,
+    target_coach_id: str | None,
+    target_coach_email: str | None,
+    notes: str,
+) -> str | None:
+    if not target_coach_id:
+        return None
+    supabase = ensure_supabase()
+    existing = safe_table_rows(
+        "assignment_requests",
+        supabase.table("assignment_requests")
+        .select("request_id")
+        .eq("athlete_id", athlete_id)
+        .eq("status", "PENDING")
+        .limit(1),
+    )
+    if existing:
+        return str(existing[0].get("request_id") or "")
+
+    request_id = str(uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    supabase.table("assignment_requests").insert(
+        {
+            "request_id": request_id,
+            "athlete_id": athlete_id,
+            "assigned_coach_id": target_coach_id,
+            "status": "PENDING",
+            "notes": notes,
+            "requested_at": now,
+        }
+    ).execute()
+    create_notification(
+        recipient_email=target_coach_email or settings.default_email.lower(),
+        recipient_role="coach",
+        recipient_coach_id=target_coach_id,
+        title="New athlete assignment request",
+        message=f"{athlete_name} registered and needs coach assignment.",
+        notification_type="ASSIGNMENT_REQUEST",
+        entity_id=request_id,
+        related_athlete_id=athlete_id,
+        action_url="/coach/assignments/pending",
+    )
+    return request_id
+
+
+def get_pending_or_assigned_coach_for_athlete(athlete_row: dict[str, Any]) -> str | None:
+    assigned_coach_id = str(athlete_row.get("coach_id") or "").strip()
+    if assigned_coach_id:
+        return assigned_coach_id
+    supabase = ensure_supabase()
+    rows = safe_table_rows(
+        "assignment_requests",
+        supabase.table("assignment_requests")
+        .select("assigned_coach_id")
+        .eq("athlete_id", athlete_row.get("athlete_id"))
+        .eq("status", "PENDING")
+        .order("requested_at", desc=True)
+        .limit(1),
+    )
+    if rows and rows[0].get("assigned_coach_id"):
+        return str(rows[0].get("assigned_coach_id"))
+    return None
+
+
+def notify_coach_of_athlete_activity(
+    *,
+    athlete_row: dict[str, Any],
+    title: str,
+    message: str,
+    notification_type: str,
+    related_session_id: str | None = None,
+    action_url: str | None = None,
+) -> None:
+    coach_id = get_pending_or_assigned_coach_for_athlete(athlete_row)
+    if not coach_id:
+        return
+    create_notification(
+        recipient_email=get_domain_coach_email(coach_id) or settings.default_email.lower(),
+        recipient_role="coach",
+        recipient_coach_id=coach_id,
+        title=title,
+        message=message,
+        notification_type=notification_type,
+        entity_id=str(athlete_row.get("athlete_id") or ""),
+        related_athlete_id=str(athlete_row.get("athlete_id") or ""),
+        related_session_id=related_session_id,
+        action_url=action_url,
+    )
+
+
 def get_next_student_score() -> int:
     supabase = ensure_supabase()
     result = (
@@ -1227,21 +1357,39 @@ def create_notification(
     message: str,
     notification_type: str,
     entity_id: str | None = None,
+    recipient_coach_id: str | None = None,
+    related_athlete_id: str | None = None,
+    related_session_id: str | None = None,
+    action_url: str | None = None,
 ) -> bool:
     try:
         supabase = ensure_supabase()
-        supabase.table(APP_TABLES["notifications"]).insert(
-            {
-                "notification_id": str(uuid4()),
-                "recipient_email": recipient_email.lower(),
-                "recipient_role": recipient_role,
-                "title": title,
-                "message": message,
-                "type": notification_type,
-                "entity_id": entity_id,
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            }
-        ).execute()
+        now = datetime.now(timezone.utc).isoformat()
+        row = {
+            "notification_id": str(uuid4()),
+            "recipient_email": recipient_email.lower(),
+            "recipient_role": recipient_role,
+            "title": title,
+            "message": message,
+            "type": notification_type,
+            "entity_id": entity_id,
+            "created_at": now,
+        }
+        if not recipient_coach_id and recipient_role == "coach":
+            recipient_coach_id = resolve_domain_coach_id_for_email(recipient_email)
+        enriched_row = {
+            **row,
+            "recipient_coach_id": recipient_coach_id,
+            "notification_type": notification_type.upper(),
+            "related_athlete_id": related_athlete_id or entity_id,
+            "related_session_id": related_session_id,
+            "action_url": action_url,
+            "is_read": False,
+        }
+        try:
+            supabase.table(APP_TABLES["notifications"]).insert(enriched_row).execute()
+        except Exception:
+            supabase.table(APP_TABLES["notifications"]).insert(row).execute()
         return True
     except Exception:
         return False
@@ -2374,9 +2522,15 @@ def list_notifications(
 ) -> NotificationsResponse:
     user = get_authenticated_user(session_token)
     supabase = ensure_supabase()
+    query = supabase.table(APP_TABLES["notifications"]).select("*").order("created_at", desc=True).limit(20)
+    coach_key = resolve_dashboard_coach_key(user) if user.role == "coach" else None
+    if coach_key:
+        query = query.or_(f"recipient_email.eq.{user.email.lower()},recipient_coach_id.eq.{coach_key}")
+    else:
+        query = query.eq("recipient_email", user.email.lower())
     rows = safe_table_rows(
         APP_TABLES["notifications"],
-        supabase.table(APP_TABLES["notifications"]).select("*").eq("recipient_email", user.email.lower()).order("created_at", desc=True).limit(20),
+        query,
     )
     notifications = [
         NotificationRecord(
@@ -2599,7 +2753,7 @@ def assign_athlete_v1(
 
     athlete_row_result = (
         supabase.table(APP_TABLES["athletes"])
-        .select("athlete_id")
+        .select("athlete_id,email,name,athlete_name")
         .eq("athlete_id", payload.athlete_id)
         .limit(1)
         .execute()
@@ -2611,6 +2765,22 @@ def assign_athlete_v1(
     assignment_id = str(uuid4())
     now = datetime.now(timezone.utc).isoformat()
     try:
+        request_rows = safe_table_rows(
+            "assignment_requests",
+            supabase.table("assignment_requests")
+            .select("request_id,assigned_coach_id,status")
+            .eq("request_id", payload.request_id)
+            .limit(1),
+        )
+        request_row = request_rows[0] if request_rows else None
+        if not request_row:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Assignment request not found.")
+        if request_row.get("status") != "PENDING":
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Assignment request is not pending.")
+        target_coach_id = str(request_row.get("assigned_coach_id") or "")
+        if target_coach_id and target_coach_id != str(requestor_coach_id):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="This assignment request belongs to another coach.")
+
         supabase.table(APP_TABLES["athletes"]).update({"coach_id": payload.assigned_coach_id}).eq("athlete_id", payload.athlete_id).execute()
         safe_table_rows(
             "coach_assignments",
@@ -2632,7 +2802,35 @@ def assign_athlete_v1(
                 "assigned_at": now,
             }
         ).eq("request_id", payload.request_id).execute()
+        athlete_email = str(athlete_row.get("email") or "").lower()
+        assigned_coach_name = None
+        coach_rows = safe_table_rows(
+            "coaches",
+            supabase.table("coaches").select("coach_name").eq("coach_id", payload.assigned_coach_id).limit(1),
+        )
+        if coach_rows:
+            assigned_coach_name = str(coach_rows[0].get("coach_name") or "Coach")
+        if athlete_email:
+            supabase.table("App_Users").update(
+                {
+                    "assignment_status": "assigned",
+                    "assigned_coach_email": get_domain_coach_email(payload.assigned_coach_id),
+                    "assigned_coach_name": assigned_coach_name,
+                    "updated_at": now,
+                }
+            ).eq("email", athlete_email).execute()
+            create_notification(
+                recipient_email=athlete_email,
+                recipient_role="student",
+                title="Coach assigned",
+                message=f"You have been assigned to {assigned_coach_name or 'your coach'}.",
+                notification_type="ASSIGNED_TO_COACH",
+                entity_id=payload.athlete_id,
+                related_athlete_id=payload.athlete_id,
+            )
     except Exception as exception:
+        if isinstance(exception, HTTPException):
+            raise exception
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to assign athlete: {exception}") from exception
 
     write_audit_log(
@@ -2848,7 +3046,14 @@ def mark_notification_read(
     user = get_authenticated_user(session_token)
     try:
         supabase = ensure_supabase()
-        supabase.table(APP_TABLES["notifications"]).update({"read_at": datetime.now(timezone.utc).isoformat()}).eq("notification_id", notification_id).eq("recipient_email", user.email.lower()).execute()
+        update = {"read_at": datetime.now(timezone.utc).isoformat(), "is_read": True}
+        query = supabase.table(APP_TABLES["notifications"]).update(update).eq("notification_id", notification_id)
+        coach_key = resolve_dashboard_coach_key(user) if user.role == "coach" else None
+        if coach_key:
+            query = query.or_(f"recipient_email.eq.{user.email.lower()},recipient_coach_id.eq.{coach_key}")
+        else:
+            query = query.eq("recipient_email", user.email.lower())
+        query.execute()
     except Exception as exception:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to update notification: {exception}") from exception
     return StatusResponse(success=True)
@@ -3303,9 +3508,9 @@ def register_mobile_athlete(payload: MobileAthleteRegistrationInput) -> MobileAt
     ensure_seed_data()
     supabase = ensure_supabase()
     email = payload.email.lower()
-    assigned_coach = get_user_by_email(payload.assigned_coach_email.lower()) if payload.assigned_coach_email else get_primary_coach()
-    if assigned_coach and assigned_coach.role != "coach":
-        assigned_coach = get_primary_coach()
+    target_coach_id, target_coach_email = get_assignment_target_for_registration(payload)
+    target_coach_user = get_user_by_email(target_coach_email) if target_coach_email else None
+    target_coach_name = target_coach_user.full_name if target_coach_user else "HamsaTech Coach"
 
     user = get_user_by_email(email)
     if not user:
@@ -3315,13 +3520,13 @@ def register_mobile_athlete(payload: MobileAthleteRegistrationInput) -> MobileAt
                 full_name=payload.full_name,
                 password=f"Mobile{uuid4().hex[:10]}!",
                 role="student",
-                assignment_status="assigned" if assigned_coach else "pending",
-                assigned_coach_email=assigned_coach.email.lower() if assigned_coach else None,
-                assigned_coach_name=assigned_coach.full_name if assigned_coach else None,
-                requested_coach_email=ADMIN_EMAIL if not assigned_coach else None,
-                requested_coach_name="HamsaTech Admin" if not assigned_coach else None,
-                requested_coach_code="ADMIN" if not assigned_coach else None,
-                coach_request_sent_at=datetime.now(timezone.utc).isoformat() if not assigned_coach else None,
+                assignment_status="pending",
+                assigned_coach_email=None,
+                assigned_coach_name=None,
+                requested_coach_email=target_coach_email,
+                requested_coach_name=target_coach_name,
+                requested_coach_code=None,
+                coach_request_sent_at=datetime.now(timezone.utc).isoformat(),
                 sport=payload.sport,
                 focus_area=payload.focus_area,
                 performance_score=get_next_student_score(),
@@ -3337,7 +3542,7 @@ def register_mobile_athlete(payload: MobileAthleteRegistrationInput) -> MobileAt
         "height_cm": 1,
         "weight_kg": 1,
         "academy_id": payload.sport or "Mobile",
-        "coach_id": assigned_coach.email.lower() if assigned_coach else "",
+        "coach_id": "",
         "contact_number": payload.phone,
         "email": email,
         "created_at": now,
@@ -3373,37 +3578,25 @@ def register_mobile_athlete(payload: MobileAthleteRegistrationInput) -> MobileAt
         except Exception:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to save mobile registration: {exception}") from exception
 
-    recipient = assigned_coach.email if assigned_coach else ADMIN_EMAIL
-    role = "coach" if assigned_coach else "admin"
-    notification_created = create_notification(
-        recipient_email=recipient,
-        recipient_role=role,
-        title="New athlete registration",
-        message=f"{payload.full_name} registered from the mobile app.",
-        notification_type="athlete_registered",
-        entity_id=athlete_id,
+    request_id = create_assignment_request_for_athlete(
+        athlete_id=athlete_id,
+        athlete_name=payload.full_name,
+        target_coach_id=target_coach_id,
+        target_coach_email=target_coach_email,
+        notes="Auto-created from mobile athlete registration",
     )
-    if not assigned_coach:
-        create_notification(
-            recipient_email=ADMIN_EMAIL,
-            recipient_role="admin",
-            title="Coach assignment needed",
-            message=f"{payload.full_name} registered without an assigned coach.",
-            notification_type="assignment_needed",
-            entity_id=athlete_id,
-        )
     write_audit_log(
         actor_email=email,
         action="mobile_athlete_registered",
         entity_type="athlete",
         entity_id=athlete_id,
-        metadata={"assignedCoachEmail": assigned_coach.email if assigned_coach else None},
+        metadata={"targetCoachId": target_coach_id, "targetCoachEmail": target_coach_email, "assignmentRequestId": request_id},
     )
     sync_latest_overall_score(athlete_row)
     return MobileAthleteRegistrationResponse(
         athleteId=athlete_id,
-        assignedCoachEmail=assigned_coach.email if assigned_coach else None,
-        notificationCreated=notification_created,
+        assignedCoachEmail=target_coach_email,
+        notificationCreated=bool(request_id),
         success=True,
     )
 
@@ -3596,7 +3789,7 @@ def save_mobile_daily_checkin(
     athlete_id: str,
     payload: MobileDailyCheckinInput,
 ) -> MobileDailyCheckinResponse:
-    ensure_mobile_athlete_row(athlete_id)
+    athlete_row = ensure_mobile_athlete_row(athlete_id)
     seed_psychology_questions()
     supabase = ensure_supabase()
     now = datetime.now(timezone.utc).isoformat()
@@ -3622,6 +3815,13 @@ def save_mobile_daily_checkin(
     except Exception as exception:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to save daily check-in: {exception}") from exception
 
+    notify_coach_of_athlete_activity(
+        athlete_row=athlete_row,
+        title="Daily check-in submitted",
+        message=f"{athlete_row.get('name') or athlete_row.get('athlete_name') or 'Athlete'} submitted a daily check-in.",
+        notification_type="DAILY_CHECKIN",
+        action_url=f"/coach/athletes/{athlete_id}",
+    )
     return MobileDailyCheckinResponse(checkin=serialize_mobile_checkin(row))
 
 
@@ -3753,6 +3953,14 @@ def create_mobile_training_session(
         supabase.table(APP_TABLES["shooting_session_log"]).insert(row).execute()
     except Exception as exception:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to create training session: {exception}") from exception
+    notify_coach_of_athlete_activity(
+        athlete_row=athlete_row,
+        title="Training session started",
+        message=f"{athlete_row.get('name') or athlete_row.get('athlete_name') or 'Athlete'} started a training session.",
+        notification_type="TRAINING_SESSION_STARTED",
+        related_session_id=session_id,
+        action_url=f"/coach/athletes/{athlete_id}",
+    )
     return MobileTrainingSessionResponse(session=serialize_mobile_session(row))
 
 
@@ -3844,6 +4052,15 @@ def save_mobile_session_reflection(
     except Exception as exception:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to save reflection: {exception}") from exception
 
+    athlete_row = ensure_mobile_athlete_row(athlete_id)
+    notify_coach_of_athlete_activity(
+        athlete_row=athlete_row,
+        title="Session reflection submitted",
+        message=f"{athlete_row.get('name') or athlete_row.get('athlete_name') or 'Athlete'} submitted a session reflection.",
+        notification_type="SESSION_REFLECTION",
+        related_session_id=session_id,
+        action_url=f"/coach/athletes/{athlete_id}",
+    )
     return MobileSessionReflectionResponse(
         reflection=serialize_mobile_reflection(row) or {},
         summary=build_mobile_session_summary(session_row),
@@ -3907,6 +4124,15 @@ def complete_mobile_training_session(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unable to complete session: {exception}") from exception
 
     session_row = (response.data or [None])[0] or ensure_mobile_session_row(athlete_id, session_id)
+    athlete_row = ensure_mobile_athlete_row(athlete_id)
+    notify_coach_of_athlete_activity(
+        athlete_row=athlete_row,
+        title="Training session completed",
+        message=f"{athlete_row.get('name') or athlete_row.get('athlete_name') or 'Athlete'} completed a training session.",
+        notification_type="TRAINING_SESSION_COMPLETED",
+        related_session_id=session_id,
+        action_url=f"/coach/athletes/{athlete_id}",
+    )
     return MobileSessionSummaryResponse(summary=build_mobile_session_summary(session_row))
 
 
