@@ -4504,8 +4504,21 @@ def get_mobile_training_session_summary(
 
 @app.post("/api/auth/login", response_model=AuthResponse)
 def login(payload: LoginRequest, response: Response) -> AuthResponse:
-    ensure_seed_data()
-    user = get_user_by_email(payload.email.lower())
+    try:
+        ensure_seed_data()
+    except Exception as exception:
+        logger.warning("Skipping login seed refresh because it failed: %s", exception)
+
+    try:
+        user = get_user_by_email(payload.email.lower())
+    except HTTPException:
+        raise
+    except Exception as exception:
+        logger.exception("Unable to load user during login")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Authentication service is temporarily unavailable. Check Supabase configuration and schema.",
+        ) from exception
 
     if not user:
         raise HTTPException(
@@ -4519,7 +4532,16 @@ def login(payload: LoginRequest, response: Response) -> AuthResponse:
             detail="Invalid password. Please try again.",
         )
 
-    session_token = create_persistent_session(user.email)
+    try:
+        session_token = create_persistent_session(user.email)
+    except HTTPException:
+        raise
+    except Exception as exception:
+        logger.exception("Unable to create session during login")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Authentication service is temporarily unavailable. Check Supabase session table setup.",
+        ) from exception
 
     response.set_cookie(
         key=settings.session_cookie_name,
