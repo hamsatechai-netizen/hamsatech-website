@@ -660,6 +660,46 @@
   color: var(--text-main);
 }
 
+.dashboard-panel {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(239, 251, 249, 0.92);
+  border: 1px solid var(--surface-border);
+}
+
+.dashboard-panel-title {
+  margin: 0 0 12px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: 0;
+}
+
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dashboard-metric {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(8, 34, 44, 0.12);
+}
+
+.dashboard-metric span {
+  color: rgba(7, 16, 20, 0.7);
+  font-size: 0.9rem;
+}
+
+.dashboard-metric strong {
+  color: var(--text-main);
+  font-size: 1.05rem;
+}
+
 .insight-meter {
   position: relative;
   height: 14px;

@@ -394,6 +394,95 @@ type AthleteFullProfileV1Response = {
   athlete: CoachAthleteDetail & { feedbackHistory?: CoachFeedbackRecord[] }
 }
 
+export type AthleteHomeSnapshot = {
+  athleteId: string
+  displayName: string
+  onboardingStatus?: string | null
+  profileCompletionStatus?: string | null
+  polar?: { linked?: boolean; deviceId?: string | null } | null
+  metrics?: {
+    readiness?: number | null
+    sleepHours?: number | null
+    restingHr?: number | null
+    hrvMs?: number | null
+  } | null
+  dailyCheckin?: {
+    mood?: string | null
+    energyLevel?: number | null
+    sleepBand?: string | null
+    sleepHours?: number | null
+    checkinDate?: string | null
+  } | null
+  recommendations?: string[]
+}
+
+type AthleteHomeSnapshotResponse = {
+  home: AthleteHomeSnapshot
+}
+
+export type CoachAthleteWidget = {
+  athleteId: string
+  readiness?: number | null
+  performance?: number | null
+  fatigue?: number | null
+  nextFocus?: string | null
+}
+
+type CoachAthleteWidgetResponse = {
+  widget: CoachAthleteWidget
+}
+
+export type CoachAthleteSessionsWidget = {
+  athleteId: string
+  lastSession?: {
+    sessionId?: string
+    sessionDate?: string | null
+    performance?: number | null
+    readiness?: number | null
+    holdStability?: number | null
+    mentalScore?: number | null
+    fatigue?: number | null
+    summaryTitle?: string | null
+  } | null
+  history?: Array<{
+    sessionId: string
+    sessionDate?: string | null
+    performance?: number | null
+    readiness?: number | null
+    fatigue?: number | null
+  }>
+}
+
+type CoachAthleteSessionsWidgetResponse = {
+  widget: CoachAthleteSessionsWidget
+}
+
+export type CoachAthleteInsightsWidget = {
+  athleteId: string
+  scores?: { social?: number | null; arousal?: number | null; decision?: number | null; focus?: number | null } | null
+  recommendation?: string | null
+  feedbackHistory?: Array<{ createdAt?: string; status?: string | null; note?: string | null; trainingPlan?: string | null }>
+}
+
+type CoachAthleteInsightsWidgetResponse = {
+  widget: CoachAthleteInsightsWidget
+}
+
+export type CoachAthleteProfileWidget = {
+  athleteId: string
+  name?: string | null
+  initials?: string | null
+  coachId?: string | null
+  scores?: { bestAvg30d?: number | null; periodAvg?: number | null; bestSeries?: number | null; lastSession?: number | null } | null
+  psychology?: { social?: number | null; arousal?: number | null; decision?: number | null; focus?: number | null; recovery?: number | null } | null
+  trainingPlan?: string | null
+  feedbackHistory?: Array<{ createdAt?: string; status?: string | null; note?: string | null; trainingPlan?: string | null }>
+}
+
+type CoachAthleteProfileWidgetResponse = {
+  widget: CoachAthleteProfileWidget
+}
+
 export type CoachDashboardSummary = {
   totalAssignedAthletes: number
   newRegistrations: number
@@ -622,6 +711,52 @@ export async function getCoachAthleteDetails(athleteId: string): Promise<CoachAt
   })
 
   return data.athlete
+}
+
+export async function getCoachAthleteHome(athleteId: string): Promise<AthleteHomeSnapshot> {
+  const data = await request<AthleteHomeSnapshotResponse>(
+    `/api/coach/athletes/${encodeURIComponent(athleteId)}/home`,
+    {
+      method: 'GET',
+    },
+  )
+
+  return data.home
+}
+
+export async function getCoachAthleteWidget(athleteId: string): Promise<CoachAthleteWidget> {
+  const data = await request<CoachAthleteWidgetResponse>(
+    `/api/coach/athletes/${encodeURIComponent(athleteId)}/widget`,
+    {
+      method: 'GET',
+    },
+  )
+
+  return data.widget
+}
+
+export async function getCoachAthleteSessionsWidget(athleteId: string): Promise<CoachAthleteSessionsWidget> {
+  const data = await request<CoachAthleteSessionsWidgetResponse>(
+    `/api/coach/athletes/${encodeURIComponent(athleteId)}/sessions-widget`,
+    { method: 'GET' },
+  )
+  return data.widget
+}
+
+export async function getCoachAthleteInsightsWidget(athleteId: string): Promise<CoachAthleteInsightsWidget> {
+  const data = await request<CoachAthleteInsightsWidgetResponse>(
+    `/api/coach/athletes/${encodeURIComponent(athleteId)}/insights-widget`,
+    { method: 'GET' },
+  )
+  return data.widget
+}
+
+export async function getCoachAthleteProfileWidget(athleteId: string): Promise<CoachAthleteProfileWidget> {
+  const data = await request<CoachAthleteProfileWidgetResponse>(
+    `/api/coach/athletes/${encodeURIComponent(athleteId)}/profile-widget`,
+    { method: 'GET' },
+  )
+  return data.widget
 }
 
 export async function getCoachAthleteFeedback(athleteId: string): Promise<CoachFeedbackRecord[]> {
