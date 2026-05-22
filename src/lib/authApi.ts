@@ -170,6 +170,7 @@ export type CoachDashboardV1 = {
     readiness?: number | null
     sleep?: number | null
     restingHr?: number | null
+    hrvIndicator?: number | null
     focus?: number | null
     consistency?: number | null
   }>>
@@ -496,9 +497,15 @@ export type CoachAthleteSessionsWidget = {
   history?: Array<{
     sessionId: string
     sessionDate?: string | null
+    trainingType?: string | null
     performance?: number | null
     readiness?: number | null
+    bestSeries?: number | null
+    avgHr?: number | null
     fatigue?: number | null
+    recovery?: number | null
+    reflection?: string | null
+    coachNotes?: string | null
   }>
 }
 
@@ -522,9 +529,16 @@ export type CoachAthleteProfileWidget = {
   name?: string | null
   initials?: string | null
   coachId?: string | null
+  coachName?: string | null
+  age?: number | null
+  gender?: string | null
+  sport?: string | null
+  currentStatus?: string | null
+  latestSessionDate?: string | null
   scores?: { bestAvg30d?: number | null; periodAvg?: number | null; bestSeries?: number | null; lastSession?: number | null } | null
   psychology?: { social?: number | null; arousal?: number | null; decision?: number | null; focus?: number | null; recovery?: number | null } | null
   trainingPlan?: string | null
+  trainingPlanStatus?: string | null
   feedbackHistory?: Array<{ createdAt?: string; status?: string | null; note?: string | null; trainingPlan?: string | null }>
 }
 

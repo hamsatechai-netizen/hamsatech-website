@@ -475,6 +475,7 @@ class CoachDashboardScatterPoint(BaseModel):
     readiness: float | None = None
     sleep: float | None = None
     resting_hr: float | None = Field(default=None, alias="restingHr")
+    hrv_indicator: float | None = Field(default=None, alias="hrvIndicator")
     focus: float | None = None
     consistency: float | None = None
 
@@ -3149,7 +3150,7 @@ def risk_reasons_for_row(
         reasons.append("Poor sleep")
     if trend == "Declining":
         reasons.append("Declining trend")
-    if not last_session_date:
+    if not is_recent_date(last_session_date):
         reasons.append("No recent activity")
     return reasons
 
@@ -3318,6 +3319,7 @@ def get_coach_dashboard_v1(
             readiness=row.readiness_score,
             sleep=row.sleep_hours,
             restingHr=row.resting_hr,
+            hrvIndicator=row.hrv_indicator,
             focus=row.focus_score,
             consistency=row.discipline_score,
         )
@@ -3346,7 +3348,7 @@ def get_coach_dashboard_v1(
             "totalAssignedAthletes": len(rows),
             "activeAthletes": len([row for row in rows if is_recent_date(row.last_session_date)]),
             "inactiveAthletes": len([row for row in rows if not is_recent_date(row.last_session_date)]),
-            "newRegistrations": len([row for row in rows if row.last_session_date]),
+            "newRegistrations": len([athlete for athlete in athletes if is_recent_date(athlete.created_at)]),
             "athletesNeedingAttention": len([row for row in rows if row.status in {"Needs Attention", "At Risk"}]),
             "topPerformers": len([row for row in rows if row.status == "Strong"]),
             "mostDisciplined": len([row for row in rows if (row.discipline_score or 0) >= 75]),
@@ -3364,6 +3366,8 @@ def get_coach_dashboard_v1(
         mapping={
             "performanceVsFatigue": mapping_points,
             "performanceVsStress": mapping_points,
+            "performanceVsHeartRate": mapping_points,
+            "performanceVsHrv": mapping_points,
             "performanceVsSleep": mapping_points,
             "readinessVsPerformance": mapping_points,
             "focusVsConsistency": mapping_points,
@@ -3619,8 +3623,8 @@ def get_coach_dashboard_summary(
         summary=CoachDashboardSummary(
             totalAssignedAthletes=len(athletes),
             newRegistrations=new_registrations,
-            activeAthletes=len(athletes),
-            inactiveAthletes=0,
+            activeAthletes=len([athlete for athlete in athletes if is_recent_date(athlete.latest_session_date)]),
+            inactiveAthletes=len([athlete for athlete in athletes if not is_recent_date(athlete.latest_session_date)]),
             averageScore=average_score,
             highestPerforming=sorted_athletes[:5],
             lowestPerforming=list(reversed(sorted_athletes[-5:])),
@@ -3818,14 +3822,28 @@ def get_coach_athlete_sessions_widget(
 
     history: list[dict[str, Any]] = []
     for row in session_rows[:2]:
+        row_summary = None
+        try:
+            row_summary = build_mobile_session_summary(row)
+        except Exception:
+            row_summary = None
+        row_score = (row_summary or {}).get("score", {}) if isinstance(row_summary, dict) else {}
+        row_physiology = (row_summary or {}).get("physiology", {}) if isinstance(row_summary, dict) else {}
+        row_reflection = ((row_summary or {}).get("mentalState", {}) or {}).get("reflection") if isinstance(row_summary, dict) else None
         history.append(
             {
                 "sessionId": str(row.get("session_id") or ""),
                 "sessionDate": session_date(row),
+                "trainingType": row.get("training_type") or row.get("session_type") or "Shooting",
                 # Keep these aligned to the Sessions mock: "Score", "Ready", "Fatigue"
-                "performance": score_by_type.get("overall").score_value if score_by_type.get("overall") else None,
+                "performance": row_score.get("averagePerShot") or (score_by_type.get("overall").score_value if score_by_type.get("overall") else None),
                 "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
+                "bestSeries": (row_score.get("bestSeries") or {}).get("total") if isinstance(row_score.get("bestSeries"), dict) else None,
+                "avgHr": row_physiology.get("avgHeartRate"),
                 "fatigue": fatigue_burden,
+                "recovery": latest_physiology.get("recovery_score"),
+                "reflection": (row_reflection or {}).get("whatWorked") if isinstance(row_reflection, dict) else row.get("athlete_notes") or row.get("notes"),
+                "coachNotes": row.get("coach_notes") or "",
             }
         )
 
@@ -3958,12 +3976,41 @@ def get_coach_athlete_profile_widget(
         for row in feedback_rows
     ]
     latest_training_plan = feedback_history[0]["trainingPlan"] if feedback_history else None
+    training_plan_rows = safe_table_rows(
+        "training_plans",
+        supabase.table("training_plans")
+        .select("*")
+        .eq("athlete_id", canonical_athlete_id)
+        .order("updated_at", desc=True)
+        .limit(1),
+    )
+    training_plan_row = training_plan_rows[0] if training_plan_rows else {}
+    persisted_training_plan = " / ".join(
+        [
+            str(value)
+            for value in [
+                training_plan_row.get("focus_area"),
+                training_plan_row.get("recommended_drills"),
+                training_plan_row.get("recovery_instructions"),
+                training_plan_row.get("mental_training_notes"),
+                training_plan_row.get("coach_recommendation"),
+            ]
+            if value
+        ]
+    )
+    latest_session_date = str(latest_session.get("session_date") or latest_session.get("created_at")) if latest_session else None
 
     widget = {
         "athleteId": canonical_athlete_id,
         "name": name,
         "initials": initials,
         "coachId": str(athlete_row.get("coach_id") or ""),
+        "coachName": coach_user.full_name,
+        "age": athlete_row.get("age"),
+        "gender": athlete_row.get("gender"),
+        "sport": athlete_row.get("academy_id") or (latest_session or {}).get("training_type") or "Shooting",
+        "currentStatus": "Needs Review" if latest_training_plan else "Stable",
+        "latestSessionDate": latest_session_date,
         "scores": {
             "bestAvg30d": score_by_type.get("best_avg_30d").score_value if score_by_type.get("best_avg_30d") else None,
             "periodAvg": score_by_type.get("period_avg").score_value if score_by_type.get("period_avg") else None,
@@ -3977,7 +4024,8 @@ def get_coach_athlete_profile_widget(
             "focus": score_by_type.get("focus").score_value if score_by_type.get("focus") else None,
             "recovery": score_by_type.get("recovery").score_value if score_by_type.get("recovery") else None,
         },
-        "trainingPlan": latest_training_plan,
+        "trainingPlan": persisted_training_plan or latest_training_plan,
+        "trainingPlanStatus": training_plan_row.get("status") or ("In Progress" if latest_training_plan else "Needs Review"),
         "feedbackHistory": feedback_history,
     }
     return CoachAthleteProfileWidgetResponse(widget=widget)

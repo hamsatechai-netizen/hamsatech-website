@@ -158,6 +158,13 @@ create table if not exists hamsatech.shooting_session_log (
 
 alter table hamsatech.shooting_session_log add column if not exists created_at timestamptz not null default now();
 alter table hamsatech.shooting_session_log add column if not exists updated_at timestamptz not null default now();
+alter table hamsatech.shooting_session_log add column if not exists session_type text;
+alter table hamsatech.shooting_session_log add column if not exists coach_notes text;
+alter table hamsatech.shooting_session_log add column if not exists athlete_notes text;
+alter table hamsatech.shooting_session_log add column if not exists planned_shots integer;
+alter table hamsatech.shooting_session_log add column if not exists completed_shots integer;
+alter table hamsatech.shooting_session_log add column if not exists missed_session boolean not null default false;
+alter table hamsatech.shooting_session_log add column if not exists reflection_submitted boolean not null default false;
 
 create table if not exists hamsatech.athlete_physiology (
   physiology_id text primary key,
@@ -174,6 +181,21 @@ create table if not exists hamsatech.athlete_physiology (
   fatigue_level integer,
   remarks text
 );
+
+alter table hamsatech.athlete_physiology add column if not exists min_heart_rate integer;
+alter table hamsatech.athlete_physiology add column if not exists max_heart_rate integer;
+alter table hamsatech.athlete_physiology add column if not exists rmssd numeric;
+alter table hamsatech.athlete_physiology add column if not exists hrv_ms numeric;
+alter table hamsatech.athlete_physiology add column if not exists hr_std_dev numeric;
+alter table hamsatech.athlete_physiology add column if not exists zone_1_time integer not null default 0;
+alter table hamsatech.athlete_physiology add column if not exists zone_2_time integer not null default 0;
+alter table hamsatech.athlete_physiology add column if not exists zone_3_time integer not null default 0;
+alter table hamsatech.athlete_physiology add column if not exists zone_4_time integer not null default 0;
+alter table hamsatech.athlete_physiology add column if not exists zone_5_time integer not null default 0;
+alter table hamsatech.athlete_physiology add column if not exists stability_score numeric;
+alter table hamsatech.athlete_physiology add column if not exists acc_hold_stability numeric;
+alter table hamsatech.athlete_physiology add column if not exists acc_settle_score numeric;
+alter table hamsatech.athlete_physiology add column if not exists acc_spike_count integer;
 
 create table if not exists hamsatech.psychology_questions (
   question_id text primary key,
@@ -202,6 +224,36 @@ create table if not exists hamsatech.athlete_scores (
   source_data jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
+);
+
+create table if not exists hamsatech.training_plans (
+  training_plan_id uuid primary key default gen_random_uuid(),
+  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  coach_id uuid references hamsatech.coaches(coach_id),
+  focus_area text,
+  recommended_drills text,
+  session_frequency text,
+  recovery_instructions text,
+  mental_training_notes text,
+  coach_recommendation text,
+  status text not null default 'New' check (status in ('New', 'In Progress', 'Completed', 'Needs Review')),
+  generated_from jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists hamsatech.athlete_insights (
+  insight_id uuid primary key default gen_random_uuid(),
+  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  session_id uuid references hamsatech.shooting_session_log(session_id) on delete set null,
+  title text not null,
+  insight_text text not null,
+  category text not null,
+  score numeric,
+  priority text not null default 'Medium' check (priority in ('High', 'Medium', 'Low')),
+  suggested_action text,
+  supporting_data jsonb,
+  created_at timestamptz not null default now()
 );
 
 create table if not exists hamsatech.coach_feedback (
@@ -352,12 +404,191 @@ create table if not exists hamsatech."Athlete_Lookup" (
 
 create index if not exists idx_app_sessions_user_email on hamsatech."App_Sessions"(user_email);
 create index if not exists idx_athletes_coach_id on hamsatech.athletes(coach_id);
+create index if not exists idx_sessions_athlete_date on hamsatech.shooting_session_log(athlete_id, session_date desc);
+create index if not exists idx_physiology_athlete_date on hamsatech.athlete_physiology(athlete_id, recorded_date desc);
 create index if not exists idx_athlete_scores_athlete_id on hamsatech.athlete_scores(athlete_id);
+create index if not exists idx_athlete_scores_type_calc on hamsatech.athlete_scores(athlete_id, score_type, calculated_at desc);
+create index if not exists idx_psychology_responses_athlete_recorded on hamsatech.psychology_responses(athlete_id, recorded_at desc);
+create index if not exists idx_training_plans_athlete_status on hamsatech.training_plans(athlete_id, status, updated_at desc);
+create index if not exists idx_athlete_insights_athlete_created on hamsatech.athlete_insights(athlete_id, created_at desc);
+create index if not exists idx_athlete_insights_category_created on hamsatech.athlete_insights(category, created_at desc);
 create index if not exists idx_notifications_email on hamsatech.notifications(recipient_email);
 create index if not exists idx_notifications_coach_unread on hamsatech.notifications(recipient_coach_id, is_read, created_at desc);
 create index if not exists idx_feedback_requests_status on hamsatech.feedback_requests(coach_id, status, requested_at desc);
 create index if not exists idx_assignment_requests_pending on hamsatech.assignment_requests(status, requested_at desc);
 create index if not exists idx_assignment_requests_athlete_pending on hamsatech.assignment_requests(athlete_id) where status = 'PENDING';
+
+create or replace view hamsatech.athlete_physiology_metrics as
+select
+  p.physiology_id,
+  p.athlete_id,
+  p.session_id,
+  p.recorded_date,
+  p.resting_heart_rate as resting_hr,
+  p.avg_heart_rate as avg_hr,
+  p.min_heart_rate as min_hr,
+  p.max_heart_rate as max_hr,
+  coalesce(p.rmssd, p.hrv_ms) as rmssd,
+  p.hr_std_dev,
+  p.zone_1_time,
+  p.zone_2_time,
+  p.zone_3_time,
+  p.zone_4_time,
+  p.zone_5_time,
+  p.sleep_hours,
+  p.recovery_score,
+  p.stress_score,
+  least(100, greatest(0, coalesce(p.fatigue_level, 0) * 10))::numeric as fatigue_score,
+  round(
+    (
+      coalesce(p.recovery_score, 50)::numeric
+      + (100 - coalesce(p.stress_score, 50))::numeric
+      + (100 - least(100, greatest(0, coalesce(p.fatigue_level, 5) * 10)))::numeric
+    ) / 3,
+    2
+  ) as readiness_score,
+  p.stability_score,
+  p.acc_hold_stability,
+  p.acc_settle_score,
+  p.acc_spike_count,
+  p.remarks
+from hamsatech.athlete_physiology p;
+
+create or replace view hamsatech.athlete_psychology_scores as
+select
+  md5(r.athlete_id || ':' || coalesce(q.category, r.question_id)) as psychology_score_id,
+  r.athlete_id,
+  lower(coalesce(q.category, r.question_id)) as category,
+  round(avg(r.answer_score)::numeric, 2) as score,
+  case
+    when avg(r.answer_score) >= 8 then 'Strong'
+    when avg(r.answer_score) >= 6 then 'Good'
+    when avg(r.answer_score) >= 4 then 'Moderate'
+    else 'Low'
+  end as interpretation,
+  jsonb_agg(
+    jsonb_build_object(
+      'questionId', r.question_id,
+      'questionText', q.question_text,
+      'answerText', r.answer_text,
+      'answerScore', r.answer_score,
+      'recordedAt', r.recorded_at
+    )
+    order by r.recorded_at desc
+  ) as input_summary,
+  max(r.recorded_at) as calculated_at
+from hamsatech.psychology_responses r
+left join hamsatech.psychology_questions q on q.question_id = r.question_id
+where r.answer_score is not null
+group by r.athlete_id, lower(coalesce(q.category, r.question_id));
+
+create or replace view hamsatech.athlete_session_summary as
+with session_series as (
+  select
+    s.session_id,
+    s.athlete_id,
+    avg(sc.score_value)::numeric as average_series_score,
+    max(sc.score_value)::numeric as best_series_score,
+    stddev_pop(sc.score_value)::numeric as series_stddev,
+    count(sc.score_id) as series_count
+  from hamsatech.shooting_session_log s
+  left join hamsatech.athlete_scores sc
+    on sc.athlete_id = s.athlete_id
+   and sc.score_type = 'mobile_series'
+   and sc.source_data ->> 'sessionId' = s.session_id::text
+  group by s.session_id, s.athlete_id
+),
+recent_sessions as (
+  select
+    s.athlete_id,
+    count(*) filter (where s.session_date >= current_date - interval '7 days') as sessions_7d,
+    count(*) filter (where s.session_date >= current_date - interval '30 days') as sessions_30d
+  from hamsatech.shooting_session_log s
+  group by s.athlete_id
+)
+select
+  s.session_id,
+  s.athlete_id,
+  s.coach_id,
+  s.session_date,
+  s.training_type,
+  s.location,
+  coalesce(ss.average_series_score, latest_overall.score_value, 0)::numeric as performance_score,
+  coalesce(ss.best_series_score, best_series.score_value)::numeric as best_series_score,
+  coalesce(pm.readiness_score, latest_readiness.score_value)::numeric as readiness_score,
+  coalesce(pm.fatigue_score, 100 - latest_fatigue.score_value)::numeric as fatigue_score,
+  coalesce(pm.stress_score, latest_stress.score_value)::numeric as stress_score,
+  coalesce(pm.recovery_score, latest_recovery.score_value)::numeric as recovery_score,
+  pm.avg_hr,
+  pm.min_hr,
+  pm.max_hr,
+  pm.rmssd,
+  coalesce(100 - least(100, coalesce(ss.series_stddev, 0) * 10), latest_consistency.score_value, 50)::numeric as consistency_index,
+  coalesce(pm.stability_score, latest_stability.score_value)::numeric as stability_index,
+  least(100, coalesce(rs.sessions_30d, 0) * 8)::numeric as training_adherence_score,
+  coalesce(rs.sessions_7d, 0) as sessions_7d,
+  coalesce(rs.sessions_30d, 0) as sessions_30d,
+  tp.focus_area as next_training_focus,
+  tp.coach_recommendation as recommendations,
+  jsonb_build_object(
+    'notes', s.notes,
+    'coachNotes', s.coach_notes,
+    'athleteNotes', s.athlete_notes,
+    'reflectionSubmitted', s.reflection_submitted,
+    'seriesCount', ss.series_count
+  ) as detailed_analysis,
+  s.created_at,
+  s.updated_at
+from hamsatech.shooting_session_log s
+left join session_series ss on ss.session_id = s.session_id
+left join hamsatech.athlete_physiology_metrics pm on pm.session_id = s.session_id
+left join recent_sessions rs on rs.athlete_id = s.athlete_id
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type in ('overall', 'performance')
+  order by calculated_at desc limit 1
+) latest_overall on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type = 'readiness'
+  order by calculated_at desc limit 1
+) latest_readiness on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type = 'fatigue'
+  order by calculated_at desc limit 1
+) latest_fatigue on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type = 'stress'
+  order by calculated_at desc limit 1
+) latest_stress on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type = 'recovery'
+  order by calculated_at desc limit 1
+) latest_recovery on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type in ('consistency', 'discipline')
+  order by calculated_at desc limit 1
+) latest_consistency on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type in ('hold_stability', 'stability')
+  order by calculated_at desc limit 1
+) latest_stability on true
+left join lateral (
+  select score_value from hamsatech.athlete_scores
+  where athlete_id = s.athlete_id and score_type = 'best_series'
+  order by calculated_at desc limit 1
+) best_series on true
+left join lateral (
+  select focus_area, coach_recommendation
+  from hamsatech.training_plans
+  where athlete_id = s.athlete_id and status in ('New', 'In Progress', 'Needs Review')
+  order by updated_at desc limit 1
+) tp on true;
 
 insert into hamsatech.psychology_questions (question_id, question_text, category, question_type)
 values

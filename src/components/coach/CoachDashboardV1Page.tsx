@@ -8,7 +8,9 @@ type SortKey = 'performance' | 'readiness' | 'fatigue' | 'stress' | 'consistency
 
 function formatDate(value?: string | null) {
   if (!value) return 'N/A'
-  return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value))
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return 'N/A'
+  return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(parsed)
 }
 
 function formatScore(value?: number | null) {
@@ -50,7 +52,7 @@ function ScatterPlot({
 }: {
   title: string
   points: NonNullable<CoachDashboardV1['mapping'][string]>
-  xKey: 'fatigue' | 'stress' | 'sleep' | 'performance' | 'consistency'
+  xKey: 'fatigue' | 'stress' | 'sleep' | 'restingHr' | 'hrvIndicator' | 'performance' | 'consistency'
   yKey: 'performance' | 'readiness' | 'focus'
 }) {
   const usable = points.filter((point) => typeof point[xKey] === 'number' && typeof point[yKey] === 'number')
@@ -117,8 +119,7 @@ export default function CoachDashboardV1Page() {
       .filter((athlete) => !term || athlete.athleteName.toLowerCase().includes(term))
       .filter((athlete) => statusFilter === 'all' || athlete.status === statusFilter)
       .sort((a, b) => {
-        const direction = sortKey === 'fatigue' || sortKey === 'stress' ? 1 : -1
-        return (sortValue(a, sortKey) - sortValue(b, sortKey)) * direction
+        return sortValue(b, sortKey) - sortValue(a, sortKey)
       })
   }, [dashboard, search, sortKey, statusFilter])
 
@@ -235,7 +236,10 @@ export default function CoachDashboardV1Page() {
               <div className="coach-map-grid">
                 <ScatterPlot title="Performance vs Fatigue" points={dashboard.mapping.performanceVsFatigue ?? []} xKey="fatigue" yKey="performance" />
                 <ScatterPlot title="Performance vs Stress" points={dashboard.mapping.performanceVsStress ?? []} xKey="stress" yKey="performance" />
+                <ScatterPlot title="Performance vs Resting HR" points={dashboard.mapping.performanceVsHeartRate ?? []} xKey="restingHr" yKey="performance" />
+                <ScatterPlot title="Performance vs HRV" points={dashboard.mapping.performanceVsHrv ?? []} xKey="hrvIndicator" yKey="performance" />
                 <ScatterPlot title="Performance vs Sleep" points={dashboard.mapping.performanceVsSleep ?? []} xKey="sleep" yKey="performance" />
+                <ScatterPlot title="Readiness vs Performance" points={dashboard.mapping.readinessVsPerformance ?? []} xKey="performance" yKey="readiness" />
                 <ScatterPlot title="Focus vs Consistency" points={dashboard.mapping.focusVsConsistency ?? []} xKey="consistency" yKey="focus" />
               </div>
               <div className="coach-heatmap">

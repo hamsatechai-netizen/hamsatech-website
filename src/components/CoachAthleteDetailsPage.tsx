@@ -20,7 +20,9 @@ function formatScore(value?: number | null) {
 
 function formatDate(value?: string | null) {
   if (!value) return 'N/A'
-  return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value))
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return 'N/A'
+  return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(parsed)
 }
 
 function scoreCategory(value?: number | null) {
@@ -174,6 +176,10 @@ function CoachAthleteDetailsPage() {
         <section className="dashboard-section">
           <h2>Athlete Summary</h2>
           <div className="coach-overview-grid">
+            <article className="coach-stat-tile"><span>Age / Gender</span><strong>{profileWidget?.age ?? '-'} / {profileWidget?.gender ?? '-'}</strong></article>
+            <article className="coach-stat-tile"><span>Sport / Discipline</span><strong>{profileWidget?.sport ?? '-'}</strong></article>
+            <article className="coach-stat-tile"><span>Coach</span><strong>{profileWidget?.coachName ?? profileWidget?.coachId ?? '-'}</strong></article>
+            <article className="coach-stat-tile"><span>Status</span><strong>{profileWidget?.currentStatus ?? '-'}</strong></article>
             <article className="coach-stat-tile"><span>Performance</span><strong>{formatScore(widget?.performance)}</strong></article>
             <article className="coach-stat-tile"><span>Readiness</span><strong>{formatScore(widget?.readiness)}</strong></article>
             <article className="coach-stat-tile"><span>Fatigue</span><strong>{formatScore(widget?.fatigue)}</strong></article>
@@ -206,8 +212,12 @@ function CoachAthleteDetailsPage() {
             <ScoreCard label="Overall Performance" value={widget?.performance} previous={previousSession?.performance} source="Session summary and score records" />
             <ScoreCard label="Readiness" value={widget?.readiness} previous={previousSession?.readiness} source="Recovery, stress, sleep, and physiology" />
             <ScoreCard label="Focus" value={insightsWidget?.scores?.focus} source="Psychology responses" />
+            <ScoreCard label="Discipline" value={profileWidget?.scores?.periodAvg} source="Session frequency and consistency" />
             <ScoreCard label="Recovery" value={profileWidget?.psychology?.recovery} source="Physiology and psychology scores" />
             <ScoreCard label="Fatigue Load" value={widget?.fatigue} previous={previousSession?.fatigue} source="Fatigue level and session load" />
+            <ScoreCard label="Stress Control" value={widget?.fatigue ? Math.max(0, 100 - widget.fatigue) : null} source="Stress and fatigue readiness signals" />
+            <ScoreCard label="Mental Resilience" value={insightsWidget?.scores?.focus} source="Focus, reflection, and mental score breakdown" />
+            <ScoreCard label="Consistency" value={profileWidget?.scores?.periodAvg} source="Session history and scoring stability" />
             <ScoreCard label="Decision Making" value={insightsWidget?.scores?.decision} source="Mental score breakdown" />
             <ScoreCard label="Arousal Control" value={insightsWidget?.scores?.arousal} source="Mental score breakdown" />
             <ScoreCard label="Social Support" value={insightsWidget?.scores?.social} source="Environment and support signals" />
@@ -230,7 +240,7 @@ function CoachAthleteDetailsPage() {
             <p className="dashboard-panel-title">{widget?.nextFocus ? `Focus area: ${widget.nextFocus}` : 'Focus area: Needs review'}</p>
             <p className="dashboard-message">{profileWidget?.trainingPlan || insightsWidget?.recommendation || 'Review weakest score, latest reflection, fatigue, and recovery before assigning the next training block.'}</p>
             <div className="risk-chip-row">
-              <span className="risk-chip risk-chip--progressing">Plan Status: In Progress</span>
+              <span className="risk-chip risk-chip--progressing">Plan Status: {profileWidget?.trainingPlanStatus ?? 'Needs Review'}</span>
               <span className="risk-chip">Session frequency: {sessionsWidget?.history?.length ?? 0}</span>
               <span className="risk-chip">Trend: {trend}</span>
             </div>
@@ -254,16 +264,20 @@ function CoachAthleteDetailsPage() {
           <div className="dashboard-empty-card coach-v1-table-wrap">
             <table className="coach-v1-table">
               <thead>
-                <tr><th align="left">Date</th><th align="left">Score</th><th align="left">Ready</th><th align="left">Fatigue</th><th align="left">Reflection</th></tr>
+                <tr><th align="left">Date</th><th align="left">Type</th><th align="left">Score</th><th align="left">Best Series</th><th align="left">Avg HR</th><th align="left">Fatigue</th><th align="left">Recovery</th><th align="left">Reflection</th><th align="left">Coach Notes</th></tr>
               </thead>
               <tbody>
                 {(sessionsWidget?.history ?? []).map((session) => (
                   <tr key={session.sessionId}>
                     <td>{formatDate(session.sessionDate)}</td>
+                    <td>{session.trainingType ?? '-'}</td>
                     <td>{formatScore(session.performance)}</td>
-                    <td>{formatScore(session.readiness)}</td>
+                    <td>{formatScore(session.bestSeries)}</td>
+                    <td>{formatScore(session.avgHr)}</td>
                     <td>{formatScore(session.fatigue)}</td>
-                    <td>{lastSession?.summaryTitle ?? 'Review session notes'}</td>
+                    <td>{formatScore(session.recovery)}</td>
+                    <td>{session.reflection || lastSession?.summaryTitle || 'Review session notes'}</td>
+                    <td>{session.coachNotes || '-'}</td>
                   </tr>
                 ))}
               </tbody>
