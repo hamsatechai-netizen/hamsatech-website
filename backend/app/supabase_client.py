@@ -10,7 +10,7 @@ from supabase.lib.client_options import SyncClientOptions
 def get_supabase_admin_client() -> Client:
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
-    schema = os.getenv("SUPABASE_SCHEMA", "public").strip() or "public"
+    schema = os.getenv("SUPABASE_SCHEMA", "hamsatech").strip() or "hamsatech"
 
     if not url or not key:
         raise HTTPException(
