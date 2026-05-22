@@ -645,6 +645,8 @@ function getApiBaseUrl() {
 }
 
 const API_BASE_URL = getApiBaseUrl()
+let cachedCoachProfile: CoachProfile | null = null
+let cachedCoachOptions: CoachOption[] | null = null
 
 type ErrorResponse = {
   detail?: string | Array<{ msg?: string; loc?: Array<string | number> }>
@@ -657,16 +659,24 @@ function wait(ms: number) {
 }
 
 async function fetchWithRetry(input: RequestInfo | URL, init?: RequestInit) {
-  const delays = [800, 1600, 3200, 5000]
+  const delays = [600, 1200]
+  const timeoutMs = 10000
   let lastError: unknown
 
   for (let attempt = 0; attempt <= delays.length; attempt += 1) {
+    const controller = new AbortController()
+    const timeoutId = globalThis.setTimeout(() => controller.abort(), timeoutMs)
     try {
-      return await fetch(input, init)
+      return await fetch(input, {
+        ...init,
+        signal: init?.signal ?? controller.signal,
+      })
     } catch (error) {
       lastError = error
       if (attempt === delays.length) break
       await wait(delays[attempt])
+    } finally {
+      globalThis.clearTimeout(timeoutId)
     }
   }
 
@@ -814,10 +824,13 @@ export async function getCoachDashboardSummary(): Promise<CoachDashboardSummary>
 }
 
 export async function getCoachProfile(): Promise<CoachProfile> {
+  if (cachedCoachProfile) return cachedCoachProfile
+
   const data = await request<CoachProfileResponse>('/api/coach/profile', {
     method: 'GET',
   })
 
+  cachedCoachProfile = data.profile
   return data.profile
 }
 
@@ -827,6 +840,7 @@ export async function updateCoachProfile(payload: Partial<Pick<CoachProfile, 'na
     body: JSON.stringify(payload),
   })
 
+  cachedCoachProfile = data.profile
   return data.profile
 }
 
@@ -1021,9 +1035,12 @@ export async function getPendingAssignments(coachId: string): Promise<PendingAss
 }
 
 export async function getAvailableCoaches(): Promise<CoachOption[]> {
+  if (cachedCoachOptions) return cachedCoachOptions
+
   const data = await request<CoachOptionsResponse>('/api/v1/coaches/available', {
     method: 'GET',
   })
+  cachedCoachOptions = data.coaches
   return data.coaches
 }
 
@@ -1080,4 +1097,6 @@ export async function signOut(): Promise<void> {
   await request<{ success: boolean }>('/api/auth/logout', {
     method: 'POST',
   })
+  cachedCoachProfile = null
+  cachedCoachOptions = null
 }
