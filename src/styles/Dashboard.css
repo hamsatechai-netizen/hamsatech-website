@@ -16,8 +16,8 @@
   background:
     radial-gradient(circle at top right, rgba(154, 214, 194, 0.18), transparent 20%),
     linear-gradient(135deg, var(--brand-deep) 0%, var(--brand-mid) 100%);
-  border-radius: 18px;
-  padding: 28px 32px;
+  border-radius: 12px;
+  padding: 30px 40px;
   color: #ffffff;
   box-shadow: 0 24px 60px rgba(var(--shadow-color), 0.18);
   position: relative;
@@ -41,6 +41,7 @@
   margin-bottom: 8px;
   line-height: 1.12;
   max-width: 1100px;
+  letter-spacing: 0;
 }
 
 .dashboard-hero p {
@@ -116,7 +117,9 @@
 }
 
 .coach-v1-hero {
-  background: linear-gradient(135deg, #4a2d8f 0%, #6d44d6 50%, #8b5cf6 100%);
+  background:
+    radial-gradient(circle at 92% 18%, rgba(183, 240, 222, 0.22), transparent 13%),
+    linear-gradient(135deg, #34505f 0%, #6050bd 52%, #7d5ce8 100%);
 }
 
 .coach-v1-hero .dashboard-eyebrow {
@@ -684,6 +687,20 @@
   color: var(--brand-deep);
   font-weight: 700;
   text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.dashboard-inline-link:hover {
+  background: rgba(190, 230, 220, 0.98);
+  border-color: rgba(47, 138, 160, 0.3);
+  transform: translateY(-1px);
+}
+
+.dashboard-inline-link:disabled {
+  opacity: 0.65;
+  cursor: wait;
+  transform: none;
 }
 
 .student-card {
@@ -780,6 +797,14 @@
   border: 1px solid rgba(185, 28, 28, 0.2);
   border-radius: 12px;
   padding: 14px 16px;
+}
+
+.dashboard-warning {
+  color: #7c4a03;
+  background: rgba(255, 247, 214, 0.82);
+  border: 1px solid rgba(217, 135, 41, 0.22);
+  border-radius: 12px;
+  padding: 12px 16px;
 }
 
 .dashboard-success {
@@ -1258,10 +1283,10 @@
 .dashboard-filter-row {
   grid-template-columns: minmax(150px, 0.75fr) minmax(190px, 0.9fr) minmax(180px, 0.85fr) minmax(190px, 0.9fr) minmax(140px, 0.65fr);
   align-items: end;
-  padding: 18px;
+  padding: 18px 20px;
   border: 1px solid rgba(47, 138, 160, 0.12);
   border-radius: 12px;
-  background: rgba(247, 252, 251, 0.7);
+  background: rgba(247, 252, 251, 0.82);
 }
 
 .dashboard-filter-row label,
@@ -1346,6 +1371,46 @@
   font-weight: 700;
 }
 
+@media (min-width: 1180px) {
+  .coach-v1-hero h1 {
+    max-width: none;
+    white-space: nowrap;
+    font-size: clamp(2.25rem, 2.9vw, 3.3rem);
+  }
+
+  .coach-v1-hero p {
+    max-width: 980px;
+  }
+}
+
+.assignment-card {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 0.9fr) auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.assignment-card .student-card-header,
+.assignment-card .student-meta,
+.assignment-card .dashboard-search,
+.assignment-card .dashboard-inline-actions {
+  margin: 0;
+}
+
+.assignment-card .student-meta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.assignment-card .student-meta div {
+  padding: 0;
+  border-top: 0;
+}
+
+.assignment-card .dashboard-inline-actions {
+  justify-self: end;
+}
+
 @media (max-width: 768px) {
   .dashboard-hero,
   .student-card {
@@ -1378,6 +1443,18 @@
 
   .dashboard-filter-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .assignment-card {
+    grid-template-columns: 1fr;
+  }
+
+  .assignment-card .dashboard-inline-actions {
+    justify-self: stretch;
+  }
+
+  .assignment-card .dashboard-inline-link {
+    width: 100%;
   }
 }
 

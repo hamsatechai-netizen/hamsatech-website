@@ -650,6 +650,29 @@ type ErrorResponse = {
   detail?: string | Array<{ msg?: string; loc?: Array<string | number> }>
 }
 
+function wait(ms: number) {
+  return new Promise((resolve) => {
+    globalThis.setTimeout(resolve, ms)
+  })
+}
+
+async function fetchWithRetry(input: RequestInfo | URL, init?: RequestInit) {
+  const delays = [800, 1600, 3200, 5000]
+  let lastError: unknown
+
+  for (let attempt = 0; attempt <= delays.length; attempt += 1) {
+    try {
+      return await fetch(input, init)
+    } catch (error) {
+      lastError = error
+      if (attempt === delays.length) break
+      await wait(delays[attempt])
+    }
+  }
+
+  throw lastError
+}
+
 function getErrorMessage(data: ErrorResponse, fallback: string) {
   if (typeof data.detail === 'string' && data.detail.trim()) {
     return data.detail
@@ -675,7 +698,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response
 
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await fetchWithRetry(`${API_BASE_URL}${path}`, {
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
@@ -720,7 +743,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   let response: Response
 
   try {
-    response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+    response = await fetchWithRetry(`${API_BASE_URL}/api/auth/me`, {
       credentials: 'include',
     })
   } catch {

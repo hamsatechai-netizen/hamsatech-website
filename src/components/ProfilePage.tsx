@@ -166,7 +166,7 @@ function ProfilePage() {
                 <label>
                   <span>Coach UUID</span>
                   <input value={coachProfile?.coachId ?? 'Not mapped'} disabled />
-                  <small>Dashboard assignment key from `hamsatech.coaches.coach_id`.</small>
+                  <small>Dashboard assignment key from public.coaches.coach_id.</small>
                 </label>
               ) : null}
 

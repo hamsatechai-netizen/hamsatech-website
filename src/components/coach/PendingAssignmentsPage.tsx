@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
@@ -18,12 +18,14 @@ export default function PendingAssignmentsPage() {
   const [coaches, setCoaches] = useState<CoachOption[]>([])
   const [selectedCoachByRequest, setSelectedCoachByRequest] = useState<Record<string, string>>({})
   const [isLoadingData, setIsLoadingData] = useState(false)
+  const [assigningRequestId, setAssigningRequestId] = useState('')
   const [error, setError] = useState('')
+  const hasLoadedAssignments = useRef(false)
 
   const load = useCallback(async () => {
     if (!user || user.role !== 'coach') return
     setIsLoadingData(true)
-    setError('')
+    if (!hasLoadedAssignments.current) setError('')
     try {
       const profile = await getCoachProfile()
       setCoachId(profile.coachId)
@@ -38,8 +40,11 @@ export default function PendingAssignmentsPage() {
         initial[request.requestId] = request.assignedCoachId ?? profile.coachId
       }
       setSelectedCoachByRequest(initial)
+      hasLoadedAssignments.current = true
+      setError('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load pending assignments')
+      const message = err instanceof Error ? err.message : 'Unable to load pending assignments'
+      setError(hasLoadedAssignments.current ? 'Connection is unstable. Showing the last loaded assignments.' : message)
     } finally {
       setIsLoadingData(false)
     }
@@ -60,13 +65,13 @@ export default function PendingAssignmentsPage() {
             <h2>Pending Assignments</h2>
             <p>Review new athlete registrations and assign coach ownership.</p>
           </div>
-          {error ? <p className="dashboard-message dashboard-error">{error}</p> : null}
+          {error ? <p className={`dashboard-message ${requests.length > 0 ? 'dashboard-warning' : 'dashboard-error'}`}>{error}</p> : null}
           {isLoadingData ? <p className="dashboard-message">Loading pending assignments...</p> : null}
           {requests.length === 0 && !isLoadingData ? (
             <div className="dashboard-empty-card"><p>No pending assignments.</p></div>
           ) : null}
           {requests.map((request) => (
-            <article key={request.requestId} className="student-card" style={{ marginTop: '16px' }}>
+            <article key={request.requestId} className="student-card assignment-card">
               <div className="student-card-header">
                 <div>
                   <p className="student-role">Pending</p>
@@ -94,19 +99,28 @@ export default function PendingAssignmentsPage() {
                 <button
                   type="button"
                   className="dashboard-inline-link"
+                  disabled={assigningRequestId === request.requestId}
                   onClick={async () => {
                     const assignedCoachId = selectedCoachByRequest[request.requestId]
                     if (!assignedCoachId) return
-                    await assignAthlete({
-                      requestId: request.requestId,
-                      athleteId: request.athleteId,
-                      assignedCoachId,
-                      notes: 'Assigned from pending assignments page',
-                    })
-                    await load()
+                    setAssigningRequestId(request.requestId)
+                    setError('')
+                    try {
+                      await assignAthlete({
+                        requestId: request.requestId,
+                        athleteId: request.athleteId,
+                        assignedCoachId,
+                        notes: 'Assigned from pending assignments page',
+                      })
+                      await load()
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : 'Unable to assign athlete')
+                    } finally {
+                      setAssigningRequestId('')
+                    }
                   }}
                 >
-                  Assign
+                  {assigningRequestId === request.requestId ? 'Assigning...' : 'Assign'}
                 </button>
               </div>
             </article>

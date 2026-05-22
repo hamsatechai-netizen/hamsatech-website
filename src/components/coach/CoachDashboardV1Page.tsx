@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { getCoachDashboardV1, getCoachProfile, type CoachDashboardV1, type CoachDashboardV1Athlete } from '../../lib/authApi'
@@ -130,11 +130,12 @@ export default function CoachDashboardV1Page() {
   const [sortKey, setSortKey] = useState<SortKey>('performance')
   const [isFetching, setIsFetching] = useState(false)
   const [error, setError] = useState('')
+  const hasLoadedDashboard = useRef(false)
 
   const load = useCallback(async () => {
     if (!user || user.role !== 'coach') return
     setIsFetching(true)
-    setError('')
+    if (!hasLoadedDashboard.current) setError('')
     try {
       const profile = await getCoachProfile()
       setCoachId(profile.coachId)
@@ -143,8 +144,11 @@ export default function CoachDashboardV1Page() {
         minScore: minScore ? Number(minScore) : undefined,
       })
       setDashboard(data)
+      hasLoadedDashboard.current = true
+      setError('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to load dashboard')
+      const message = err instanceof Error ? err.message : 'Unable to load dashboard'
+      setError(hasLoadedDashboard.current ? 'Connection is unstable. Showing the last loaded dashboard data.' : message)
     } finally {
       setIsFetching(false)
     }
@@ -215,7 +219,7 @@ export default function CoachDashboardV1Page() {
           </div>
         </section>
 
-        {error ? <p className="dashboard-message dashboard-error">{error}</p> : null}
+        {error ? <p className={`dashboard-message ${dashboard ? 'dashboard-warning' : 'dashboard-error'}`}>{error}</p> : null}
         {isFetching ? <p className="dashboard-message">Loading dashboard...</p> : null}
 
         {dashboard ? (
