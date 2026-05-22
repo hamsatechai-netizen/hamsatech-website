@@ -132,6 +132,7 @@
 .coach-v1-table td {
   padding: 12px 10px;
   border-bottom: 1px solid rgba(109, 68, 214, 0.14);
+  white-space: nowrap;
 }
 
 .coach-v1-row {
@@ -181,6 +182,162 @@
 .coach-v1-alert-list li {
   margin-left: 16px;
   margin-bottom: 8px;
+}
+
+.coach-map-grid,
+.coach-ranking-grid,
+.coach-risk-grid,
+.athlete-score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.coach-map-card,
+.coach-ranking-card,
+.coach-risk-card,
+.athlete-score-card {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(247, 252, 251, 0.96);
+  border: 1px solid rgba(47, 138, 160, 0.14);
+  box-shadow: 0 12px 28px rgba(var(--shadow-color), 0.08);
+}
+
+.coach-map-card-header,
+.athlete-score-card > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.coach-map-card strong,
+.coach-ranking-card h3,
+.coach-risk-card h3,
+.athlete-score-card strong {
+  color: var(--text-main);
+}
+
+.coach-map-card p,
+.coach-risk-card p,
+.athlete-score-card p,
+.coach-ranking-card p {
+  color: var(--text-soft);
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+.athlete-score-card span,
+.coach-map-card-header span,
+.athlete-score-card small {
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+.coach-scatter {
+  position: relative;
+  height: 190px;
+  margin-top: 14px;
+  border-radius: 14px;
+  background:
+    linear-gradient(90deg, rgba(8, 34, 44, 0.08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(8, 34, 44, 0.08) 1px, transparent 1px),
+    rgba(239, 251, 249, 0.94);
+  background-size: 25% 25%;
+  overflow: hidden;
+}
+
+.coach-scatter-dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--brand-deep);
+  box-shadow: 0 0 0 4px rgba(47, 138, 160, 0.16);
+  transform: translate(-50%, 50%);
+}
+
+.coach-scatter-dot:hover {
+  background: #9b1c1c;
+  box-shadow: 0 0 0 6px rgba(185, 58, 50, 0.18);
+}
+
+.coach-heatmap {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.coach-heatmap article {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) repeat(5, minmax(34px, 1fr));
+  gap: 8px;
+  align-items: center;
+}
+
+.coach-heatmap strong {
+  color: var(--text-main);
+  font-size: 0.9rem;
+}
+
+.coach-heatmap span {
+  height: 22px;
+  border-radius: 7px;
+  background: linear-gradient(135deg, var(--brand-main), var(--brand-deep));
+}
+
+.coach-ranking-card {
+  display: grid;
+  gap: 10px;
+}
+
+.coach-ranking-card a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--text-main);
+  text-decoration: none;
+  border-top: 1px solid rgba(47, 138, 160, 0.12);
+}
+
+.coach-ranking-card a:first-of-type {
+  border-top: 0;
+}
+
+.coach-risk-card {
+  display: grid;
+  gap: 10px;
+}
+
+.coach-risk-card a {
+  color: var(--brand-deep);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.performance-line {
+  height: 180px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18px, 1fr));
+  align-items: end;
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: rgba(239, 251, 249, 0.94);
+  border: 1px solid var(--surface-border);
+}
+
+.performance-line span {
+  min-height: 8px;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, var(--brand-main), var(--brand-deep));
 }
 
 @keyframes pulse-alert {

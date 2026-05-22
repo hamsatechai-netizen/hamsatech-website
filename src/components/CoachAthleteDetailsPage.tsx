@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
+  createCoachAthleteFeedback,
   getCoachAthleteInsightsWidget,
   getCoachAthleteProfileWidget,
   getCoachAthleteSessionsWidget,
@@ -13,6 +14,47 @@ import {
 } from '../lib/authApi'
 import '../styles/Dashboard.css'
 
+function formatScore(value?: number | null) {
+  return typeof value === 'number' ? Math.round(value) : '-'
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return 'N/A'
+  return new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(value))
+}
+
+function scoreCategory(value?: number | null) {
+  if (typeof value !== 'number') return 'Pending'
+  if (value >= 80) return 'Strong'
+  if (value >= 60) return 'Good'
+  if (value >= 45) return 'Moderate'
+  return 'Low'
+}
+
+function trendFromHistory(history?: CoachAthleteSessionsWidget['history']) {
+  const values = (history ?? []).map((item) => item.performance).filter((value): value is number => typeof value === 'number')
+  if (values.length < 2) return 'Stable'
+  const delta = values[0] - values[values.length - 1]
+  if (delta >= 5) return 'Improving'
+  if (delta <= -5) return 'Declining'
+  return 'Stable'
+}
+
+function ScoreCard({ label, value, previous, source }: { label: string; value?: number | null; previous?: number | null; source: string }) {
+  const delta = typeof value === 'number' && typeof previous === 'number' ? value - previous : null
+  const trend = delta === null ? 'Stable' : delta >= 3 ? 'Improving' : delta <= -3 ? 'Declining' : 'Stable'
+  return (
+    <article className="athlete-score-card">
+      <div>
+        <span>{label}</span>
+        <strong>{formatScore(value)}</strong>
+      </div>
+      <p>{scoreCategory(value)} / {trend}</p>
+      <small>{source}</small>
+    </article>
+  )
+}
+
 function CoachAthleteDetailsPage() {
   const { athleteId } = useParams()
   const { user, isLoading } = useAuth()
@@ -20,58 +62,105 @@ function CoachAthleteDetailsPage() {
   const [sessionsWidget, setSessionsWidget] = useState<CoachAthleteSessionsWidget | null>(null)
   const [insightsWidget, setInsightsWidget] = useState<CoachAthleteInsightsWidget | null>(null)
   const [profileWidget, setProfileWidget] = useState<CoachAthleteProfileWidget | null>(null)
+  const [feedbackNote, setFeedbackNote] = useState('')
+  const [recommendation, setRecommendation] = useState('')
+  const [feedbackStatus, setFeedbackStatus] = useState<'Needs Attention' | 'Progressing' | 'Strong'>('Progressing')
+  const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [isFetching, setIsFetching] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
 
-  useEffect(() => {
-    if (!user || user.role !== 'coach' || !athleteId) {
-      return
+  const loadWidget = useMemo(() => async () => {
+    if (!user || user.role !== 'coach' || !athleteId) return
+    setIsFetching(true)
+    setError('')
+
+    try {
+      const [widgetSnapshot, sessionsSnapshot, insightsSnapshot, profileSnapshot] = await Promise.all([
+        getCoachAthleteWidget(athleteId),
+        getCoachAthleteSessionsWidget(athleteId),
+        getCoachAthleteInsightsWidget(athleteId),
+        getCoachAthleteProfileWidget(athleteId),
+      ])
+      setWidget(widgetSnapshot)
+      setSessionsWidget(sessionsSnapshot)
+      setInsightsWidget(insightsSnapshot)
+      setProfileWidget(profileSnapshot)
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : 'Unable to load athlete details')
+    } finally {
+      setIsFetching(false)
     }
-
-    const loadWidget = async () => {
-      setIsFetching(true)
-      setError('')
-
-      try {
-        const [widgetSnapshot, sessionsSnapshot, insightsSnapshot, profileSnapshot] = await Promise.all([
-          getCoachAthleteWidget(athleteId),
-          getCoachAthleteSessionsWidget(athleteId),
-          getCoachAthleteInsightsWidget(athleteId),
-          getCoachAthleteProfileWidget(athleteId),
-        ])
-        setWidget(widgetSnapshot)
-        setSessionsWidget(sessionsSnapshot)
-        setInsightsWidget(insightsSnapshot)
-        setProfileWidget(profileSnapshot)
-      } catch (fetchError) {
-        setError(fetchError instanceof Error ? fetchError.message : 'Unable to load athlete details')
-      } finally {
-        setIsFetching(false)
-      }
-    }
-
-    void loadWidget()
   }, [athleteId, user])
+
+  useEffect(() => { void loadWidget() }, [loadWidget])
+
+  const athleteName = profileWidget?.name ?? (widget?.athleteId ? `Athlete ${widget.athleteId}` : 'Athlete Dashboard')
+  const trend = trendFromHistory(sessionsWidget?.history)
+  const lastSession = sessionsWidget?.lastSession
+  const previousSession = sessionsWidget?.history?.[1]
+  const insightCards = [
+    {
+      title: widget?.fatigue && widget.fatigue >= 70 ? 'Fatigue is affecting readiness' : 'Readiness pattern',
+      text: widget?.fatigue && widget.fatigue >= 70
+        ? 'Performance may drop when fatigue is elevated. Reduce session load and check sleep/recovery.'
+        : 'Readiness and performance are currently stable enough for normal training load.',
+      priority: widget?.fatigue && widget.fatigue >= 70 ? 'High' : 'Medium',
+    },
+    {
+      title: (insightsWidget?.scores?.focus ?? 0) >= 70 ? 'Focus is a strength' : 'Focus needs support',
+      text: (insightsWidget?.scores?.focus ?? 0) >= 70
+        ? 'Focus score is strong. Preserve pre-shot routine and avoid unnecessary technical changes.'
+        : 'Add one short attention drill before the next live session.',
+      priority: (insightsWidget?.scores?.focus ?? 0) >= 70 ? 'Low' : 'Medium',
+    },
+    {
+      title: trend === 'Declining' ? 'Performance trend is declining' : 'Performance trend',
+      text: trend === 'Declining'
+        ? 'Review the latest session reflection and identify whether the driver is technical, physical, or mental.'
+        : `Recent sessions are ${trend.toLowerCase()}. Keep tracking fatigue, stress, and recovery before changing plan.`,
+      priority: trend === 'Declining' ? 'High' : 'Low',
+    },
+  ]
+
+  const handleFeedback = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!athleteId || feedbackNote.trim().length < 2 || recommendation.trim().length < 2) return
+    setIsSaving(true)
+    setMessage('')
+    setError('')
+    try {
+      await createCoachAthleteFeedback(athleteId, {
+        note: feedbackNote.trim(),
+        recommendation: recommendation.trim(),
+        status: feedbackStatus,
+      })
+      setFeedbackNote('')
+      setRecommendation('')
+      setFeedbackStatus('Progressing')
+      setMessage('Feedback saved.')
+      await loadWidget()
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'Unable to save feedback')
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   if (!isLoading && !user) {
     return <Navigate to="/signin" replace state={{ from: { pathname: `/coach/athletes/${athleteId ?? ''}` } }} />
   }
 
-  if (!user) {
-    return null
-  }
-
-  if (user.role !== 'coach') {
-    return <Navigate to="/dashboard" replace />
-  }
+  if (!user) return null
+  if (user.role !== 'coach') return <Navigate to="/dashboard" replace />
 
   return (
     <section className="dashboard-shell">
       <div className="dashboard-container">
         <div className="dashboard-hero">
-          <p className="dashboard-eyebrow">Athlete Review</p>
-          <h1>{widget?.athleteId ? `Athlete ${widget.athleteId}` : 'Athlete Dashboard'}</h1>
-          <p>Review this athlete profile, spot weak areas quickly, and share coach observations back to the athlete app.</p>
+          <p className="dashboard-eyebrow">Athlete Detail Dashboard</p>
+          <h1>{athleteName}</h1>
+          <p>Understand the full performance story: scores, readiness, fatigue, focus, training plan, insights, and coach feedback.</p>
         </div>
 
         <div className="dashboard-links">
@@ -80,122 +169,142 @@ function CoachAthleteDetailsPage() {
 
         {isFetching ? <p className="dashboard-message">Loading athlete...</p> : null}
         {error ? <p className="dashboard-message dashboard-error">{error}</p> : null}
+        {message ? <p className="dashboard-message dashboard-success">{message}</p> : null}
 
-        {widget ? (
-          <div className="dashboard-panel" style={{ marginTop: 18 }}>
-            <p className="dashboard-panel-title">Athlete Home</p>
+        <section className="dashboard-section">
+          <h2>Athlete Summary</h2>
+          <div className="coach-overview-grid">
+            <article className="coach-stat-tile"><span>Performance</span><strong>{formatScore(widget?.performance)}</strong></article>
+            <article className="coach-stat-tile"><span>Readiness</span><strong>{formatScore(widget?.readiness)}</strong></article>
+            <article className="coach-stat-tile"><span>Fatigue</span><strong>{formatScore(widget?.fatigue)}</strong></article>
+            <article className="coach-stat-tile"><span>Focus</span><strong>{formatScore(insightsWidget?.scores?.focus)}</strong></article>
+            <article className="coach-stat-tile"><span>Latest Session</span><strong>{formatDate(lastSession?.sessionDate)}</strong></article>
+            <article className="coach-stat-tile"><span>Trend</span><strong>{trend}</strong></article>
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Performance Summary</h2>
+          <div className="athlete-detail-card">
+            <div className="performance-line">
+              {(sessionsWidget?.history ?? []).slice(0, 8).reverse().map((item) => (
+                <span key={item.sessionId} style={{ height: `${Math.max(8, item.performance ?? 0)}%` }} title={`${formatDate(item.sessionDate)}: ${formatScore(item.performance)}`} />
+              ))}
+            </div>
             <div className="dashboard-metrics">
-              <div className="dashboard-metric">
-                <span>Readiness</span>
-                <strong>{widget.readiness ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Performance</span>
-                <strong>{widget.performance ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Fatigue</span>
-                <strong>{widget.fatigue ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Next Focus</span>
-                <strong>{widget.nextFocus ?? '-'}</strong>
-              </div>
+              <div className="dashboard-metric"><span>Latest session score</span><strong>{formatScore(lastSession?.performance)}</strong></div>
+              <div className="dashboard-metric"><span>Best 30d average</span><strong>{formatScore(profileWidget?.scores?.bestAvg30d)}</strong></div>
+              <div className="dashboard-metric"><span>Best series</span><strong>{formatScore(profileWidget?.scores?.bestSeries)}</strong></div>
+              <div className="dashboard-metric"><span>Session frequency</span><strong>{sessionsWidget?.history?.length ?? 0}</strong></div>
             </div>
           </div>
-        ) : null}
+        </section>
 
-        {sessionsWidget?.lastSession ? (
-          <div className="dashboard-panel" style={{ marginTop: 18 }}>
-            <p className="dashboard-panel-title">Sessions</p>
-            <div className="dashboard-metrics">
-              <div className="dashboard-metric">
-                <span>Performance</span>
-                <strong>{sessionsWidget.lastSession.performance ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Readiness</span>
-                <strong>{sessionsWidget.lastSession.readiness ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Hold stability</span>
-                <strong>{sessionsWidget.lastSession.holdStability ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Mental score</span>
-                <strong>{sessionsWidget.lastSession.mentalScore ?? '-'}</strong>
-              </div>
+        <section className="dashboard-section">
+          <h2>Derived Score Breakdown</h2>
+          <div className="athlete-score-grid">
+            <ScoreCard label="Overall Performance" value={widget?.performance} previous={previousSession?.performance} source="Session summary and score records" />
+            <ScoreCard label="Readiness" value={widget?.readiness} previous={previousSession?.readiness} source="Recovery, stress, sleep, and physiology" />
+            <ScoreCard label="Focus" value={insightsWidget?.scores?.focus} source="Psychology responses" />
+            <ScoreCard label="Recovery" value={profileWidget?.psychology?.recovery} source="Physiology and psychology scores" />
+            <ScoreCard label="Fatigue Control" value={widget?.fatigue} previous={previousSession?.fatigue} source="Fatigue score and session load" />
+            <ScoreCard label="Decision Making" value={insightsWidget?.scores?.decision} source="Mental score breakdown" />
+            <ScoreCard label="Arousal Control" value={insightsWidget?.scores?.arousal} source="Mental score breakdown" />
+            <ScoreCard label="Social Support" value={insightsWidget?.scores?.social} source="Environment and support signals" />
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Health and Readiness Mapping</h2>
+          <div className="coach-map-grid">
+            <article className="coach-map-card"><strong>Performance vs Fatigue</strong><p>{formatScore(widget?.performance)} performance / {formatScore(widget?.fatigue)} fatigue</p></article>
+            <article className="coach-map-card"><strong>Readiness vs Performance</strong><p>{formatScore(widget?.readiness)} readiness / {formatScore(widget?.performance)} performance</p></article>
+            <article className="coach-map-card"><strong>Focus vs Consistency</strong><p>{formatScore(insightsWidget?.scores?.focus)} focus / {formatScore(profileWidget?.scores?.periodAvg)} period average</p></article>
+            <article className="coach-map-card"><strong>Mental Load</strong><p>{formatScore(insightsWidget?.scores?.arousal)} arousal / {formatScore(insightsWidget?.scores?.decision)} decision</p></article>
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Training Plan</h2>
+          <div className="dashboard-panel">
+            <p className="dashboard-panel-title">{widget?.nextFocus ? `Focus area: ${widget.nextFocus}` : 'Focus area: Needs review'}</p>
+            <p className="dashboard-message">{profileWidget?.trainingPlan || insightsWidget?.recommendation || 'Review weakest score, latest reflection, fatigue, and recovery before assigning the next training block.'}</p>
+            <div className="risk-chip-row">
+              <span className="risk-chip risk-chip--progressing">Plan Status: In Progress</span>
+              <span className="risk-chip">Session frequency: {sessionsWidget?.history?.length ?? 0}</span>
+              <span className="risk-chip">Trend: {trend}</span>
             </div>
           </div>
-        ) : null}
+        </section>
 
-        {insightsWidget ? (
-          <div className="dashboard-panel" style={{ marginTop: 18 }}>
-            <p className="dashboard-panel-title">Insights</p>
-            <div className="dashboard-metrics">
-              <div className="dashboard-metric">
-                <span>Social</span>
-                <strong>{insightsWidget.scores?.social ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Arousal</span>
-                <strong>{insightsWidget.scores?.arousal ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Decision</span>
-                <strong>{insightsWidget.scores?.decision ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Focus</span>
-                <strong>{insightsWidget.scores?.focus ?? '-'}</strong>
-              </div>
-            </div>
-            {insightsWidget.recommendation ? (
-              <p className="dashboard-message" style={{ marginTop: 12 }}>
-                {insightsWidget.recommendation}
-              </p>
-            ) : null}
+        <section className="dashboard-section">
+          <h2>Insights</h2>
+          <div className="notification-list">
+            {insightCards.map((item) => (
+              <article key={item.title} className="notification-item">
+                <span>{item.priority} Priority</span>
+                <p><strong>{item.title}</strong> - {item.text}</p>
+              </article>
+            ))}
           </div>
-        ) : null}
+        </section>
 
-        {profileWidget ? (
-          <div className="dashboard-panel" style={{ marginTop: 18 }}>
-            <p className="dashboard-panel-title">Profile</p>
-            <div className="dashboard-metrics">
-              <div className="dashboard-metric">
-                <span>Best avg (30d)</span>
-                <strong>{profileWidget.scores?.bestAvg30d ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Period avg</span>
-                <strong>{profileWidget.scores?.periodAvg ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Best series</span>
-                <strong>{profileWidget.scores?.bestSeries ?? '-'}</strong>
-              </div>
-              <div className="dashboard-metric">
-                <span>Last session</span>
-                <strong>{profileWidget.scores?.lastSession ?? '-'}</strong>
-              </div>
-            </div>
-            {profileWidget.trainingPlan ? (
-              <p className="dashboard-message" style={{ marginTop: 12 }}>
-                Training plan: {profileWidget.trainingPlan}
-              </p>
-            ) : null}
-            {profileWidget.feedbackHistory && profileWidget.feedbackHistory.length > 0 ? (
-              <div style={{ marginTop: 12 }}>
-                <p className="dashboard-panel-title" style={{ marginBottom: 8 }}>Coach Feedback</p>
-                {profileWidget.feedbackHistory.slice(0, 5).map((item, index) => (
-                  <p key={index} className="dashboard-message" style={{ margin: '6px 0' }}>
-                    {item.status ? `${item.status}: ` : ''}{item.note || item.trainingPlan || ''}
-                  </p>
+        <section className="dashboard-section">
+          <h2>Session History</h2>
+          <div className="dashboard-empty-card coach-v1-table-wrap">
+            <table className="coach-v1-table">
+              <thead>
+                <tr><th align="left">Date</th><th align="left">Score</th><th align="left">Ready</th><th align="left">Fatigue</th><th align="left">Reflection</th></tr>
+              </thead>
+              <tbody>
+                {(sessionsWidget?.history ?? []).map((session) => (
+                  <tr key={session.sessionId}>
+                    <td>{formatDate(session.sessionDate)}</td>
+                    <td>{formatScore(session.performance)}</td>
+                    <td>{formatScore(session.readiness)}</td>
+                    <td>{formatScore(session.fatigue)}</td>
+                    <td>{lastSession?.summaryTitle ?? 'Review session notes'}</td>
+                  </tr>
                 ))}
-              </div>
-            ) : null}
+              </tbody>
+            </table>
           </div>
-        ) : null}
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Coach Feedback</h2>
+          <div className="athlete-detail-card">
+            <form className="coach-feedback-form" onSubmit={handleFeedback}>
+              <label>
+                <span>Status</span>
+                <select value={feedbackStatus} onChange={(event) => setFeedbackStatus(event.target.value as typeof feedbackStatus)}>
+                  <option value="Progressing">Progressing</option>
+                  <option value="Strong">Strong</option>
+                  <option value="Needs Attention">Needs Attention</option>
+                </select>
+              </label>
+              <label>
+                <span>Feedback</span>
+                <textarea value={feedbackNote} onChange={(event) => setFeedbackNote(event.target.value)} placeholder="What should the athlete understand from this review?" />
+              </label>
+              <label>
+                <span>Recommendation</span>
+                <textarea value={recommendation} onChange={(event) => setRecommendation(event.target.value)} placeholder="Next training action, drill, recovery instruction, or mental note" />
+              </label>
+              <button className="dashboard-action-button" disabled={isSaving} type="submit">{isSaving ? 'Saving...' : 'Save Feedback'}</button>
+            </form>
+            <div className="athlete-detail-list">
+              {(profileWidget?.feedbackHistory ?? insightsWidget?.feedbackHistory ?? []).slice(0, 8).map((item, index) => (
+                <article key={`${item.createdAt}-${index}`} className="athlete-detail-row">
+                  <strong>{item.status ?? 'Feedback'}</strong>
+                  <span>{formatDate(item.createdAt)}</span>
+                  <p>{item.note || item.trainingPlan || 'No details recorded.'}</p>
+                  {item.trainingPlan ? <p>{item.trainingPlan}</p> : null}
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   )

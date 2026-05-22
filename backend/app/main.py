@@ -427,21 +427,73 @@ class AthleteAssignmentStatusResponse(BaseModel):
 class CoachDashboardAthleteRow(BaseModel):
     athlete_id: str = Field(alias="athleteId")
     athlete_name: str = Field(alias="athleteName")
+    sport: str | None = None
+    discipline: str | None = None
     gender: str | None = None
     age: int | None = None
     score: float | None = None
+    readiness_score: float | None = Field(default=None, alias="readinessScore")
+    focus_score: float | None = Field(default=None, alias="focusScore")
+    discipline_score: float | None = Field(default=None, alias="disciplineScore")
     score_category: str = Field(alias="scoreCategory")
+    status: Literal["Strong", "Stable", "Needs Attention", "At Risk"] = "Stable"
+    trend: Literal["Improving", "Declining", "Stable"] = "Stable"
     latest_stress: float | None = Field(default=None, alias="latestStress")
+    resting_hr: float | None = Field(default=None, alias="restingHr")
+    hrv_indicator: float | None = Field(default=None, alias="hrvIndicator")
+    fatigue_score: float | None = Field(default=None, alias="fatigueScore")
     latest_recovery: float | None = Field(default=None, alias="latestRecovery")
+    sleep_hours: float | None = Field(default=None, alias="sleepHours")
     last_session_date: str | None = Field(default=None, alias="lastSessionDate")
+    risk_score: float = Field(default=0, alias="riskScore")
+    risk_reasons: list[str] = Field(default_factory=list, alias="riskReasons")
+    suggested_action: str | None = Field(default=None, alias="suggestedAction")
+
+
+class CoachDashboardRiskItem(BaseModel):
+    athlete_id: str = Field(alias="athleteId")
+    athlete_name: str = Field(alias="athleteName")
+    severity: Literal["High", "Medium", "Low"]
+    reasons: list[str]
+    suggested_action: str = Field(alias="suggestedAction")
+
+
+class CoachDashboardInsightItem(BaseModel):
+    title: str
+    insight_text: str = Field(alias="insightText")
+    category: str
+    score: float | None = None
+    priority: Literal["High", "Medium", "Low"] = "Medium"
+
+
+class CoachDashboardScatterPoint(BaseModel):
+    athlete_id: str = Field(alias="athleteId")
+    athlete_name: str = Field(alias="athleteName")
+    performance: float | None = None
+    stress: float | None = None
+    fatigue: float | None = None
+    readiness: float | None = None
+    sleep: float | None = None
+    resting_hr: float | None = Field(default=None, alias="restingHr")
+    focus: float | None = None
+    consistency: float | None = None
 
 
 class CoachDashboardV1Payload(BaseModel):
     coach_id: str = Field(alias="coachId")
-    totals: dict[str, int]
+    totals: dict[str, float | int | None]
     average_score: float | None = Field(default=None, alias="averageScore")
+    average_readiness: float | None = Field(default=None, alias="averageReadiness")
+    average_fatigue: float | None = Field(default=None, alias="averageFatigue")
+    average_stress: float | None = Field(default=None, alias="averageStress")
     score_distribution: dict[str, int] = Field(alias="scoreDistribution")
     athletes: list[CoachDashboardAthleteRow]
+    top_performers: list[CoachDashboardAthleteRow] = Field(default_factory=list, alias="topPerformers")
+    most_disciplined: list[CoachDashboardAthleteRow] = Field(default_factory=list, alias="mostDisciplined")
+    healthy_focused: list[CoachDashboardAthleteRow] = Field(default_factory=list, alias="healthyFocused")
+    risk_queue: list[CoachDashboardRiskItem] = Field(default_factory=list, alias="riskQueue")
+    mapping: dict[str, list[CoachDashboardScatterPoint]] = Field(default_factory=dict)
+    insights: list[CoachDashboardInsightItem] = Field(default_factory=list)
     alerts: list[str]
 
 
@@ -2995,6 +3047,103 @@ def get_athlete_assignment_status_v1(
     )
 
 
+def average_metric(values: list[float | None]) -> float | None:
+    real_values = [value for value in values if isinstance(value, (int, float))]
+    return round(sum(real_values) / len(real_values), 2) if real_values else None
+
+
+def score_lookup_for_row(athlete_row: dict[str, Any]) -> dict[str, float]:
+    values: dict[str, float] = {}
+    for score in get_scores_for_athlete(athlete_row):
+        current = values.get(score.score_type)
+        if current is None:
+            values[score.score_type] = round(float(score.score_value), 2)
+    return values
+
+
+def score_value(values: dict[str, float], *keys: str) -> float | None:
+    for key in keys:
+        value = values.get(key)
+        if value is not None:
+            return round(float(value), 2)
+    return None
+
+
+def derive_status(
+    *,
+    performance: float | None,
+    readiness: float | None,
+    stress: float | None,
+    fatigue: float | None,
+    recovery: float | None,
+) -> Literal["Strong", "Stable", "Needs Attention", "At Risk"]:
+    if (stress is not None and stress >= 80) or (fatigue is not None and fatigue >= 80) or (recovery is not None and recovery < 35):
+        return "At Risk"
+    if (performance is not None and performance < 60) or (readiness is not None and readiness < 50):
+        return "Needs Attention"
+    if (performance is not None and performance >= 80) and (readiness is None or readiness >= 70) and (stress is None or stress < 65):
+        return "Strong"
+    return "Stable"
+
+
+def derive_trend(history_values: list[float]) -> Literal["Improving", "Declining", "Stable"]:
+    if len(history_values) < 2:
+        return "Stable"
+    delta = history_values[0] - history_values[-1]
+    if delta >= 5:
+        return "Improving"
+    if delta <= -5:
+        return "Declining"
+    return "Stable"
+
+
+def risk_reasons_for_row(
+    *,
+    performance: float | None,
+    readiness: float | None,
+    focus: float | None,
+    stress: float | None,
+    fatigue: float | None,
+    recovery: float | None,
+    sleep_hours: float | None,
+    last_session_date: str | None,
+    trend: str,
+) -> list[str]:
+    reasons: list[str] = []
+    if stress is not None and stress >= 70:
+        reasons.append("High stress")
+    if fatigue is not None and fatigue >= 70:
+        reasons.append("High fatigue")
+    if recovery is not None and recovery < 50:
+        reasons.append("Low recovery")
+    if readiness is not None and readiness < 55:
+        reasons.append("Low readiness")
+    if focus is not None and focus < 55:
+        reasons.append("Low focus")
+    if performance is not None and performance < 60:
+        reasons.append("Low performance")
+    if sleep_hours is not None and sleep_hours < 6:
+        reasons.append("Poor sleep")
+    if trend == "Declining":
+        reasons.append("Declining trend")
+    if not last_session_date:
+        reasons.append("No recent activity")
+    return reasons
+
+
+def suggested_action_for_reasons(reasons: list[str]) -> str:
+    reason_text = " ".join(reasons).lower()
+    if "stress" in reason_text or "focus" in reason_text:
+        return "Schedule a short regulation check-in and add a breathing/focus drill before the next session."
+    if "fatigue" in reason_text or "recovery" in reason_text or "sleep" in reason_text:
+        return "Reduce load for the next session and review sleep, recovery, and hydration habits."
+    if "performance" in reason_text or "declining" in reason_text:
+        return "Review recent session data and assign one technical correction for the next practice."
+    if "activity" in reason_text:
+        return "Contact the athlete and confirm the next planned training session."
+    return "Review the athlete detail dashboard and add coach feedback."
+
+
 @app.get("/api/v1/coaches/{coach_id}/dashboard", response_model=CoachDashboardV1Response)
 def get_coach_dashboard_v1(
     coach_id: str,
@@ -3005,22 +3154,98 @@ def get_coach_dashboard_v1(
 ) -> CoachDashboardV1Response:
     coach_user = ensure_coach_user(session_token)
     ensure_coach_owns_coach_id(coach_user, coach_id)
-    athletes = list_coach_athletes(search="", athlete_ids="", include_pending=False, session_token=session_token).athletes
+    supabase = ensure_supabase()
+    athletes = list_coach_athletes(search="", athlete_ids="", include_pending=True, session_token=session_token).athletes
 
     rows: list[CoachDashboardAthleteRow] = []
     for athlete in athletes:
-        score = athlete.overall_score
-        category = "Pending" if score is None else ("Strong" if score >= 80 else "Progressing" if score >= 60 else "Needs Attention")
+        athlete_row = resolve_athlete_row_by_identifier(supabase, athlete.athlete_id) or {"athlete_id": athlete.athlete_id}
+        score_map = score_lookup_for_row(athlete_row)
+        latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], [athlete.athlete_id], "recorded_date").get(athlete.athlete_id) or {}
+        session_rows = safe_table_rows(
+            APP_TABLES["shooting_session_log"],
+            supabase.table(APP_TABLES["shooting_session_log"])
+            .select("*")
+            .eq("athlete_id", athlete.athlete_id)
+            .order("session_date", desc=True)
+            .limit(5),
+        )
+
+        history_scores: list[float] = []
+        for session_row in session_rows[:5]:
+            try:
+                summary = build_mobile_session_summary(session_row)
+                value = row_float(summary.get("score", {}).get("efficiencyPercent"), fallback=None)  # type: ignore[arg-type]
+                if value is not None:
+                    history_scores.append(value)
+            except Exception:
+                continue
+
+        score = athlete.overall_score or score_value(score_map, "overall", "performance")
+        readiness = score_value(score_map, "readiness")
+        focus = score_value(score_map, "focus", "mental_score")
+        fatigue = score_value(score_map, "fatigue")
+        if fatigue is None and latest_physiology.get("fatigue_level") is not None:
+            fatigue = round(row_float(latest_physiology.get("fatigue_level"), 0) * 10, 2)
+        recovery = athlete.latest_recovery_score or score_value(score_map, "recovery")
+        stress = athlete.latest_stress_score or score_value(score_map, "stress")
+        sleep_hours = row_float(latest_physiology.get("sleep_hours"), fallback=None)  # type: ignore[arg-type]
+        resting_hr = row_float(latest_physiology.get("resting_heart_rate") or latest_physiology.get("resting_hr"), fallback=None)  # type: ignore[arg-type]
+        hrv = row_float(latest_physiology.get("rmssd") or latest_physiology.get("hrv") or latest_physiology.get("hrv_ms"), fallback=None)  # type: ignore[arg-type]
+        session_count = len(session_rows)
+        discipline = score_value(score_map, "discipline", "consistency")
+        if discipline is None:
+            discipline_parts = [
+                min(100, session_count * 18),
+                recovery,
+                (100 - stress) if stress is not None else None,
+                (100 - fatigue) if fatigue is not None else None,
+            ]
+            discipline = average_metric(discipline_parts)
+        trend = derive_trend(history_scores or ([score] if score is not None else []))
+        status_value = derive_status(
+            performance=score,
+            readiness=readiness,
+            stress=stress,
+            fatigue=fatigue,
+            recovery=recovery,
+        )
+        reasons = risk_reasons_for_row(
+            performance=score,
+            readiness=readiness,
+            focus=focus,
+            stress=stress,
+            fatigue=fatigue,
+            recovery=recovery,
+            sleep_hours=sleep_hours,
+            last_session_date=athlete.latest_session_date,
+            trend=trend,
+        )
+        category = "Pending" if score is None else ("Strong" if score >= 80 else "Stable" if score >= 60 else "Needs Attention")
         row = CoachDashboardAthleteRow(
             athleteId=athlete.athlete_id,
             athleteName=athlete.name,
+            sport=athlete.latest_training_type or "Shooting",
+            discipline=athlete.academy_id or "Performance",
             gender=athlete.gender,
             age=athlete.age,
             score=score,
+            readinessScore=readiness,
+            focusScore=focus,
+            disciplineScore=discipline,
             scoreCategory=category,
-            latestStress=athlete.latest_stress_score,
-            latestRecovery=athlete.latest_recovery_score,
+            status=status_value,
+            trend=trend,
+            latestStress=stress,
+            restingHr=resting_hr,
+            hrvIndicator=hrv,
+            fatigueScore=fatigue,
+            latestRecovery=recovery,
+            sleepHours=sleep_hours,
             lastSessionDate=athlete.latest_session_date,
+            riskScore=min(100, len(reasons) * 18),
+            riskReasons=reasons,
+            suggestedAction=suggested_action_for_reasons(reasons) if reasons else None,
         )
         rows.append(row)
 
@@ -3038,19 +3263,91 @@ def get_coach_dashboard_v1(
         "needsAttention": len([value for value in scores if value < 60]),
         "pending": len([row for row in rows if row.score is None]),
     }
-    alerts = [f"{row.athlete_name} needs attention" for row in rows if row.score is not None and row.score < 60][:8]
+    risk_queue = [
+        CoachDashboardRiskItem(
+            athleteId=row.athlete_id,
+            athleteName=row.athlete_name,
+            severity="High" if row.risk_score >= 54 else "Medium" if row.risk_score >= 18 else "Low",
+            reasons=row.risk_reasons,
+            suggestedAction=row.suggested_action or "Review athlete detail dashboard.",
+        )
+        for row in sorted(rows, key=lambda item: item.risk_score, reverse=True)
+        if row.risk_reasons
+    ][:8]
+    alerts = [f"{item.athlete_name}: {', '.join(item.reasons[:2])}" for item in risk_queue]
+    top_performers = sorted(rows, key=lambda row: (row.score or -1, row.latest_recovery or -1), reverse=True)[:5]
+    most_disciplined = sorted(rows, key=lambda row: (row.discipline_score or -1, row.score or -1), reverse=True)[:5]
+    healthy_focused = sorted(
+        rows,
+        key=lambda row: (
+            row.latest_recovery or -1,
+            row.focus_score or -1,
+            -(row.latest_stress or 100),
+            -(row.fatigue_score or 100),
+        ),
+        reverse=True,
+    )[:5]
+    mapping_points = [
+        CoachDashboardScatterPoint(
+            athleteId=row.athlete_id,
+            athleteName=row.athlete_name,
+            performance=row.score,
+            stress=row.latest_stress,
+            fatigue=row.fatigue_score,
+            readiness=row.readiness_score,
+            sleep=row.sleep_hours,
+            restingHr=row.resting_hr,
+            focus=row.focus_score,
+            consistency=row.discipline_score,
+        )
+        for row in rows
+    ]
+    insights = [
+        CoachDashboardInsightItem(
+            title="Attention queue",
+            insightText=f"{len(risk_queue)} athletes need coach review today.",
+            category="risk",
+            score=float(len(risk_queue)),
+            priority="High" if len(risk_queue) >= 3 else "Medium" if risk_queue else "Low",
+        ),
+        CoachDashboardInsightItem(
+            title="Performance baseline",
+            insightText="Team average performance is stable." if scores and average_metric(scores) and average_metric(scores) >= 60 else "Team performance needs a baseline review.",
+            category="performance",
+            score=average_metric(scores),
+            priority="Medium",
+        ),
+    ]
 
     payload = CoachDashboardV1Payload(
         coachId=coach_id,
         totals={
             "totalAssignedAthletes": len(rows),
-            "activeAthletes": len(rows),
-            "inactiveAthletes": 0,
+            "activeAthletes": len([row for row in rows if row.last_session_date]),
+            "inactiveAthletes": len([row for row in rows if not row.last_session_date]),
             "newRegistrations": len([row for row in rows if row.last_session_date]),
+            "athletesNeedingAttention": len([row for row in rows if row.status in {"Needs Attention", "At Risk"}]),
+            "topPerformers": len([row for row in rows if row.status == "Strong"]),
+            "mostDisciplined": len([row for row in rows if (row.discipline_score or 0) >= 75]),
         },
         averageScore=round(sum(scores) / len(scores), 2) if scores else None,
+        averageReadiness=average_metric([row.readiness_score for row in rows]),
+        averageFatigue=average_metric([row.fatigue_score for row in rows]),
+        averageStress=average_metric([row.latest_stress for row in rows]),
         scoreDistribution=distribution,
         athletes=rows,
+        topPerformers=top_performers,
+        mostDisciplined=most_disciplined,
+        healthyFocused=healthy_focused,
+        riskQueue=risk_queue,
+        mapping={
+            "performanceVsFatigue": mapping_points,
+            "performanceVsStress": mapping_points,
+            "performanceVsSleep": mapping_points,
+            "readinessVsPerformance": mapping_points,
+            "focusVsConsistency": mapping_points,
+        },
+        insights=insights,
         alerts=alerts,
     )
     return CoachDashboardV1Response(dashboard=payload)

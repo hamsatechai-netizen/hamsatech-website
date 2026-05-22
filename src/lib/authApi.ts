@@ -111,13 +111,27 @@ export type CoachOption = {
 export type CoachDashboardV1Athlete = {
   athleteId: string
   athleteName: string
+  sport?: string | null
+  discipline?: string | null
   gender?: string | null
   age?: number | null
   score?: number | null
+  readinessScore?: number | null
+  focusScore?: number | null
+  disciplineScore?: number | null
   scoreCategory: string
+  status: 'Strong' | 'Stable' | 'Needs Attention' | 'At Risk'
+  trend: 'Improving' | 'Declining' | 'Stable'
   latestStress?: number | null
+  restingHr?: number | null
+  hrvIndicator?: number | null
+  fatigueScore?: number | null
   latestRecovery?: number | null
+  sleepHours?: number | null
   lastSessionDate?: string | null
+  riskScore: number
+  riskReasons: string[]
+  suggestedAction?: string | null
 }
 
 export type CoachDashboardV1 = {
@@ -127,10 +141,45 @@ export type CoachDashboardV1 = {
     activeAthletes: number
     inactiveAthletes: number
     newRegistrations: number
+    athletesNeedingAttention?: number
+    topPerformers?: number
+    mostDisciplined?: number
   }
   averageScore?: number | null
+  averageReadiness?: number | null
+  averageFatigue?: number | null
+  averageStress?: number | null
   scoreDistribution: Record<string, number>
   athletes: CoachDashboardV1Athlete[]
+  topPerformers: CoachDashboardV1Athlete[]
+  mostDisciplined: CoachDashboardV1Athlete[]
+  healthyFocused: CoachDashboardV1Athlete[]
+  riskQueue: Array<{
+    athleteId: string
+    athleteName: string
+    severity: 'High' | 'Medium' | 'Low'
+    reasons: string[]
+    suggestedAction: string
+  }>
+  mapping: Record<string, Array<{
+    athleteId: string
+    athleteName: string
+    performance?: number | null
+    stress?: number | null
+    fatigue?: number | null
+    readiness?: number | null
+    sleep?: number | null
+    restingHr?: number | null
+    focus?: number | null
+    consistency?: number | null
+  }>>
+  insights: Array<{
+    title: string
+    insightText: string
+    category: string
+    score?: number | null
+    priority: 'High' | 'Medium' | 'Low'
+  }>
   alerts: string[]
 }
 
