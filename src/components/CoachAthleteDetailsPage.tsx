@@ -207,7 +207,7 @@ function CoachAthleteDetailsPage() {
             <ScoreCard label="Readiness" value={widget?.readiness} previous={previousSession?.readiness} source="Recovery, stress, sleep, and physiology" />
             <ScoreCard label="Focus" value={insightsWidget?.scores?.focus} source="Psychology responses" />
             <ScoreCard label="Recovery" value={profileWidget?.psychology?.recovery} source="Physiology and psychology scores" />
-            <ScoreCard label="Fatigue Control" value={widget?.fatigue} previous={previousSession?.fatigue} source="Fatigue score and session load" />
+            <ScoreCard label="Fatigue Load" value={widget?.fatigue} previous={previousSession?.fatigue} source="Fatigue level and session load" />
             <ScoreCard label="Decision Making" value={insightsWidget?.scores?.decision} source="Mental score breakdown" />
             <ScoreCard label="Arousal Control" value={insightsWidget?.scores?.arousal} source="Mental score breakdown" />
             <ScoreCard label="Social Support" value={insightsWidget?.scores?.social} source="Environment and support signals" />

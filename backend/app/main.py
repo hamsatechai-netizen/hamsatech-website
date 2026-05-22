@@ -3069,6 +3069,29 @@ def score_value(values: dict[str, float], *keys: str) -> float | None:
     return None
 
 
+def fatigue_burden_from_inputs(score_values: dict[str, float], physiology_row: dict[str, Any] | None = None) -> float | None:
+    physiology_row = physiology_row or {}
+    if physiology_row.get("fatigue_level") is not None:
+        return round(min(100, max(0, row_float(physiology_row.get("fatigue_level"), 0) * 10)), 2)
+    fatigue_control = score_value(score_values, "fatigue")
+    if fatigue_control is None:
+        return None
+    return round(min(100, max(0, 100 - fatigue_control)), 2)
+
+
+def is_recent_date(value: str | None, days: int = 7) -> bool:
+    if not value:
+        return False
+    try:
+        normalized = str(value).replace("Z", "+00:00")
+        parsed = datetime.fromisoformat(normalized)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed >= datetime.now(timezone.utc) - timedelta(days=days)
+    except ValueError:
+        return False
+
+
 def derive_status(
     *,
     performance: float | None,
@@ -3184,9 +3207,7 @@ def get_coach_dashboard_v1(
         score = athlete.overall_score or score_value(score_map, "overall", "performance")
         readiness = score_value(score_map, "readiness")
         focus = score_value(score_map, "focus", "mental_score")
-        fatigue = score_value(score_map, "fatigue")
-        if fatigue is None and latest_physiology.get("fatigue_level") is not None:
-            fatigue = round(row_float(latest_physiology.get("fatigue_level"), 0) * 10, 2)
+        fatigue = fatigue_burden_from_inputs(score_map, latest_physiology)
         recovery = athlete.latest_recovery_score or score_value(score_map, "recovery")
         stress = athlete.latest_stress_score or score_value(score_map, "stress")
         sleep_hours = row_float(latest_physiology.get("sleep_hours"), fallback=None)  # type: ignore[arg-type]
@@ -3323,8 +3344,8 @@ def get_coach_dashboard_v1(
         coachId=coach_id,
         totals={
             "totalAssignedAthletes": len(rows),
-            "activeAthletes": len([row for row in rows if row.last_session_date]),
-            "inactiveAthletes": len([row for row in rows if not row.last_session_date]),
+            "activeAthletes": len([row for row in rows if is_recent_date(row.last_session_date)]),
+            "inactiveAthletes": len([row for row in rows if not is_recent_date(row.last_session_date)]),
             "newRegistrations": len([row for row in rows if row.last_session_date]),
             "athletesNeedingAttention": len([row for row in rows if row.status in {"Needs Attention", "At Risk"}]),
             "topPerformers": len([row for row in rows if row.status == "Strong"]),
@@ -3726,6 +3747,9 @@ def get_coach_athlete_widget(
     canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
     scores = get_scores_for_athlete(athlete_row)
     score_by_type = {score.score_type: score for score in scores}
+    score_map = {score.score_type: round(float(score.score_value), 2) for score in scores}
+    latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], [canonical_athlete_id], "recorded_date").get(canonical_athlete_id) or {}
+    fatigue_burden = fatigue_burden_from_inputs(score_map, latest_physiology)
     home = get_mobile_athlete_home(athlete_id=canonical_athlete_id).home
     recommendations = home.get("recommendations") if isinstance(home, dict) else None
 
@@ -3746,7 +3770,7 @@ def get_coach_athlete_widget(
         "athleteId": canonical_athlete_id,
         "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
         "performance": score_by_type.get("overall").score_value if score_by_type.get("overall") else None,
-        "fatigue": score_by_type.get("fatigue").score_value if score_by_type.get("fatigue") else None,
+        "fatigue": fatigue_burden,
         "nextFocus": next_focus,
     }
     return CoachAthleteWidgetResponse(widget=widget)
@@ -3784,6 +3808,9 @@ def get_coach_athlete_sessions_widget(
 
     scores = get_scores_for_athlete(athlete_row)
     score_by_type = {score.score_type: score for score in scores}
+    score_map = {score.score_type: round(float(score.score_value), 2) for score in scores}
+    latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], [canonical_athlete_id], "recorded_date").get(canonical_athlete_id) or {}
+    fatigue_burden = fatigue_burden_from_inputs(score_map, latest_physiology)
 
     def session_date(row: dict[str, Any]) -> str | None:
         value = row.get("session_date") or row.get("created_at")
@@ -3798,7 +3825,7 @@ def get_coach_athlete_sessions_widget(
                 # Keep these aligned to the Sessions mock: "Score", "Ready", "Fatigue"
                 "performance": score_by_type.get("overall").score_value if score_by_type.get("overall") else None,
                 "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
-                "fatigue": score_by_type.get("fatigue").score_value if score_by_type.get("fatigue") else None,
+                "fatigue": fatigue_burden,
             }
         )
 
@@ -3811,7 +3838,7 @@ def get_coach_athlete_sessions_widget(
             "readiness": score_by_type.get("readiness").score_value if score_by_type.get("readiness") else None,
             "holdStability": score_by_type.get("hold_stability").score_value if score_by_type.get("hold_stability") else None,
             "mentalScore": score_by_type.get("mental_score").score_value if score_by_type.get("mental_score") else None,
-            "fatigue": score_by_type.get("fatigue").score_value if score_by_type.get("fatigue") else None,
+            "fatigue": fatigue_burden,
             "summaryTitle": (latest_summary or {}).get("keyInsight", {}).get("title") if isinstance(latest_summary, dict) else None,
         },
         "history": history,
@@ -4038,7 +4065,7 @@ def create_coach_athlete_feedback(
         "feedback_id": str(uuid4()),
         "athlete_id": canonical_athlete_id,
         "athlete_name": athlete_row.get("athlete_name") or athlete_row.get("name") or "Athlete",
-        "athlete_email": athlete_row["email"],
+        "athlete_email": athlete_row.get("email") or "",
         "coach_email": coach_user.email,
         "coach_name": coach_user.full_name,
         "note": payload.note,
