@@ -1,8 +1,8 @@
-create table if not exists hamsatech.assignment_requests (
+create table if not exists public.assignment_requests (
   request_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id),
-  requesting_coach_id uuid references hamsatech.coaches(coach_id),
-  assigned_coach_id uuid references hamsatech.coaches(coach_id),
+  athlete_id text not null references public.athletes(athlete_id),
+  requesting_coach_id uuid references public.coaches(coach_id),
+  assigned_coach_id uuid references public.coaches(coach_id),
   status text not null default 'PENDING' check (status in ('PENDING', 'ASSIGNED', 'REJECTED')),
   notes text,
   requested_at timestamp with time zone default now(),
@@ -10,9 +10,9 @@ create table if not exists hamsatech.assignment_requests (
 );
 
 create index if not exists idx_assignment_requests_pending
-  on hamsatech.assignment_requests(status, requested_at desc);
+  on public.assignment_requests(status, requested_at desc);
 
-create or replace function hamsatech.notify_default_coach_new_registration()
+create or replace function public.notify_default_coach_new_registration()
 returns trigger
 language plpgsql
 as $$
@@ -21,14 +21,14 @@ declare
   v_athlete_name text;
 begin
   select c.coach_id into v_default_coach_id
-  from hamsatech.coaches c
+  from public.coaches c
   where upper(coalesce(c.coach_id_text, '')) = 'C001'
   order by c.created_at asc
   limit 1;
 
   if v_default_coach_id is null then
     select c.coach_id into v_default_coach_id
-    from hamsatech.coaches c
+    from public.coaches c
     order by c.created_at asc
     limit 1;
   end if;
@@ -39,11 +39,11 @@ begin
 
   select coalesce(a.athlete_name, a.name, 'Athlete')
     into v_athlete_name
-  from hamsatech.athletes a
+  from public.athletes a
   where a.athlete_id = new.athlete_id
   limit 1;
 
-  insert into hamsatech.assignment_requests (
+  insert into public.assignment_requests (
     athlete_id,
     assigned_coach_id,
     status,
@@ -56,7 +56,7 @@ begin
   )
   on conflict do nothing;
 
-  insert into hamsatech.notifications (
+  insert into public.notifications (
     recipient_coach_id,
     notification_type,
     related_athlete_id,
@@ -80,8 +80,8 @@ begin
 end;
 $$;
 
-drop trigger if exists trigger_new_user_assignment_request on hamsatech.athlete_details;
+drop trigger if exists trigger_new_user_assignment_request on public.athlete_details;
 create trigger trigger_new_user_assignment_request
-after insert on hamsatech.athlete_details
+after insert on public.athlete_details
 for each row
-execute function hamsatech.notify_default_coach_new_registration();
+execute function public.notify_default_coach_new_registration();

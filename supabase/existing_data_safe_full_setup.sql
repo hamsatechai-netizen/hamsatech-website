@@ -9,9 +9,9 @@
 -- - replace triggers only, without touching table data
 
 create extension if not exists pgcrypto;
-create schema if not exists hamsatech;
+create schema if not exists public;
 
-create table if not exists hamsatech."App_Users" (
+create table if not exists public."App_Users" (
   email text primary key,
   full_name text not null,
   role text not null check (role in ('coach', 'student')),
@@ -33,27 +33,27 @@ create table if not exists hamsatech."App_Users" (
   updated_at timestamptz not null default now()
 );
 
-alter table hamsatech."App_Users" add column if not exists assignment_status text not null default 'unassigned';
-alter table hamsatech."App_Users" add column if not exists assigned_coach_email text;
-alter table hamsatech."App_Users" add column if not exists assigned_coach_name text;
-alter table hamsatech."App_Users" add column if not exists requested_coach_email text;
-alter table hamsatech."App_Users" add column if not exists requested_coach_name text;
-alter table hamsatech."App_Users" add column if not exists requested_coach_code text;
-alter table hamsatech."App_Users" add column if not exists coach_request_sent_at timestamptz;
-alter table hamsatech."App_Users" add column if not exists sport text;
-alter table hamsatech."App_Users" add column if not exists focus_area text;
-alter table hamsatech."App_Users" add column if not exists date_of_birth date;
-alter table hamsatech."App_Users" add column if not exists performance_score integer;
-alter table hamsatech."App_Users" add column if not exists updated_at timestamptz not null default now();
+alter table public."App_Users" add column if not exists assignment_status text not null default 'unassigned';
+alter table public."App_Users" add column if not exists assigned_coach_email text;
+alter table public."App_Users" add column if not exists assigned_coach_name text;
+alter table public."App_Users" add column if not exists requested_coach_email text;
+alter table public."App_Users" add column if not exists requested_coach_name text;
+alter table public."App_Users" add column if not exists requested_coach_code text;
+alter table public."App_Users" add column if not exists coach_request_sent_at timestamptz;
+alter table public."App_Users" add column if not exists sport text;
+alter table public."App_Users" add column if not exists focus_area text;
+alter table public."App_Users" add column if not exists date_of_birth date;
+alter table public."App_Users" add column if not exists performance_score integer;
+alter table public."App_Users" add column if not exists updated_at timestamptz not null default now();
 
-create table if not exists hamsatech."App_Sessions" (
+create table if not exists public."App_Sessions" (
   session_token text primary key,
-  user_email text not null references hamsatech."App_Users"(email) on delete cascade,
+  user_email text not null references public."App_Users"(email) on delete cascade,
   created_at timestamptz not null default now(),
   expires_at timestamptz not null
 );
 
-create table if not exists hamsatech.coaches (
+create table if not exists public.coaches (
   coach_id uuid primary key default gen_random_uuid(),
   coach_name text not null,
   coach_id_text text unique,
@@ -64,13 +64,13 @@ create table if not exists hamsatech.coaches (
   updated_at timestamptz not null default now()
 );
 
-alter table hamsatech.coaches add column if not exists coach_id_text text;
-alter table hamsatech.coaches add column if not exists email text;
-alter table hamsatech.coaches add column if not exists specialization text;
-alter table hamsatech.coaches add column if not exists status text not null default 'active';
-alter table hamsatech.coaches add column if not exists updated_at timestamptz not null default now();
+alter table public.coaches add column if not exists coach_id_text text;
+alter table public.coaches add column if not exists email text;
+alter table public.coaches add column if not exists specialization text;
+alter table public.coaches add column if not exists status text not null default 'active';
+alter table public.coaches add column if not exists updated_at timestamptz not null default now();
 
-create table if not exists hamsatech.athletes (
+create table if not exists public.athletes (
   athlete_id text primary key,
   athlete_name text,
   name text not null,
@@ -90,25 +90,25 @@ create table if not exists hamsatech.athletes (
   updated_by text
 );
 
-alter table hamsatech.athletes add column if not exists athlete_name text;
-alter table hamsatech.athletes add column if not exists name text;
-alter table hamsatech.athletes add column if not exists age integer;
-alter table hamsatech.athletes add column if not exists gender text;
-alter table hamsatech.athletes add column if not exists height_cm numeric;
-alter table hamsatech.athletes add column if not exists weight_kg numeric;
-alter table hamsatech.athletes add column if not exists academy_id text;
-alter table hamsatech.athletes add column if not exists coach_id text not null default '';
-alter table hamsatech.athletes add column if not exists contact_number text;
-alter table hamsatech.athletes add column if not exists email text;
-alter table hamsatech.athletes add column if not exists registration_source text default 'website';
-alter table hamsatech.athletes add column if not exists onboarding_status text default 'registered';
-alter table hamsatech.athletes add column if not exists profile_completion_status text default 'partial';
-alter table hamsatech.athletes add column if not exists updated_at timestamptz not null default now();
-alter table hamsatech.athletes add column if not exists updated_by text;
+alter table public.athletes add column if not exists athlete_name text;
+alter table public.athletes add column if not exists name text;
+alter table public.athletes add column if not exists age integer;
+alter table public.athletes add column if not exists gender text;
+alter table public.athletes add column if not exists height_cm numeric;
+alter table public.athletes add column if not exists weight_kg numeric;
+alter table public.athletes add column if not exists academy_id text;
+alter table public.athletes add column if not exists coach_id text not null default '';
+alter table public.athletes add column if not exists contact_number text;
+alter table public.athletes add column if not exists email text;
+alter table public.athletes add column if not exists registration_source text default 'website';
+alter table public.athletes add column if not exists onboarding_status text default 'registered';
+alter table public.athletes add column if not exists profile_completion_status text default 'partial';
+alter table public.athletes add column if not exists updated_at timestamptz not null default now();
+alter table public.athletes add column if not exists updated_by text;
 
-create table if not exists hamsatech.athlete_family (
+create table if not exists public.athlete_family (
   family_id text primary key,
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   mother_name text,
   father_name text,
   mother_occupation text,
@@ -124,9 +124,9 @@ create table if not exists hamsatech.athlete_family (
   comments text
 );
 
-create table if not exists hamsatech.athlete_details (
+create table if not exists public.athlete_details (
   details_id text primary key,
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   class text,
   school_name text,
   diet_type text check (diet_type in ('Veg', 'Non-Veg', 'Mixed')),
@@ -141,9 +141,9 @@ create table if not exists hamsatech.athlete_details (
   athlete_goal text
 );
 
-create table if not exists hamsatech.shooting_session_log (
+create table if not exists public.shooting_session_log (
   session_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   coach_id text not null default '',
   session_date date not null,
   start_time text not null,
@@ -156,20 +156,20 @@ create table if not exists hamsatech.shooting_session_log (
   updated_at timestamptz not null default now()
 );
 
-alter table hamsatech.shooting_session_log add column if not exists created_at timestamptz not null default now();
-alter table hamsatech.shooting_session_log add column if not exists updated_at timestamptz not null default now();
-alter table hamsatech.shooting_session_log add column if not exists session_type text;
-alter table hamsatech.shooting_session_log add column if not exists coach_notes text;
-alter table hamsatech.shooting_session_log add column if not exists athlete_notes text;
-alter table hamsatech.shooting_session_log add column if not exists planned_shots integer;
-alter table hamsatech.shooting_session_log add column if not exists completed_shots integer;
-alter table hamsatech.shooting_session_log add column if not exists missed_session boolean not null default false;
-alter table hamsatech.shooting_session_log add column if not exists reflection_submitted boolean not null default false;
+alter table public.shooting_session_log add column if not exists created_at timestamptz not null default now();
+alter table public.shooting_session_log add column if not exists updated_at timestamptz not null default now();
+alter table public.shooting_session_log add column if not exists session_type text;
+alter table public.shooting_session_log add column if not exists coach_notes text;
+alter table public.shooting_session_log add column if not exists athlete_notes text;
+alter table public.shooting_session_log add column if not exists planned_shots integer;
+alter table public.shooting_session_log add column if not exists completed_shots integer;
+alter table public.shooting_session_log add column if not exists missed_session boolean not null default false;
+alter table public.shooting_session_log add column if not exists reflection_submitted boolean not null default false;
 
-create table if not exists hamsatech.athlete_physiology (
+create table if not exists public.athlete_physiology (
   physiology_id text primary key,
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
-  session_id uuid references hamsatech.shooting_session_log(session_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
+  session_id uuid references public.shooting_session_log(session_id) on delete cascade,
   recorded_date date not null,
   resting_heart_rate integer,
   avg_heart_rate integer,
@@ -182,40 +182,40 @@ create table if not exists hamsatech.athlete_physiology (
   remarks text
 );
 
-alter table hamsatech.athlete_physiology add column if not exists min_heart_rate integer;
-alter table hamsatech.athlete_physiology add column if not exists max_heart_rate integer;
-alter table hamsatech.athlete_physiology add column if not exists rmssd numeric;
-alter table hamsatech.athlete_physiology add column if not exists hrv_ms numeric;
-alter table hamsatech.athlete_physiology add column if not exists hr_std_dev numeric;
-alter table hamsatech.athlete_physiology add column if not exists zone_1_time integer not null default 0;
-alter table hamsatech.athlete_physiology add column if not exists zone_2_time integer not null default 0;
-alter table hamsatech.athlete_physiology add column if not exists zone_3_time integer not null default 0;
-alter table hamsatech.athlete_physiology add column if not exists zone_4_time integer not null default 0;
-alter table hamsatech.athlete_physiology add column if not exists zone_5_time integer not null default 0;
-alter table hamsatech.athlete_physiology add column if not exists stability_score numeric;
-alter table hamsatech.athlete_physiology add column if not exists acc_hold_stability numeric;
-alter table hamsatech.athlete_physiology add column if not exists acc_settle_score numeric;
-alter table hamsatech.athlete_physiology add column if not exists acc_spike_count integer;
+alter table public.athlete_physiology add column if not exists min_heart_rate integer;
+alter table public.athlete_physiology add column if not exists max_heart_rate integer;
+alter table public.athlete_physiology add column if not exists rmssd numeric;
+alter table public.athlete_physiology add column if not exists hrv_ms numeric;
+alter table public.athlete_physiology add column if not exists hr_std_dev numeric;
+alter table public.athlete_physiology add column if not exists zone_1_time integer not null default 0;
+alter table public.athlete_physiology add column if not exists zone_2_time integer not null default 0;
+alter table public.athlete_physiology add column if not exists zone_3_time integer not null default 0;
+alter table public.athlete_physiology add column if not exists zone_4_time integer not null default 0;
+alter table public.athlete_physiology add column if not exists zone_5_time integer not null default 0;
+alter table public.athlete_physiology add column if not exists stability_score numeric;
+alter table public.athlete_physiology add column if not exists acc_hold_stability numeric;
+alter table public.athlete_physiology add column if not exists acc_settle_score numeric;
+alter table public.athlete_physiology add column if not exists acc_spike_count integer;
 
-create table if not exists hamsatech.psychology_questions (
+create table if not exists public.psychology_questions (
   question_id text primary key,
   question_text text not null,
   category text not null,
   question_type text not null
 );
 
-create table if not exists hamsatech.psychology_responses (
+create table if not exists public.psychology_responses (
   answer_id text primary key,
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
-  question_id text not null references hamsatech.psychology_questions(question_id),
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
+  question_id text not null references public.psychology_questions(question_id),
   answer_text text not null,
   answer_score integer,
   recorded_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.athlete_scores (
+create table if not exists public.athlete_scores (
   score_id text primary key,
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   score_type text not null,
   score_value numeric not null,
   percentile numeric,
@@ -226,10 +226,10 @@ create table if not exists hamsatech.athlete_scores (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.training_plans (
+create table if not exists public.training_plans (
   training_plan_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
-  coach_id uuid references hamsatech.coaches(coach_id),
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
+  coach_id uuid references public.coaches(coach_id),
   focus_area text,
   recommended_drills text,
   session_frequency text,
@@ -242,10 +242,10 @@ create table if not exists hamsatech.training_plans (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.athlete_insights (
+create table if not exists public.athlete_insights (
   insight_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
-  session_id uuid references hamsatech.shooting_session_log(session_id) on delete set null,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
+  session_id uuid references public.shooting_session_log(session_id) on delete set null,
   title text not null,
   insight_text text not null,
   category text not null,
@@ -256,14 +256,14 @@ create table if not exists hamsatech.athlete_insights (
   created_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.coach_feedback (
+create table if not exists public.coach_feedback (
   feedback_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   athlete_name text,
   athlete_email text,
   coach_email text,
   coach_name text,
-  coach_id uuid references hamsatech.coaches(coach_id),
+  coach_id uuid references public.coaches(coach_id),
   coach_uid text,
   note text,
   recommendation text,
@@ -281,30 +281,30 @@ create table if not exists hamsatech.coach_feedback (
   created_at timestamptz not null default now()
 );
 
-alter table hamsatech.coach_feedback add column if not exists athlete_name text;
-alter table hamsatech.coach_feedback add column if not exists athlete_email text;
-alter table hamsatech.coach_feedback add column if not exists coach_email text;
-alter table hamsatech.coach_feedback add column if not exists coach_name text;
-alter table hamsatech.coach_feedback add column if not exists coach_id uuid;
-alter table hamsatech.coach_feedback add column if not exists coach_uid text;
-alter table hamsatech.coach_feedback add column if not exists note text;
-alter table hamsatech.coach_feedback add column if not exists recommendation text;
-alter table hamsatech.coach_feedback add column if not exists status text;
-alter table hamsatech.coach_feedback add column if not exists technique_score numeric;
-alter table hamsatech.coach_feedback add column if not exists focus_score numeric;
-alter table hamsatech.coach_feedback add column if not exists breathing_score numeric;
-alter table hamsatech.coach_feedback add column if not exists posture_score numeric;
-alter table hamsatech.coach_feedback add column if not exists coach_observations text;
-alter table hamsatech.coach_feedback add column if not exists coach_notes text;
-alter table hamsatech.coach_feedback add column if not exists strengths text;
-alter table hamsatech.coach_feedback add column if not exists training_plan text;
-alter table hamsatech.coach_feedback add column if not exists exercise_plan text;
-alter table hamsatech.coach_feedback add column if not exists improvement_areas text;
+alter table public.coach_feedback add column if not exists athlete_name text;
+alter table public.coach_feedback add column if not exists athlete_email text;
+alter table public.coach_feedback add column if not exists coach_email text;
+alter table public.coach_feedback add column if not exists coach_name text;
+alter table public.coach_feedback add column if not exists coach_id uuid;
+alter table public.coach_feedback add column if not exists coach_uid text;
+alter table public.coach_feedback add column if not exists note text;
+alter table public.coach_feedback add column if not exists recommendation text;
+alter table public.coach_feedback add column if not exists status text;
+alter table public.coach_feedback add column if not exists technique_score numeric;
+alter table public.coach_feedback add column if not exists focus_score numeric;
+alter table public.coach_feedback add column if not exists breathing_score numeric;
+alter table public.coach_feedback add column if not exists posture_score numeric;
+alter table public.coach_feedback add column if not exists coach_observations text;
+alter table public.coach_feedback add column if not exists coach_notes text;
+alter table public.coach_feedback add column if not exists strengths text;
+alter table public.coach_feedback add column if not exists training_plan text;
+alter table public.coach_feedback add column if not exists exercise_plan text;
+alter table public.coach_feedback add column if not exists improvement_areas text;
 
-create table if not exists hamsatech.coach_profiles (
+create table if not exists public.coach_profiles (
   coach_id text primary key,
   name text not null,
-  email text not null unique references hamsatech."App_Users"(email) on delete cascade,
+  email text not null unique references public."App_Users"(email) on delete cascade,
   phone text,
   profile_image text,
   specialization text,
@@ -313,40 +313,40 @@ create table if not exists hamsatech.coach_profiles (
   updated_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.coach_athlete_assignments (
+create table if not exists public.coach_athlete_assignments (
   assignment_id text primary key,
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
-  coach_email text not null references hamsatech."App_Users"(email),
-  assigned_by text not null references hamsatech."App_Users"(email),
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
+  coach_email text not null references public."App_Users"(email),
+  assigned_by text not null references public."App_Users"(email),
   previous_coach_email text,
   status text not null default 'active',
   created_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.coach_assignments (
+create table if not exists public.coach_assignments (
   assignment_id uuid primary key default gen_random_uuid(),
-  coach_id uuid references hamsatech.coaches(coach_id),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  coach_id uuid references public.coaches(coach_id),
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech.assignment_requests (
+create table if not exists public.assignment_requests (
   request_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
-  requesting_coach_id uuid references hamsatech.coaches(coach_id),
-  assigned_coach_id uuid references hamsatech.coaches(coach_id),
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
+  requesting_coach_id uuid references public.coaches(coach_id),
+  assigned_coach_id uuid references public.coaches(coach_id),
   status text not null default 'PENDING',
   notes text,
   requested_at timestamptz not null default now(),
   assigned_at timestamptz
 );
 
-create table if not exists hamsatech.notifications (
+create table if not exists public.notifications (
   notification_id uuid primary key default gen_random_uuid(),
-  recipient_coach_id uuid references hamsatech.coaches(coach_id),
+  recipient_coach_id uuid references public.coaches(coach_id),
   notification_type text,
-  related_athlete_id text references hamsatech.athletes(athlete_id),
+  related_athlete_id text references public.athletes(athlete_id),
   related_session_id uuid,
   message text not null,
   is_read boolean not null default false,
@@ -360,34 +360,34 @@ create table if not exists hamsatech.notifications (
   created_at timestamptz not null default now()
 );
 
-alter table hamsatech.notifications add column if not exists recipient_coach_id uuid;
-alter table hamsatech.notifications add column if not exists notification_type text;
-alter table hamsatech.notifications add column if not exists related_athlete_id text;
-alter table hamsatech.notifications add column if not exists related_session_id uuid;
-alter table hamsatech.notifications add column if not exists is_read boolean not null default false;
-alter table hamsatech.notifications add column if not exists action_url text;
-alter table hamsatech.notifications add column if not exists recipient_email text;
-alter table hamsatech.notifications add column if not exists recipient_role text;
-alter table hamsatech.notifications add column if not exists title text;
-alter table hamsatech.notifications add column if not exists type text;
-alter table hamsatech.notifications add column if not exists entity_id text;
-alter table hamsatech.notifications add column if not exists read_at timestamptz;
+alter table public.notifications add column if not exists recipient_coach_id uuid;
+alter table public.notifications add column if not exists notification_type text;
+alter table public.notifications add column if not exists related_athlete_id text;
+alter table public.notifications add column if not exists related_session_id uuid;
+alter table public.notifications add column if not exists is_read boolean not null default false;
+alter table public.notifications add column if not exists action_url text;
+alter table public.notifications add column if not exists recipient_email text;
+alter table public.notifications add column if not exists recipient_role text;
+alter table public.notifications add column if not exists title text;
+alter table public.notifications add column if not exists type text;
+alter table public.notifications add column if not exists entity_id text;
+alter table public.notifications add column if not exists read_at timestamptz;
 
-create table if not exists hamsatech.feedback_requests (
+create table if not exists public.feedback_requests (
   request_id uuid primary key default gen_random_uuid(),
-  athlete_id text not null references hamsatech.athletes(athlete_id) on delete cascade,
+  athlete_id text not null references public.athletes(athlete_id) on delete cascade,
   session_id uuid not null,
-  coach_id uuid not null references hamsatech.coaches(coach_id),
+  coach_id uuid not null references public.coaches(coach_id),
   status text not null default 'PENDING',
   requested_at timestamptz not null default now(),
   completed_at timestamptz,
   feedback_id uuid
 );
 
-alter table hamsatech.feedback_requests add column if not exists completed_at timestamptz;
-alter table hamsatech.feedback_requests add column if not exists feedback_id uuid;
+alter table public.feedback_requests add column if not exists completed_at timestamptz;
+alter table public.feedback_requests add column if not exists feedback_id uuid;
 
-create table if not exists hamsatech.audit_logs (
+create table if not exists public.audit_logs (
   audit_id text primary key,
   actor_email text not null,
   action text not null,
@@ -397,55 +397,55 @@ create table if not exists hamsatech.audit_logs (
   created_at timestamptz not null default now()
 );
 
-create table if not exists hamsatech."Athlete_Lookup" (
-  athlete_id text primary key references hamsatech.athletes(athlete_id) on delete cascade,
+create table if not exists public."Athlete_Lookup" (
+  athlete_id text primary key references public.athletes(athlete_id) on delete cascade,
   name text not null
 );
 
-create index if not exists idx_app_sessions_user_email on hamsatech."App_Sessions"(user_email);
-create index if not exists idx_athletes_coach_id on hamsatech.athletes(coach_id);
-create index if not exists idx_sessions_athlete_date on hamsatech.shooting_session_log(athlete_id, session_date desc);
-create index if not exists idx_physiology_athlete_date on hamsatech.athlete_physiology(athlete_id, recorded_date desc);
-create index if not exists idx_athlete_scores_athlete_id on hamsatech.athlete_scores(athlete_id);
-create index if not exists idx_athlete_scores_type_calc on hamsatech.athlete_scores(athlete_id, score_type, calculated_at desc);
-create index if not exists idx_psychology_responses_athlete_recorded on hamsatech.psychology_responses(athlete_id, recorded_at desc);
-create index if not exists idx_training_plans_athlete_status on hamsatech.training_plans(athlete_id, status, updated_at desc);
-create index if not exists idx_athlete_insights_athlete_created on hamsatech.athlete_insights(athlete_id, created_at desc);
-create index if not exists idx_athlete_insights_category_created on hamsatech.athlete_insights(category, created_at desc);
-create index if not exists idx_notifications_email on hamsatech.notifications(recipient_email);
-create index if not exists idx_notifications_coach_unread on hamsatech.notifications(recipient_coach_id, is_read, created_at desc);
-create index if not exists idx_feedback_requests_status on hamsatech.feedback_requests(coach_id, status, requested_at desc);
-create index if not exists idx_assignment_requests_pending on hamsatech.assignment_requests(status, requested_at desc);
-create index if not exists idx_assignment_requests_athlete_pending on hamsatech.assignment_requests(athlete_id) where status = 'PENDING';
+create index if not exists idx_app_sessions_user_email on public."App_Sessions"(user_email);
+create index if not exists idx_athletes_coach_id on public.athletes(coach_id);
+create index if not exists idx_sessions_athlete_date on public.shooting_session_log(athlete_id, session_date desc);
+create index if not exists idx_physiology_athlete_date on public.athlete_physiology(athlete_id, recorded_date desc);
+create index if not exists idx_athlete_scores_athlete_id on public.athlete_scores(athlete_id);
+create index if not exists idx_athlete_scores_type_calc on public.athlete_scores(athlete_id, score_type, calculated_at desc);
+create index if not exists idx_psychology_responses_athlete_recorded on public.psychology_responses(athlete_id, recorded_at desc);
+create index if not exists idx_training_plans_athlete_status on public.training_plans(athlete_id, status, updated_at desc);
+create index if not exists idx_athlete_insights_athlete_created on public.athlete_insights(athlete_id, created_at desc);
+create index if not exists idx_athlete_insights_category_created on public.athlete_insights(category, created_at desc);
+create index if not exists idx_notifications_email on public.notifications(recipient_email);
+create index if not exists idx_notifications_coach_unread on public.notifications(recipient_coach_id, is_read, created_at desc);
+create index if not exists idx_feedback_requests_status on public.feedback_requests(coach_id, status, requested_at desc);
+create index if not exists idx_assignment_requests_pending on public.assignment_requests(status, requested_at desc);
+create index if not exists idx_assignment_requests_athlete_pending on public.assignment_requests(athlete_id) where status = 'PENDING';
 
 -- Security posture for hosted Supabase:
 -- The web app talks to the Render FastAPI backend, and the backend uses the
 -- Supabase service role. Enabling RLS blocks direct anon/authenticated table
 -- access unless explicit policies are added later.
-alter table hamsatech."App_Users" enable row level security;
-alter table hamsatech."App_Sessions" enable row level security;
-alter table hamsatech.coaches enable row level security;
-alter table hamsatech.athletes enable row level security;
-alter table hamsatech.athlete_family enable row level security;
-alter table hamsatech.athlete_details enable row level security;
-alter table hamsatech.shooting_session_log enable row level security;
-alter table hamsatech.athlete_physiology enable row level security;
-alter table hamsatech.psychology_questions enable row level security;
-alter table hamsatech.psychology_responses enable row level security;
-alter table hamsatech.athlete_scores enable row level security;
-alter table hamsatech.training_plans enable row level security;
-alter table hamsatech.athlete_insights enable row level security;
-alter table hamsatech.coach_feedback enable row level security;
-alter table hamsatech.coach_profiles enable row level security;
-alter table hamsatech.coach_athlete_assignments enable row level security;
-alter table hamsatech.coach_assignments enable row level security;
-alter table hamsatech.assignment_requests enable row level security;
-alter table hamsatech.notifications enable row level security;
-alter table hamsatech.feedback_requests enable row level security;
-alter table hamsatech.audit_logs enable row level security;
-alter table hamsatech."Athlete_Lookup" enable row level security;
+alter table public."App_Users" enable row level security;
+alter table public."App_Sessions" enable row level security;
+alter table public.coaches enable row level security;
+alter table public.athletes enable row level security;
+alter table public.athlete_family enable row level security;
+alter table public.athlete_details enable row level security;
+alter table public.shooting_session_log enable row level security;
+alter table public.athlete_physiology enable row level security;
+alter table public.psychology_questions enable row level security;
+alter table public.psychology_responses enable row level security;
+alter table public.athlete_scores enable row level security;
+alter table public.training_plans enable row level security;
+alter table public.athlete_insights enable row level security;
+alter table public.coach_feedback enable row level security;
+alter table public.coach_profiles enable row level security;
+alter table public.coach_athlete_assignments enable row level security;
+alter table public.coach_assignments enable row level security;
+alter table public.assignment_requests enable row level security;
+alter table public.notifications enable row level security;
+alter table public.feedback_requests enable row level security;
+alter table public.audit_logs enable row level security;
+alter table public."Athlete_Lookup" enable row level security;
 
-create or replace view hamsatech.athlete_physiology_metrics as
+create or replace view public.athlete_physiology_metrics as
 select
   p.physiology_id,
   p.athlete_id,
@@ -479,9 +479,9 @@ select
   p.acc_settle_score,
   p.acc_spike_count,
   p.remarks
-from hamsatech.athlete_physiology p;
+from public.athlete_physiology p;
 
-create or replace view hamsatech.athlete_psychology_scores as
+create or replace view public.athlete_psychology_scores as
 select
   md5(r.athlete_id || ':' || lower(coalesce(q.category, r.question_id))) as psychology_score_id,
   r.athlete_id,
@@ -504,12 +504,12 @@ select
     order by r.recorded_at desc
   ) as input_summary,
   max(r.recorded_at) as calculated_at
-from hamsatech.psychology_responses r
-left join hamsatech.psychology_questions q on q.question_id = r.question_id
+from public.psychology_responses r
+left join public.psychology_questions q on q.question_id = r.question_id
 where r.answer_score is not null
 group by r.athlete_id, lower(coalesce(q.category, r.question_id));
 
-create or replace view hamsatech.athlete_session_summary as
+create or replace view public.athlete_session_summary as
 with session_series as (
   select
     s.session_id,
@@ -518,8 +518,8 @@ with session_series as (
     max(sc.score_value)::numeric as best_series_score,
     stddev_pop(sc.score_value)::numeric as series_stddev,
     count(sc.score_id) as series_count
-  from hamsatech.shooting_session_log s
-  left join hamsatech.athlete_scores sc
+  from public.shooting_session_log s
+  left join public.athlete_scores sc
     on sc.athlete_id = s.athlete_id
    and sc.score_type = 'mobile_series'
    and sc.source_data ->> 'sessionId' = s.session_id::text
@@ -530,7 +530,7 @@ recent_sessions as (
     s.athlete_id,
     count(*) filter (where s.session_date >= current_date - interval '7 days') as sessions_7d,
     count(*) filter (where s.session_date >= current_date - interval '30 days') as sessions_30d
-  from hamsatech.shooting_session_log s
+  from public.shooting_session_log s
   group by s.athlete_id
 )
 select
@@ -566,58 +566,58 @@ select
   ) as detailed_analysis,
   s.created_at,
   s.updated_at
-from hamsatech.shooting_session_log s
+from public.shooting_session_log s
 left join session_series ss on ss.session_id = s.session_id
-left join hamsatech.athlete_physiology_metrics pm on pm.session_id = s.session_id
+left join public.athlete_physiology_metrics pm on pm.session_id = s.session_id
 left join recent_sessions rs on rs.athlete_id = s.athlete_id
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type in ('overall', 'performance')
   order by calculated_at desc limit 1
 ) latest_overall on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type = 'readiness'
   order by calculated_at desc limit 1
 ) latest_readiness on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type = 'fatigue'
   order by calculated_at desc limit 1
 ) latest_fatigue on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type = 'stress'
   order by calculated_at desc limit 1
 ) latest_stress on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type = 'recovery'
   order by calculated_at desc limit 1
 ) latest_recovery on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type in ('consistency', 'discipline')
   order by calculated_at desc limit 1
 ) latest_consistency on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type in ('hold_stability', 'stability')
   order by calculated_at desc limit 1
 ) latest_stability on true
 left join lateral (
-  select score_value from hamsatech.athlete_scores
+  select score_value from public.athlete_scores
   where athlete_id = s.athlete_id and score_type = 'best_series'
   order by calculated_at desc limit 1
 ) best_series on true
 left join lateral (
   select focus_area, coach_recommendation
-  from hamsatech.training_plans
+  from public.training_plans
   where athlete_id = s.athlete_id and status in ('New', 'In Progress', 'Needs Review')
   order by updated_at desc limit 1
 ) tp on true;
 
-insert into hamsatech.psychology_questions (question_id, question_text, category, question_type)
+insert into public.psychology_questions (question_id, question_text, category, question_type)
 values
   ('Q1', 'How stressed do you feel?', 'Stress', 'Scale'),
   ('Q2', 'How focused were you today?', 'Focus', 'Scale'),
@@ -626,13 +626,13 @@ values
   ('MOBILE_SESSION_REFLECTION', 'Mobile training session reflection', 'Mobile', 'Json')
 on conflict (question_id) do nothing;
 
-insert into hamsatech.coaches (coach_name, coach_id_text, email, specialization)
+insert into public.coaches (coach_name, coach_id_text, email, specialization)
 values
   ('HamsaTech Coach', 'C001', 'coach@hamsatech.ai', 'Shooting performance'),
   ('HamsaTech Admin', 'C002', 'admin@hamsatech.ai', 'Assignment operations')
 on conflict (coach_id_text) do nothing;
 
-create or replace function hamsatech.notify_coach_feedback_request()
+create or replace function public.notify_coach_feedback_request()
 returns trigger
 language plpgsql
 as $$
@@ -641,11 +641,11 @@ declare
 begin
   select coalesce(a.athlete_name, a.name, 'Athlete')
     into v_athlete_name
-  from hamsatech.athletes a
+  from public.athletes a
   where a.athlete_id = new.athlete_id
   limit 1;
 
-  insert into hamsatech.notifications (
+  insert into public.notifications (
     recipient_coach_id, notification_type, related_athlete_id, related_session_id,
     message, action_url, title, type, entity_id
   ) values (
@@ -664,13 +664,13 @@ begin
 end;
 $$;
 
-drop trigger if exists trigger_feedback_request_notification on hamsatech.feedback_requests;
+drop trigger if exists trigger_feedback_request_notification on public.feedback_requests;
 create trigger trigger_feedback_request_notification
-after insert on hamsatech.feedback_requests
+after insert on public.feedback_requests
 for each row
-execute function hamsatech.notify_coach_feedback_request();
+execute function public.notify_coach_feedback_request();
 
-create or replace function hamsatech.notify_default_coach_new_registration()
+create or replace function public.notify_default_coach_new_registration()
 returns trigger
 language plpgsql
 as $$
@@ -681,7 +681,7 @@ declare
   v_request_id uuid;
 begin
   select ar.request_id into v_existing_request_id
-  from hamsatech.assignment_requests ar
+  from public.assignment_requests ar
   where ar.athlete_id = new.athlete_id
     and ar.status = 'PENDING'
   order by ar.requested_at desc
@@ -692,7 +692,7 @@ begin
   end if;
 
   select c.coach_id into v_default_coach_id
-  from hamsatech.coaches c
+  from public.coaches c
   where upper(coalesce(c.coach_id_text, '')) = 'C001'
   order by c.created_at asc
   limit 1;
@@ -703,15 +703,15 @@ begin
 
   select coalesce(a.athlete_name, a.name, 'Athlete')
     into v_athlete_name
-  from hamsatech.athletes a
+  from public.athletes a
   where a.athlete_id = new.athlete_id
   limit 1;
 
-  insert into hamsatech.assignment_requests (athlete_id, assigned_coach_id, status, notes)
+  insert into public.assignment_requests (athlete_id, assigned_coach_id, status, notes)
   values (new.athlete_id, v_default_coach_id, 'PENDING', 'Fallback auto-created on athlete profile registration')
   returning request_id into v_request_id;
 
-  insert into hamsatech.notifications (
+  insert into public.notifications (
     recipient_coach_id, notification_type, related_athlete_id,
     message, action_url, title, type, entity_id
   ) values (
@@ -729,12 +729,12 @@ begin
 end;
 $$;
 
-drop trigger if exists trigger_new_user_assignment_request on hamsatech.athlete_details;
+drop trigger if exists trigger_new_user_assignment_request on public.athlete_details;
 create trigger trigger_new_user_assignment_request
-after insert on hamsatech.athlete_details
+after insert on public.athlete_details
 for each row
-execute function hamsatech.notify_default_coach_new_registration();
+execute function public.notify_default_coach_new_registration();
 
 -- Optional verification:
--- select table_name from information_schema.tables where table_schema = 'hamsatech' order by table_name;
--- select coach_id_text, coach_name, email from hamsatech.coaches order by coach_id_text;
+-- select table_name from information_schema.tables where table_schema = 'public' order by table_name;
+-- select coach_id_text, coach_name, email from public.coaches order by coach_id_text;
