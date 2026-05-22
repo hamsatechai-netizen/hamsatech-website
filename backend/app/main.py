@@ -1576,8 +1576,11 @@ def ensure_coach_profile(user: UserRecord) -> CoachProfileRecord:
             "updated_at": None,
         }
 
+    # Dashboard endpoints are keyed by the domain coaches.coach_id UUID, not the
+    # legacy coach_profiles.coach_id text value.
+    resolved_coach_id = coach_key or row.get("coach_id") or user.email.lower()
     return CoachProfileRecord(
-        coachId=str(row.get("coach_id") or coach_key or user.email.lower()),
+        coachId=str(resolved_coach_id),
         name=str(row.get("name") or (domain_row or {}).get("coach_name") or user.full_name),
         email=str(row.get("email") or user.email.lower()),
         phone=row.get("phone"),
@@ -3341,6 +3344,27 @@ def get_coach_dashboard_v1(
             priority="Medium",
         ),
     ]
+    insight_rows = safe_table_rows(
+        "athlete_insights",
+        supabase.table("athlete_insights")
+        .select("title,insight_text,category,score,priority,created_at")
+        .in_("athlete_id", [row.athlete_id for row in rows])
+        .order("created_at", desc=True)
+        .limit(6),
+    )
+    insights.extend(
+        [
+            CoachDashboardInsightItem(
+                title=str(row.get("title") or "Coach insight"),
+                insightText=str(row.get("insight_text") or ""),
+                category=str(row.get("category") or "insight"),
+                score=row_float(row.get("score"), fallback=None),  # type: ignore[arg-type]
+                priority=row.get("priority") if row.get("priority") in {"High", "Medium", "Low"} else "Medium",
+            )
+            for row in insight_rows
+            if row.get("insight_text")
+        ]
+    )
 
     payload = CoachDashboardV1Payload(
         coachId=coach_id,
@@ -3908,6 +3932,27 @@ def get_coach_athlete_insights_widget(
     fallback_plan = None
     if isinstance(recommendations, list) and recommendations:
         fallback_plan = " / ".join([str(item) for item in recommendations[:2]])
+    insight_rows = safe_table_rows(
+        "athlete_insights",
+        supabase.table("athlete_insights")
+        .select("title,insight_text,category,score,priority,suggested_action,supporting_data,created_at")
+        .eq("athlete_id", canonical_athlete_id)
+        .order("created_at", desc=True)
+        .limit(20),
+    )
+    insight_history = [
+        {
+            "title": str(row.get("title") or "Insight"),
+            "insightText": str(row.get("insight_text") or ""),
+            "category": str(row.get("category") or "coach"),
+            "score": row_float(row.get("score"), fallback=None),  # type: ignore[arg-type]
+            "priority": row.get("priority") if row.get("priority") in {"High", "Medium", "Low"} else "Medium",
+            "suggestedAction": row.get("suggested_action") or "",
+            "supportingData": row.get("supporting_data") if isinstance(row.get("supporting_data"), dict) else {},
+            "createdAt": str(row.get("created_at") or ""),
+        }
+        for row in insight_rows
+    ]
 
     widget = {
         "athleteId": canonical_athlete_id,
@@ -3919,6 +3964,7 @@ def get_coach_athlete_insights_widget(
         },
         "recommendation": latest_training_plan or fallback_plan,
         "feedbackHistory": feedback_history,
+        "insights": insight_history,
     }
     return CoachAthleteInsightsWidgetResponse(widget=widget)
 
@@ -3947,7 +3993,7 @@ def get_coach_athlete_profile_widget(
 
     session_rows = safe_table_rows(
         APP_TABLES["shooting_session_log"],
-        supabase.table(APP_TABLES["shooting_session_log"]).select("*").eq("athlete_id", canonical_athlete_id).order("session_date", desc=True).limit(1),
+        supabase.table(APP_TABLES["shooting_session_log"]).select("*").eq("athlete_id", canonical_athlete_id).order("session_date", desc=True).limit(30),
     )
     latest_session = session_rows[0] if session_rows else None
     latest_summary = None
@@ -3964,6 +4010,29 @@ def get_coach_athlete_profile_widget(
         best_series = latest_summary.get("score", {}).get("bestSeries")
         if isinstance(best_series, dict):
             best_series_total = best_series.get("total")
+    latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], [canonical_athlete_id], "recorded_date").get(canonical_athlete_id) or {}
+    latest_physiology_fatigue = fatigue_burden_from_inputs({score.score_type: score.score_value for score in scores}, latest_physiology)
+    performance_values: list[float] = []
+    for row in session_rows:
+        try:
+            summary = build_mobile_session_summary(row)
+            value = row_float(summary.get("score", {}).get("averagePerShot"), fallback=None)  # type: ignore[arg-type]
+            if value is not None:
+                performance_values.append(value)
+        except Exception:
+            continue
+    fallback_overall = score_by_type.get("overall").score_value if score_by_type.get("overall") else None
+    if not performance_values and fallback_overall is not None:
+        performance_values = [fallback_overall]
+    avg_7d_values = [
+        value
+        for index, value in enumerate(performance_values)
+        if index < len([row for row in session_rows if is_recent_date(str(row.get("session_date") or row.get("created_at")), days=7)])
+    ]
+    best_score = max(performance_values) if performance_values else None
+    latest_score = performance_values[0] if performance_values else last_session_avg
+    oldest_score = performance_values[-1] if performance_values else None
+    improvement_rate = round(latest_score - oldest_score, 2) if latest_score is not None and oldest_score is not None and len(performance_values) > 1 else None
 
     feedback_rows = list_coach_feedback_rows(supabase=supabase, athlete_id=canonical_athlete_id, limit=50)
     feedback_history = [
@@ -4012,10 +4081,13 @@ def get_coach_athlete_profile_widget(
         "currentStatus": "Needs Review" if latest_training_plan else "Stable",
         "latestSessionDate": latest_session_date,
         "scores": {
-            "bestAvg30d": score_by_type.get("best_avg_30d").score_value if score_by_type.get("best_avg_30d") else None,
-            "periodAvg": score_by_type.get("period_avg").score_value if score_by_type.get("period_avg") else None,
+            "bestAvg30d": score_by_type.get("best_avg_30d").score_value if score_by_type.get("best_avg_30d") else average_metric(performance_values),
+            "avg7d": average_metric(avg_7d_values),
+            "periodAvg": score_by_type.get("period_avg").score_value if score_by_type.get("period_avg") else average_metric(performance_values),
+            "bestScore": best_score,
             "bestSeries": score_by_type.get("best_series").score_value if score_by_type.get("best_series") else best_series_total,
             "lastSession": score_by_type.get("last_session_avg").score_value if score_by_type.get("last_session_avg") else last_session_avg,
+            "improvementRate": improvement_rate,
         },
         "psychology": {
             "social": score_by_type.get("social").score_value if score_by_type.get("social") else None,
@@ -4026,6 +4098,33 @@ def get_coach_athlete_profile_widget(
         },
         "trainingPlan": persisted_training_plan or latest_training_plan,
         "trainingPlanStatus": training_plan_row.get("status") or ("In Progress" if latest_training_plan else "Needs Review"),
+        "physiology": {
+            "stress": latest_physiology.get("stress_score"),
+            "restingHr": latest_physiology.get("resting_heart_rate") or latest_physiology.get("resting_hr"),
+            "avgHr": latest_physiology.get("avg_heart_rate"),
+            "minHr": latest_physiology.get("min_heart_rate"),
+            "maxHr": latest_physiology.get("max_heart_rate"),
+            "hrv": latest_physiology.get("rmssd") or latest_physiology.get("hrv") or latest_physiology.get("hrv_ms"),
+            "hrStdDev": latest_physiology.get("hr_std_dev"),
+            "sleepHours": latest_physiology.get("sleep_hours"),
+            "recovery": latest_physiology.get("recovery_score"),
+            "fatigue": latest_physiology_fatigue,
+            "energyLevel": parse_json_object(latest_physiology.get("remarks")).get("energyLevel"),
+            "mood": parse_json_object(latest_physiology.get("remarks")).get("mood"),
+            "zones": [
+                latest_physiology.get("zone_1_time") or 0,
+                latest_physiology.get("zone_2_time") or 0,
+                latest_physiology.get("zone_3_time") or 0,
+                latest_physiology.get("zone_4_time") or 0,
+                latest_physiology.get("zone_5_time") or 0,
+            ],
+        },
+        "holdStability": {
+            "stabilityScore": latest_physiology.get("stability_score") or score_by_type.get("hold_stability").score_value if score_by_type.get("hold_stability") else latest_physiology.get("stability_score"),
+            "holdStability": latest_physiology.get("acc_hold_stability"),
+            "settleScore": latest_physiology.get("acc_settle_score"),
+            "spikeCount": latest_physiology.get("acc_spike_count"),
+        },
         "feedbackHistory": feedback_history,
     }
     return CoachAthleteProfileWidgetResponse(widget=widget)

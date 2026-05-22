@@ -44,6 +44,45 @@ function notifyCoachIntent(message: string) {
   if (typeof fn === 'function') fn(message)
 }
 
+function RankingChips({ athlete }: { athlete: CoachDashboardV1Athlete }) {
+  return (
+    <div className="coach-ranking-chips">
+      <span>30d {formatScore(athlete.score)}</span>
+      <span>Best {formatScore(athlete.score)}</span>
+      <span>Series {formatScore(athlete.score)}</span>
+      <span>Cons {formatScore(athlete.disciplineScore)}</span>
+      <span>Fatigue {formatScore(athlete.fatigueScore)}</span>
+    </div>
+  )
+}
+
+function HabitCard({ athlete }: { athlete: CoachDashboardV1Athlete }) {
+  const habits = [
+    ['Sleep', athlete.sleepHours ? `${athlete.sleepHours.toFixed(1)}h` : '-'],
+    ['Stress', formatScore(athlete.latestStress)],
+    ['Fatigue', formatScore(athlete.fatigueScore)],
+    ['HR/HRV', `${formatScore(athlete.restingHr)} / ${formatScore(athlete.hrvIndicator)}`],
+    ['Recovery', formatScore(athlete.latestRecovery)],
+    ['Focus', formatScore(athlete.focusScore)],
+  ]
+  return (
+    <Link className="coach-habit-card" to={`/coach/athletes/${athlete.athleteId}`}>
+      <div>
+        <strong>{athlete.athleteName}</strong>
+        <span>{athlete.trend}</span>
+      </div>
+      <dl>
+        {habits.map(([label, value]) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+    </Link>
+  )
+}
+
 function ScatterPlot({
   title,
   points,
@@ -264,6 +303,15 @@ export default function CoachDashboardV1Page() {
             </section>
 
             <section className="dashboard-section">
+              <h2>Healthy and Focused Habits</h2>
+              <div className="coach-habit-grid">
+                {dashboard.healthyFocused.slice(0, 6).map((athlete) => (
+                  <HabitCard key={athlete.athleteId} athlete={athlete} />
+                ))}
+              </div>
+            </section>
+
+            <section className="dashboard-section">
               <h2>Risk / Attention Queue</h2>
               <div className="coach-risk-grid">
                 {dashboard.riskQueue.length > 0 ? dashboard.riskQueue.map((item) => (
@@ -306,7 +354,10 @@ function Ranking({ title, athletes, metric }: { title: string; athletes: CoachDa
       <h3>{title}</h3>
       {athletes.length > 0 ? athletes.map((athlete, index) => (
         <Link key={athlete.athleteId} to={`/coach/athletes/${athlete.athleteId}`}>
-          <span>{index + 1}. {athlete.athleteName}</span>
+          <div>
+            <span>{index + 1}. {athlete.athleteName}</span>
+            <RankingChips athlete={athlete} />
+          </div>
           <strong>{formatScore(athlete[metric] as number | null | undefined)}</strong>
         </Link>
       )) : <p>No athletes yet.</p>}

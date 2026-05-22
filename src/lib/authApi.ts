@@ -517,6 +517,16 @@ export type CoachAthleteInsightsWidget = {
   athleteId: string
   scores?: { social?: number | null; arousal?: number | null; decision?: number | null; focus?: number | null } | null
   recommendation?: string | null
+  insights?: Array<{
+    title?: string | null
+    insightText?: string | null
+    category?: string | null
+    score?: number | null
+    priority?: 'High' | 'Medium' | 'Low' | string | null
+    suggestedAction?: string | null
+    supportingData?: Record<string, unknown> | null
+    createdAt?: string | null
+  }>
   feedbackHistory?: Array<{ createdAt?: string; status?: string | null; note?: string | null; trainingPlan?: string | null }>
 }
 
@@ -535,8 +545,37 @@ export type CoachAthleteProfileWidget = {
   sport?: string | null
   currentStatus?: string | null
   latestSessionDate?: string | null
-  scores?: { bestAvg30d?: number | null; periodAvg?: number | null; bestSeries?: number | null; lastSession?: number | null } | null
+  scores?: {
+    avg7d?: number | null
+    bestAvg30d?: number | null
+    periodAvg?: number | null
+    bestScore?: number | null
+    bestSeries?: number | null
+    lastSession?: number | null
+    improvementRate?: number | null
+  } | null
   psychology?: { social?: number | null; arousal?: number | null; decision?: number | null; focus?: number | null; recovery?: number | null } | null
+  physiology?: {
+    stress?: number | null
+    restingHr?: number | null
+    avgHr?: number | null
+    minHr?: number | null
+    maxHr?: number | null
+    hrv?: number | null
+    hrStdDev?: number | null
+    sleepHours?: number | null
+    recovery?: number | null
+    fatigue?: number | null
+    energyLevel?: number | null
+    mood?: string | null
+    zones?: number[]
+  } | null
+  holdStability?: {
+    stabilityScore?: number | null
+    holdStability?: number | null
+    settleScore?: number | null
+    spikeCount?: number | null
+  } | null
   trainingPlan?: string | null
   trainingPlanStatus?: string | null
   feedbackHistory?: Array<{ createdAt?: string; status?: string | null; note?: string | null; trainingPlan?: string | null }>

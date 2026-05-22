@@ -57,6 +57,15 @@ function ScoreCard({ label, value, previous, source }: { label: string; value?: 
   )
 }
 
+function MetricTile({ label, value }: { label: string; value?: string | number | null }) {
+  return (
+    <div className="dashboard-metric">
+      <span>{label}</span>
+      <strong>{typeof value === 'number' ? formatScore(value) : value ?? '-'}</strong>
+    </div>
+  )
+}
+
 function CoachAthleteDetailsPage() {
   const { athleteId } = useParams()
   const { user, isLoading } = useAuth()
@@ -199,9 +208,13 @@ function CoachAthleteDetailsPage() {
             </div>
             <div className="dashboard-metrics">
               <div className="dashboard-metric"><span>Latest session score</span><strong>{formatScore(lastSession?.performance)}</strong></div>
+              <div className="dashboard-metric"><span>7-day average</span><strong>{formatScore(profileWidget?.scores?.avg7d)}</strong></div>
               <div className="dashboard-metric"><span>Best 30d average</span><strong>{formatScore(profileWidget?.scores?.bestAvg30d)}</strong></div>
+              <div className="dashboard-metric"><span>Best score</span><strong>{formatScore(profileWidget?.scores?.bestScore)}</strong></div>
               <div className="dashboard-metric"><span>Best series</span><strong>{formatScore(profileWidget?.scores?.bestSeries)}</strong></div>
+              <div className="dashboard-metric"><span>Improvement rate</span><strong>{formatScore(profileWidget?.scores?.improvementRate)}</strong></div>
               <div className="dashboard-metric"><span>Session frequency</span><strong>{sessionsWidget?.history?.length ?? 0}</strong></div>
+              <div className="dashboard-metric"><span>Best vs latest</span><strong>{formatScore((profileWidget?.scores?.bestScore ?? 0) - (lastSession?.performance ?? 0))}</strong></div>
             </div>
           </div>
         </section>
@@ -231,6 +244,39 @@ function CoachAthleteDetailsPage() {
             <article className="coach-map-card"><strong>Readiness vs Performance</strong><p>{formatScore(widget?.readiness)} readiness / {formatScore(widget?.performance)} performance</p></article>
             <article className="coach-map-card"><strong>Focus vs Consistency</strong><p>{formatScore(insightsWidget?.scores?.focus)} focus / {formatScore(profileWidget?.scores?.periodAvg)} period average</p></article>
             <article className="coach-map-card"><strong>Mental Load</strong><p>{formatScore(insightsWidget?.scores?.arousal)} arousal / {formatScore(insightsWidget?.scores?.decision)} decision</p></article>
+            <article className="coach-map-card"><strong>Stress and Recovery</strong><p>{formatScore(profileWidget?.physiology?.stress)} stress / {formatScore(profileWidget?.physiology?.recovery)} recovery</p></article>
+            <article className="coach-map-card"><strong>HR and HRV</strong><p>{formatScore(profileWidget?.physiology?.restingHr)} resting HR / {formatScore(profileWidget?.physiology?.hrv)} HRV</p></article>
+            <article className="coach-map-card"><strong>Sleep and Energy</strong><p>{profileWidget?.physiology?.sleepHours ?? '-'}h sleep / {formatScore(profileWidget?.physiology?.energyLevel)} energy</p></article>
+            <article className="coach-map-card"><strong>Mood Check-in</strong><p>{profileWidget?.physiology?.mood ?? 'No check-in mood recorded'}</p></article>
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Physiology Panel</h2>
+          <div className="dashboard-panel">
+            <div className="dashboard-metrics">
+              <MetricTile label="Avg HR" value={profileWidget?.physiology?.avgHr} />
+              <MetricTile label="Min HR" value={profileWidget?.physiology?.minHr} />
+              <MetricTile label="Max HR" value={profileWidget?.physiology?.maxHr} />
+              <MetricTile label="RMSSD / HRV" value={profileWidget?.physiology?.hrv} />
+              <MetricTile label="HR Std Dev" value={profileWidget?.physiology?.hrStdDev} />
+              <MetricTile label="Sleep Hours" value={profileWidget?.physiology?.sleepHours} />
+            </div>
+            <div className="zone-strip" aria-label="Heart rate zones">
+              {(profileWidget?.physiology?.zones ?? [0, 0, 0, 0, 0]).map((zone, index) => (
+                <span key={index} style={{ flexGrow: Math.max(1, zone) }}>Z{index + 1}: {zone}</span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="dashboard-section">
+          <h2>Hold Stability</h2>
+          <div className="dashboard-metrics">
+            <MetricTile label="Stability Score" value={profileWidget?.holdStability?.stabilityScore} />
+            <MetricTile label="Hold Stability" value={profileWidget?.holdStability?.holdStability} />
+            <MetricTile label="Settle Score" value={profileWidget?.holdStability?.settleScore} />
+            <MetricTile label="Spike Count" value={profileWidget?.holdStability?.spikeCount} />
           </div>
         </section>
 
@@ -250,10 +296,15 @@ function CoachAthleteDetailsPage() {
         <section className="dashboard-section">
           <h2>Insights</h2>
           <div className="notification-list">
-            {insightCards.map((item) => (
+            {[...insightCards, ...(insightsWidget?.insights ?? []).map((item) => ({
+              title: item.title ?? 'Insight',
+              text: `${item.insightText ?? ''}${item.suggestedAction ? ` Suggested action: ${item.suggestedAction}` : ''}`,
+              priority: item.priority ?? 'Medium',
+              category: item.category ?? 'coach',
+            }))].map((item) => (
               <article key={item.title} className="notification-item">
-                <span>{item.priority} Priority</span>
-                <p><strong>{item.title}</strong> - {item.text}</p>
+                <span>{item.priority} Priority{'category' in item ? ` / ${item.category}` : ''}</span>
+                <p><strong>{item.title}</strong> - {'text' in item ? item.text : ''}</p>
               </article>
             ))}
           </div>

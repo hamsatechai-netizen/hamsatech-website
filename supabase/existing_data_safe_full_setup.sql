@@ -418,6 +418,33 @@ create index if not exists idx_feedback_requests_status on hamsatech.feedback_re
 create index if not exists idx_assignment_requests_pending on hamsatech.assignment_requests(status, requested_at desc);
 create index if not exists idx_assignment_requests_athlete_pending on hamsatech.assignment_requests(athlete_id) where status = 'PENDING';
 
+-- Security posture for hosted Supabase:
+-- The web app talks to the Render FastAPI backend, and the backend uses the
+-- Supabase service role. Enabling RLS blocks direct anon/authenticated table
+-- access unless explicit policies are added later.
+alter table hamsatech."App_Users" enable row level security;
+alter table hamsatech."App_Sessions" enable row level security;
+alter table hamsatech.coaches enable row level security;
+alter table hamsatech.athletes enable row level security;
+alter table hamsatech.athlete_family enable row level security;
+alter table hamsatech.athlete_details enable row level security;
+alter table hamsatech.shooting_session_log enable row level security;
+alter table hamsatech.athlete_physiology enable row level security;
+alter table hamsatech.psychology_questions enable row level security;
+alter table hamsatech.psychology_responses enable row level security;
+alter table hamsatech.athlete_scores enable row level security;
+alter table hamsatech.training_plans enable row level security;
+alter table hamsatech.athlete_insights enable row level security;
+alter table hamsatech.coach_feedback enable row level security;
+alter table hamsatech.coach_profiles enable row level security;
+alter table hamsatech.coach_athlete_assignments enable row level security;
+alter table hamsatech.coach_assignments enable row level security;
+alter table hamsatech.assignment_requests enable row level security;
+alter table hamsatech.notifications enable row level security;
+alter table hamsatech.feedback_requests enable row level security;
+alter table hamsatech.audit_logs enable row level security;
+alter table hamsatech."Athlete_Lookup" enable row level security;
+
 create or replace view hamsatech.athlete_physiology_metrics as
 select
   p.physiology_id,
@@ -456,7 +483,7 @@ from hamsatech.athlete_physiology p;
 
 create or replace view hamsatech.athlete_psychology_scores as
 select
-  md5(r.athlete_id || ':' || coalesce(q.category, r.question_id)) as psychology_score_id,
+  md5(r.athlete_id || ':' || lower(coalesce(q.category, r.question_id))) as psychology_score_id,
   r.athlete_id,
   lower(coalesce(q.category, r.question_id)) as category,
   round(avg(r.answer_score)::numeric, 2) as score,
