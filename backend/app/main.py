@@ -3065,54 +3065,6 @@ def score_lookup_for_row(athlete_row: dict[str, Any]) -> dict[str, float]:
     return values
 
 
-def score_lookups_for_athletes(supabase: Any, athlete_rows: list[dict[str, Any]]) -> dict[str, dict[str, float]]:
-    athlete_ids = [str(row.get("athlete_id") or "") for row in athlete_rows if row.get("athlete_id")]
-    if not athlete_ids:
-        return {}
-
-    score_rows = safe_table_rows(
-        APP_TABLES["athlete_scores"],
-        supabase.table(APP_TABLES["athlete_scores"])
-        .select("athlete_id,score_type,score_value,calculated_at,created_at")
-        .in_("athlete_id", athlete_ids)
-        .order("calculated_at", desc=True),
-    )
-    lookup: dict[str, dict[str, float]] = {athlete_id: {} for athlete_id in athlete_ids}
-    for row in score_rows:
-        athlete_id = str(row.get("athlete_id") or "")
-        score_type = str(row.get("score_type") or "")
-        if not athlete_id or not score_type or score_type in lookup.setdefault(athlete_id, {}):
-            continue
-        lookup[athlete_id][score_type] = round(row_float(row.get("score_value")), 2)
-
-    for athlete_row in athlete_rows:
-        athlete_id = str(athlete_row.get("athlete_id") or "")
-        if athlete_id and not lookup.get(athlete_id):
-            lookup[athlete_id] = {
-                score.score_type: round(float(score.score_value), 2)
-                for score in fallback_scores_for_athlete(athlete_row)
-            }
-    return lookup
-
-
-def recent_sessions_by_athlete(supabase: Any, athlete_ids: list[str], limit_per_athlete: int = 5) -> dict[str, list[dict[str, Any]]]:
-    if not athlete_ids:
-        return {}
-    rows = safe_table_rows(
-        APP_TABLES["shooting_session_log"],
-        supabase.table(APP_TABLES["shooting_session_log"])
-        .select("*")
-        .in_("athlete_id", athlete_ids)
-        .order("session_date", desc=True),
-    )
-    grouped: dict[str, list[dict[str, Any]]] = {athlete_id: [] for athlete_id in athlete_ids}
-    for row in rows:
-        athlete_id = str(row.get("athlete_id") or "")
-        if athlete_id and len(grouped.setdefault(athlete_id, [])) < limit_per_athlete:
-            grouped[athlete_id].append(row)
-    return grouped
-
-
 def score_value(values: dict[str, float], *keys: str) -> float | None:
     for key in keys:
         value = values.get(key)
@@ -3230,24 +3182,21 @@ def get_coach_dashboard_v1(
     coach_user = ensure_coach_user(session_token)
     ensure_coach_owns_coach_id(coach_user, coach_id)
     supabase = ensure_supabase()
-    athlete_rows = safe_table_rows(
-        APP_TABLES["athletes"],
-        supabase.table(APP_TABLES["athletes"]).select("*").eq("coach_id", coach_id).order("athlete_name"),
-    )
-    athlete_rows.sort(key=lambda row: str(row.get("athlete_name") or row.get("name") or ""))
-    athlete_ids = [str(row.get("athlete_id") or "") for row in athlete_rows if row.get("athlete_id")]
-    latest_sessions = get_latest_rows_by_athlete(APP_TABLES["shooting_session_log"], athlete_ids, "session_date")
-    latest_physiology_rows = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], athlete_ids, "recorded_date")
-    score_maps = score_lookups_for_athletes(supabase, athlete_rows)
-    session_rows_by_athlete = recent_sessions_by_athlete(supabase, athlete_ids)
+    athletes = list_coach_athletes(search="", athlete_ids="", include_pending=True, session_token=session_token).athletes
 
     rows: list[CoachDashboardAthleteRow] = []
-    for athlete_row in athlete_rows:
-        athlete_id = str(athlete_row.get("athlete_id") or "")
-        score_map = score_maps.get(athlete_id, {})
-        latest_physiology = latest_physiology_rows.get(athlete_id) or {}
-        session_rows = session_rows_by_athlete.get(athlete_id, [])
-        latest_session = latest_sessions.get(athlete_id) or {}
+    for athlete in athletes:
+        athlete_row = resolve_athlete_row_by_identifier(supabase, athlete.athlete_id) or {"athlete_id": athlete.athlete_id}
+        score_map = score_lookup_for_row(athlete_row)
+        latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], [athlete.athlete_id], "recorded_date").get(athlete.athlete_id) or {}
+        session_rows = safe_table_rows(
+            APP_TABLES["shooting_session_log"],
+            supabase.table(APP_TABLES["shooting_session_log"])
+            .select("*")
+            .eq("athlete_id", athlete.athlete_id)
+            .order("session_date", desc=True)
+            .limit(5),
+        )
 
         history_scores: list[float] = []
         for session_row in session_rows[:5]:
@@ -3259,12 +3208,12 @@ def get_coach_dashboard_v1(
             except Exception:
                 continue
 
-        score = score_value(score_map, "overall", "performance")
+        score = athlete.overall_score or score_value(score_map, "overall", "performance")
         readiness = score_value(score_map, "readiness")
         focus = score_value(score_map, "focus", "mental_score")
         fatigue = fatigue_burden_from_inputs(score_map, latest_physiology)
-        recovery = row_float(latest_physiology.get("recovery_score"), fallback=None) if latest_physiology.get("recovery_score") is not None else score_value(score_map, "recovery")  # type: ignore[arg-type]
-        stress = row_float(latest_physiology.get("stress_score"), fallback=None) if latest_physiology.get("stress_score") is not None else score_value(score_map, "stress")  # type: ignore[arg-type]
+        recovery = athlete.latest_recovery_score or score_value(score_map, "recovery")
+        stress = athlete.latest_stress_score or score_value(score_map, "stress")
         sleep_hours = row_float(latest_physiology.get("sleep_hours"), fallback=None)  # type: ignore[arg-type]
         resting_hr = row_float(latest_physiology.get("resting_heart_rate") or latest_physiology.get("resting_hr"), fallback=None)  # type: ignore[arg-type]
         hrv = row_float(latest_physiology.get("rmssd") or latest_physiology.get("hrv") or latest_physiology.get("hrv_ms"), fallback=None)  # type: ignore[arg-type]
@@ -3294,17 +3243,17 @@ def get_coach_dashboard_v1(
             fatigue=fatigue,
             recovery=recovery,
             sleep_hours=sleep_hours,
-            last_session_date=latest_session.get("session_date"),
+            last_session_date=athlete.latest_session_date,
             trend=trend,
         )
         category = "Pending" if score is None else ("Strong" if score >= 80 else "Stable" if score >= 60 else "Needs Attention")
         row = CoachDashboardAthleteRow(
-            athleteId=athlete_id,
-            athleteName=str(athlete_row.get("athlete_name") or athlete_row.get("name") or "Unnamed athlete"),
-            sport=str(latest_session.get("training_type") or "Shooting"),
-            discipline=str(athlete_row.get("academy_id") or "Performance"),
-            gender=athlete_row.get("gender"),
-            age=athlete_row.get("age"),
+            athleteId=athlete.athlete_id,
+            athleteName=athlete.name,
+            sport=athlete.latest_training_type or "Shooting",
+            discipline=athlete.academy_id or "Performance",
+            gender=athlete.gender,
+            age=athlete.age,
             score=score,
             readinessScore=readiness,
             focusScore=focus,
@@ -3318,7 +3267,7 @@ def get_coach_dashboard_v1(
             fatigueScore=fatigue,
             latestRecovery=recovery,
             sleepHours=sleep_hours,
-            lastSessionDate=latest_session.get("session_date"),
+            lastSessionDate=athlete.latest_session_date,
             riskScore=min(100, len(reasons) * 18),
             riskReasons=reasons,
             suggestedAction=suggested_action_for_reasons(reasons) if reasons else None,
@@ -3423,7 +3372,7 @@ def get_coach_dashboard_v1(
             "totalAssignedAthletes": len(rows),
             "activeAthletes": len([row for row in rows if is_recent_date(row.last_session_date)]),
             "inactiveAthletes": len([row for row in rows if not is_recent_date(row.last_session_date)]),
-            "newRegistrations": len([athlete for athlete in athlete_rows if is_recent_date(athlete.get("created_at"))]),
+            "newRegistrations": len([athlete for athlete in athletes if is_recent_date(athlete.created_at)]),
             "athletesNeedingAttention": len([row for row in rows if row.status in {"Needs Attention", "At Risk"}]),
             "topPerformers": len([row for row in rows if row.status == "Strong"]),
             "mostDisciplined": len([row for row in rows if (row.discipline_score or 0) >= 75]),
