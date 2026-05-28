@@ -1,24 +1,46 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../styles/Home.css'
 import performanceModule from '../images/performance.jpg'
 import relationshipsModule from '../images/relationships.jpg'
 import wellbeingModule from '../images/wellbeing.jpg'
+import pistolHeroVideo from '../images/Pistol Reel.mp4'
+import rifleHeroVideo from '../images/Rifel Lok.mp4'
+
+const heroVideos = [pistolHeroVideo, rifleHeroVideo]
 
 function HomePage() {
+  const [heroVideoIndex, setHeroVideoIndex] = useState(0)
+  const activeHeroVideo = heroVideos[heroVideoIndex]
+
   return (
     <div className="home-page">
-      <section className="hero-minimal">
-        <div className="container">
-          <h1>Your personal intelligence platform</h1>
+      <section className="hero-minimal hero-video">
+        <video
+          key={activeHeroVideo}
+          className="hero-video-media"
+          autoPlay
+          muted
+          playsInline
+          preload="metadata"
+          poster={performanceModule}
+          onEnded={() => setHeroVideoIndex((index) => (index + 1) % heroVideos.length)}
+        >
+          <source src={activeHeroVideo} type="video/mp4" />
+        </video>
+        <div className="hero-video-shade" aria-hidden="true" />
+        <div className="container hero-video-content">
+          <p className="hero-eyebrow">Astra Performance</p>
+          <h1>HamsaTech</h1>
           <p className="hero-tagline">
-            Understanding what drives outcomes - from performance to relationships to daily life
+            Real-time intelligence for shooting athletes, coaches, and academies.
           </p>
           <div className="hero-cta-buttons">
-            <Link to="/signup" className="btn-primary-large">
-              Get Early Access
+            <Link to="/coach/login" className="btn-primary-large">
+              Open Coach Dashboard
             </Link>
-            <Link to="/howitworks" className="btn-secondary-large">
-              See How It Works
+            <Link to="/platform" className="btn-secondary-large">
+              Explore Platform
             </Link>
           </div>
         </div>
