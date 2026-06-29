@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getCoachProfile, updateCoachProfile, type CoachProfile } from '../lib/authApi'
 import { getStoredProfile, saveStoredProfile } from '../lib/profileStorage'
 import '../styles/Profile.css'
 
@@ -11,7 +12,12 @@ function ProfilePage() {
   const [sport, setSport] = useState('')
   const [focusArea, setFocusArea] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
+  const [phone, setPhone] = useState('')
+  const [specialization, setSpecialization] = useState('')
+  const [coachStatus, setCoachStatus] = useState<'active' | 'inactive'>('active')
+  const [coachProfile, setCoachProfile] = useState<CoachProfile | null>(null)
   const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
@@ -25,7 +31,19 @@ function ProfilePage() {
     setSport(storedProfile.sport ?? user.sport ?? '')
     setFocusArea(storedProfile.focusArea ?? user.focusArea ?? '')
     setDateOfBirth(storedProfile.dateOfBirth ?? user.dateOfBirth ?? '')
-  }, [user?.dateOfBirth, user?.email, user?.focusArea, user?.fullName, user?.sport])
+
+    if (user.role === 'coach') {
+      void getCoachProfile()
+        .then((profile) => {
+          setCoachProfile(profile)
+          setDisplayName(profile.name || user.fullName)
+          setPhone(profile.phone ?? '')
+          setSpecialization(profile.specialization ?? '')
+          setCoachStatus(profile.status)
+        })
+        .catch(() => undefined)
+    }
+  }, [user?.dateOfBirth, user?.email, user?.focusArea, user?.fullName, user?.role, user?.sport])
 
   if (!isLoading && !user) {
     return <Navigate to="/signin" replace state={{ from: { pathname: '/profile' } }} />
@@ -42,8 +60,9 @@ function ProfilePage() {
     </svg>
   )
 
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setErrorMessage('')
     saveStoredProfile(user.email, {
       displayName: displayName.trim() || user.fullName,
       photoDataUrl,
@@ -51,7 +70,22 @@ function ProfilePage() {
       focusArea,
       dateOfBirth,
     })
-    setSuccessMessage('Profile preferences saved.')
+    if (user.role === 'coach') {
+      try {
+        const updatedProfile = await updateCoachProfile({
+          name: displayName.trim() || user.fullName,
+          phone,
+          profileImage: photoDataUrl,
+          specialization,
+          status: coachStatus,
+        })
+        setCoachProfile(updatedProfile)
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : 'Unable to update coach profile.')
+        return
+      }
+    }
+    setSuccessMessage(user.role === 'coach' ? 'Coach profile saved.' : 'Profile preferences saved.')
   }
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -130,9 +164,33 @@ function ProfilePage() {
 
               {user.role === 'coach' ? (
                 <label>
-                  <span>Coach Code</span>
-                  <input value={user.coachCode ?? 'Not assigned'} disabled />
-                  <small>This is the code students use to map themselves to your coach profile.</small>
+                  <span>Coach UUID</span>
+                  <input value={coachProfile?.coachId ?? 'Not mapped'} disabled />
+                  <small>Dashboard assignment key from public.coaches.coach_id.</small>
+                </label>
+              ) : null}
+
+              {user.role === 'coach' ? (
+                <label>
+                  <span>Phone</span>
+                  <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Coach phone number" />
+                </label>
+              ) : null}
+
+              {user.role === 'coach' ? (
+                <label>
+                  <span>Specialization</span>
+                  <input value={specialization} onChange={(event) => setSpecialization(event.target.value)} placeholder="Example: Shooting performance" />
+                </label>
+              ) : null}
+
+              {user.role === 'coach' ? (
+                <label>
+                  <span>Status</span>
+                  <select value={coachStatus} onChange={(event) => setCoachStatus(event.target.value as typeof coachStatus)}>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
                 </label>
               ) : null}
 
@@ -230,10 +288,11 @@ function ProfilePage() {
 
           <div className="profile-page-actions">
             <div>
+              {errorMessage ? <p className="profile-page-error">{errorMessage}</p> : null}
               {successMessage ? <p className="profile-page-success">{successMessage}</p> : null}
             </div>
             <div className="profile-page-actions-right">
-              <Link to="/dashboard" className="profile-page-secondary">Back to Dashboard</Link>
+              <Link to={user.role === 'coach' ? '/coach/dashboard' : '/dashboard'} className="profile-page-secondary">Back to Dashboard</Link>
               <button type="submit" className="profile-page-submit">Save Profile</button>
             </div>
           </div>

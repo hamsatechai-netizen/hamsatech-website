@@ -1,13 +1,10 @@
-/* src/styles/HowItWorks.css */
-
 .howitworks-page {
   min-height: 100vh;
-  background: #FAFBFC;
+  background: #fafbfc;
 }
 
-/* Hero Section */
 .howitworks-hero {
-  background: linear-gradient(135deg, #E8F5FF 0%, #F0F9FF 100%);
+  background: linear-gradient(135deg, #e8f5ff 0%, #f0f9ff 100%);
   padding: 100px 20px 60px;
   text-align: center;
 }
@@ -15,25 +12,23 @@
 .howitworks-hero h1 {
   font-size: 48px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 20px;
 }
 
 .howitworks-hero p {
   font-size: 20px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   max-width: 700px;
   margin: 0 auto;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Timeline */
 .timeline-container {
   position: relative;
   margin: 60px 0;
@@ -45,11 +40,10 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(to bottom, #4ECDC4, #3DB3A9);
+  background: linear-gradient(to bottom, #4ecdc4, #3db3a9);
   transform: translateX(-50%);
 }
 
-/* Steps Section */
 .steps-section {
   padding: 40px 20px 80px;
   position: relative;
@@ -68,8 +62,8 @@
   left: 50%;
   top: 0;
   transform: translateX(-50%);
-  background: #4ECDC4;
-  color: #FFFFFF;
+  background: #4ecdc4;
+  color: #ffffff;
   width: 80px;
   height: 80px;
   border-radius: 50%;
@@ -83,7 +77,7 @@
 }
 
 .step-content {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 100px 40px 40px;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
@@ -101,13 +95,13 @@
 .step-header h2 {
   font-size: 28px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin: 0;
 }
 
 .time-badge {
-  background: #E8F9F7;
-  color: #4ECDC4;
+  background: #e8f9f7;
+  color: #4ecdc4;
   padding: 6px 16px;
   border-radius: 20px;
   font-size: 14px;
@@ -117,13 +111,13 @@
 .step-content h3 {
   font-size: 24px;
   font-weight: 500;
-  color: #2D5B8F;
+  color: #2d5b8f;
   margin-bottom: 16px;
 }
 
 .step-description {
   font-size: 16px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
   margin-bottom: 28px;
 }
@@ -137,7 +131,7 @@
 .step-examples h4 {
   font-size: 16px;
   font-weight: 500;
-  color: #2D5B8F;
+  color: #2d5b8f;
   margin-bottom: 12px;
 }
 
@@ -151,29 +145,28 @@
 .step-list li,
 .step-examples li {
   font-size: 15px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   padding: 8px 0 8px 28px;
   position: relative;
   line-height: 1.6;
 }
 
 .step-list li::before {
-  content: "✓";
+  content: '+';
   position: absolute;
   left: 8px;
-  color: #4ECDC4;
-  font-weight: 500;
+  color: #4ecdc4;
+  font-weight: 700;
 }
 
 .step-examples li::before {
-  content: "→";
+  content: '>';
   position: absolute;
   left: 8px;
-  color: #FFB366;
-  font-weight: 500;
+  color: #ffb366;
+  font-weight: 700;
 }
 
-/* Visual Placeholder */
 .step-visual {
   display: flex;
   justify-content: center;
@@ -190,36 +183,35 @@
   justify-content: center;
   font-size: 18px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .visual-placeholder.onboarding {
-  background: linear-gradient(135deg, #4F89D8, #6BA3E8);
+  background: linear-gradient(135deg, #4f89d8, #6ba3e8);
 }
 
 .visual-placeholder.sensor {
-  background: linear-gradient(135deg, #FF6B8A, #FF8FA3);
+  background: linear-gradient(135deg, #ff6b8a, #ff8fa3);
 }
 
 .visual-placeholder.training {
-  background: linear-gradient(135deg, #4ECDC4, #6EDDD5);
+  background: linear-gradient(135deg, #4ecdc4, #6eddd5);
 }
 
 .visual-placeholder.insights {
-  background: linear-gradient(135deg, #FFB366, #FFC580);
+  background: linear-gradient(135deg, #ffb366, #ffc580);
 }
 
 .visual-placeholder.action {
-  background: linear-gradient(135deg, #7BC9BA, #91D9CC);
+  background: linear-gradient(135deg, #7bc9ba, #91d9cc);
 }
 
 .visual-placeholder.progress {
-  background: linear-gradient(135deg, #9B59B6, #B07CC6);
+  background: linear-gradient(135deg, #9b59b6, #b07cc6);
 }
 
-/* CTA Section */
 .howitworks-cta {
-  background: linear-gradient(135deg, #1A3D5C, #2D5B8F);
+  background: linear-gradient(135deg, #1a3d5c, #2d5b8f);
   padding: 80px 20px;
   text-align: center;
 }
@@ -227,13 +219,13 @@
 .howitworks-cta h2 {
   font-size: 36px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 16px;
 }
 
 .howitworks-cta p {
   font-size: 18px;
-  color: #FFFFFF;
+  color: #ffffff;
   opacity: 0.9;
   max-width: 700px;
   margin: 0 auto 40px;
@@ -248,6 +240,10 @@
 
 .primary-cta,
 .secondary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   padding: 16px 32px;
   border-radius: 8px;
   font-size: 16px;
@@ -258,8 +254,8 @@
 }
 
 .primary-cta {
-  background: #4ECDC4;
-  color: #FFFFFF;
+  background: #4ecdc4;
+  color: #ffffff;
 }
 
 .primary-cta:hover {
@@ -269,8 +265,8 @@
 
 .secondary-cta {
   background: transparent;
-  color: #FFFFFF;
-  border: 2px solid #FFFFFF;
+  color: #ffffff;
+  border: 2px solid #ffffff;
 }
 
 .secondary-cta:hover {
@@ -278,7 +274,6 @@
   transform: translateY(-2px);
 }
 
-/* Tablet and Desktop */
 @media (min-width: 768px) {
   .step-card {
     grid-template-columns: 1fr 1fr;
@@ -293,11 +288,6 @@
   .step-card.right .step-content,
   .step-card.right .step-visual {
     direction: ltr;
-  }
-
-  .step-number-badge {
-    left: 50%;
-    transform: translateX(-50%);
   }
 }
 

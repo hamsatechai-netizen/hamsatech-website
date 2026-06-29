@@ -19,15 +19,32 @@ services:
         value: true
       - key: HAMSA_COOKIE_SAMESITE
         value: none
+      - key: HAMSA_ENABLE_STARTUP_TEST_MAPPER
+        value: false
+      - key: HAMSA_ENABLE_STARTUP_TEST_MAPPER
+        value: false
       - key: HAMSA_FRONTEND_ORIGIN
-        sync: false
+        value: https://hamsatech-website.pages.dev
+        value: https://hamsatech-website.pages.dev
       - key: HAMSA_FRONTEND_ORIGINS
-        sync: false
+        value: https://hamsatech-website.pages.dev,http://127.0.0.1:5173,http://localhost:5173
+        value: https://hamsatech-website.pages.dev,http://127.0.0.1:5173,http://localhost:5173
       - key: HAMSA_FRONTEND_ORIGIN_REGEX
-        sync: false
+        value: https://([a-z0-9-]+\.)?hamsatech-website\.pages\.dev
+        value: https://([a-z0-9-]+\.)?hamsatech-website\.pages\.dev
       - key: HAMSA_DEFAULT_PASSWORD
+        sync: false
+      - key: HAMSA_ADMIN_PASSWORD
+        sync: false
+      - key: HAMSA_DEMO_STUDENT_PASSWORD
+        sync: false
+      - key: HAMSA_ADMIN_PASSWORD
+        sync: false
+      - key: HAMSA_DEMO_STUDENT_PASSWORD
         sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: SUPABASE_SCHEMA
+        value: public

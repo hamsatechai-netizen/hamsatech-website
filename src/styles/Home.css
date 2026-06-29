@@ -1,22 +1,17 @@
-/* Add to src/styles/Home.css */
-/* src/styles/Home.css */
-
 .home-page {
   min-height: 100vh;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Section Titles */
 .section-title {
   font-size: 42px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   text-align: center;
   margin-bottom: 16px;
   line-height: 1.2;
@@ -24,38 +19,84 @@
 
 .section-subtitle {
   font-size: 18px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   text-align: center;
-  margin-bottom: 60px;
+  margin: 0 auto 60px;
   max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
   line-height: 1.6;
 }
 
-/* Hero Section - Minimal */
 .hero-minimal {
-  background: linear-gradient(135deg, #2D5B8F 0%, #1A3D5C 100%);
+  background: linear-gradient(135deg, #2d5b8f 0%, #1a3d5c 100%);
   padding: 140px 20px 120px;
   text-align: center;
-  color: #FFFFFF;
+  color: #ffffff;
+}
+
+.hero-video {
+  position: relative;
+  min-height: clamp(640px, 92svh, 860px);
+  padding: 0 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+}
+
+.hero-video-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  z-index: -3;
+  background: #071018;
+}
+
+.hero-video-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(5, 12, 20, 0.42) 0%, rgba(5, 12, 20, 0.62) 54%, rgba(5, 12, 20, 0.86) 100%),
+    radial-gradient(circle at 50% 38%, rgba(78, 205, 196, 0.18), transparent 34%),
+    linear-gradient(90deg, rgba(4, 10, 18, 0.74) 0%, rgba(4, 10, 18, 0.22) 48%, rgba(4, 10, 18, 0.74) 100%);
+}
+
+.hero-video-content {
+  padding-top: 92px;
+  padding-bottom: 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-eyebrow {
+  margin: 0 0 18px;
+  color: #9ad6c2;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .hero-minimal h1 {
-  font-size: 64px;
-  font-weight: 500;
+  font-size: 96px;
+  font-weight: 700;
   margin-bottom: 28px;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 0.96;
+  letter-spacing: 0;
+  text-shadow: 0 8px 34px rgba(0, 0, 0, 0.42);
 }
 
 .hero-tagline {
-  font-size: 24px;
+  font-size: 28px;
   opacity: 0.95;
-  max-width: 850px;
+  max-width: 780px;
   margin: 0 auto 48px;
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: 500;
+  text-shadow: 0 4px 22px rgba(0, 0, 0, 0.48);
 }
 
 .hero-cta-buttons {
@@ -66,9 +107,14 @@
 }
 
 .btn-primary-large,
-.btn-secondary-large {
+.btn-secondary-large,
+.cta-large {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   padding: 18px 40px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 18px;
   font-weight: 500;
   cursor: pointer;
@@ -77,32 +123,37 @@
 }
 
 .btn-primary-large {
-  background: #4ECDC4;
-  color: #FFFFFF;
-  box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
+  background: #ffffff;
+  color: #1a3d5c;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.24);
 }
 
 .btn-primary-large:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 28px rgba(78, 205, 196, 0.4);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.3);
 }
 
 .btn-secondary-large {
   background: transparent;
-  color: #FFFFFF;
+  color: #ffffff;
   border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 .btn-secondary-large:hover {
   background: rgba(255, 255, 255, 0.15);
-  border-color: #FFFFFF;
+  border-color: #ffffff;
   transform: translateY(-2px);
 }
 
-/* Problem Section */
+.problem-section,
+.astra-intro-section,
+.how-we-help-section,
+.astra-performance-section {
+  padding: 80px 20px;
+}
+
 .problem-section {
-  padding: 100px 20px;
-  background: #E8F5F7;
+  background: #e8f5f7;
 }
 
 .problem-grid {
@@ -113,31 +164,38 @@
   margin: 0 auto;
 }
 
-.problem-card {
-  background: #FFFFFF;
-  padding: 40px;
+.problem-card,
+.module-card,
+.help-card-large {
+  background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-.problem-card h3 {
+.problem-card {
+  padding: 40px;
+}
+
+.problem-card h3,
+.help-card-large h3 {
   font-size: 22px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 12px;
 }
 
-.problem-card p {
+.problem-card p,
+.help-card-large p,
+.module-content p {
   font-size: 16px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
   margin: 0;
 }
 
-/* Astra Intro Section */
-.astra-intro-section {
-  padding: 100px 20px;
-  background: #FFFFFF;
+.astra-intro-section,
+.astra-performance-section {
+  background: #ffffff;
 }
 
 .modules-grid {
@@ -147,10 +205,7 @@
 }
 
 .module-card {
-  background: #F8FAFB;
-  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -163,7 +218,7 @@
   width: 100%;
   height: 240px;
   overflow: hidden;
-  background: #E8F5F7;
+  background: #e8f5f7;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -191,7 +246,7 @@
 .module-header h3 {
   font-size: 24px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin: 0;
 }
 
@@ -203,26 +258,17 @@
 }
 
 .badge.available {
-  background: #E8F9F7;
-  color: #4ECDC4;
+  background: #e8f9f7;
+  color: #4ecdc4;
 }
 
 .badge.coming-soon {
-  background: #FFF3E5;
-  color: #FFB366;
+  background: #fff3e5;
+  color: #ffb366;
 }
 
-.module-content p {
-  font-size: 16px;
-  color: #5A7A9C;
-  line-height: 1.7;
-  margin: 0;
-}
-
-/* How We Help Section */
 .how-we-help-section {
-  padding: 100px 20px;
-  background: #E8F9F7;
+  background: #e8f9f7;
 }
 
 .help-cards-container {
@@ -234,31 +280,8 @@
 }
 
 .help-card-large {
-  background: #FFFFFF;
   padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border-left: 4px solid #4ECDC4;
-}
-
-.help-card-large h3 {
-  font-size: 22px;
-  font-weight: 500;
-  color: #1A3D5C;
-  margin-bottom: 12px;
-}
-
-.help-card-large p {
-  font-size: 16px;
-  color: #5A7A9C;
-  line-height: 1.7;
-  margin: 0;
-}
-
-/* Astra Performance Section */
-.astra-performance-section {
-  padding: 100px 20px;
-  background: #FFFFFF;
+  border-left: 4px solid #4ecdc4;
 }
 
 .performance-content {
@@ -273,22 +296,22 @@
 .performance-header h2 {
   font-size: 38px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 20px;
 }
 
 .performance-header p {
   font-size: 18px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
 }
 
 .performance-features {
-  background: linear-gradient(135deg, #F8FAFB 0%, #FFFFFF 100%);
+  background: linear-gradient(135deg, #f8fafb 0%, #ffffff 100%);
   padding: 40px;
   border-radius: 12px;
   margin-bottom: 40px;
-  border: 1px solid #E8EAED;
+  border: 1px solid #e8eaed;
 }
 
 .feature-row {
@@ -297,8 +320,8 @@
   gap: 16px;
   padding: 16px 0;
   font-size: 16px;
-  color: #2D5B8F;
-  border-bottom: 1px solid #E8EAED;
+  color: #2d5b8f;
+  border-bottom: 1px solid #e8eaed;
 }
 
 .feature-row:last-child {
@@ -306,23 +329,16 @@
 }
 
 .checkmark {
-  color: #4ECDC4;
-  font-size: 20px;
-  font-weight: 500;
+  color: #4ecdc4;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
 .cta-large {
-  background: #4ECDC4;
-  color: #FFFFFF;
-  border: none;
-  padding: 18px 48px;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  display: block;
+  background: #4ecdc4;
+  color: #ffffff;
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
@@ -333,10 +349,17 @@
   box-shadow: 0 8px 24px rgba(78, 205, 196, 0.4);
 }
 
-/* Trust Section */
 .trust-section-simple {
-  padding: 80px 20px;
-  background: #F8FAFB;
+  padding: 60px 20px;
+  background: #f8fafb;
+}
+
+.trust-section-title {
+  font-size: 32px;
+  font-weight: 500;
+  color: #1a3d5c;
+  text-align: center;
+  margin-bottom: 48px;
 }
 
 .trust-item-horizontal {
@@ -344,7 +367,7 @@
   align-items: flex-start;
   gap: 20px;
   padding: 32px 0;
-  border-bottom: 1px solid #E8EAED;
+  border-bottom: 1px solid #e8eaed;
   max-width: 800px;
   margin: 0 auto;
 }
@@ -356,14 +379,14 @@
 .trust-icon-circle {
   width: 56px;
   height: 56px;
-  background: #E8F9F7;
+  background: #e8f9f7;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
-  color: #4ECDC4;
-  font-weight: 500;
+  color: #4ecdc4;
+  font-weight: 700;
   flex-shrink: 0;
 }
 
@@ -374,34 +397,31 @@
 .trust-text h4 {
   font-size: 18px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 6px;
 }
 
 .trust-text p {
   font-size: 15px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   margin: 0;
   line-height: 1.6;
 }
 
-/* Final CTA Section */
 .final-cta-section {
-  padding: 100px 20px;
-  background: linear-gradient(135deg, #2D5B8F 0%, #1A3D5C 100%);
+  padding: 80px 20px;
+  background: linear-gradient(135deg, #2d5b8f 0%, #1a3d5c 100%);
   text-align: center;
 }
 
 .final-cta-section h2 {
   font-size: 42px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 40px;
 }
 
 .final-cta-section .cta-large {
-  background: #4ECDC4;
-  color: #FFFFFF;
   box-shadow: 0 4px 16px rgba(78, 205, 196, 0.3);
 }
 
@@ -410,7 +430,6 @@
   box-shadow: 0 8px 28px rgba(78, 205, 196, 0.5);
 }
 
-/* Tablet */
 @media (min-width: 768px) {
   .problem-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -430,18 +449,32 @@
   }
 }
 
-/* Mobile */
 @media (max-width: 767px) {
   .hero-minimal {
     padding: 100px 20px 80px;
   }
 
+  .hero-video {
+    min-height: 720px;
+    padding: 0 18px;
+  }
+
+  .hero-video-media {
+    object-position: center center;
+  }
+
+  .hero-video-content {
+    padding-top: 88px;
+    padding-bottom: 76px;
+  }
+
   .hero-minimal h1 {
-    font-size: 42px;
+    font-size: 58px;
   }
 
   .hero-tagline {
-    font-size: 18px;
+    font-size: 20px;
+    max-width: 360px;
   }
 
   .btn-primary-large,
@@ -450,56 +483,15 @@
     max-width: 320px;
   }
 
-  .section-title {
-    font-size: 32px;
-  }
-
-  .performance-header h2 {
-    font-size: 32px;
-  }
-
+  .section-title,
+  .performance-header h2,
   .final-cta-section h2 {
     font-size: 32px;
   }
 }
 
-/* Desktop */
 @media (min-width: 1024px) {
   .section-title {
     font-size: 48px;
   }
-}
-
-/* Trust Section Title */
-.trust-section-title {
-  font-size: 32px;
-  font-weight: 500;
-  color: #1A3D5C;
-  text-align: center;
-  margin-bottom: 48px;
-}
-
-/* Reduce spacing between sections */
-.problem-section {
-  padding: 80px 20px;
-}
-
-.astra-intro-section {
-  padding: 80px 20px;
-}
-
-.how-we-help-section {
-  padding: 80px 20px;
-}
-
-.astra-performance-section {
-  padding: 80px 20px;
-}
-
-.trust-section-simple {
-  padding: 60px 20px;
-}
-
-.final-cta-section {
-  padding: 80px 20px;
 }

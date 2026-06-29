@@ -1,12 +1,9 @@
-/* src/styles/Platform.css */
-
 .platform-page {
   min-height: 100vh;
 }
 
-/* Hero Section */
 .platform-hero {
-  background: linear-gradient(135deg, #E8F5FF 0%, #F0F9FF 100%);
+  background: linear-gradient(135deg, #e8f5ff 0%, #f0f9ff 100%);
   padding: 100px 20px 80px;
   text-align: center;
 }
@@ -14,52 +11,64 @@
 .platform-hero h1 {
   font-size: 48px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 24px;
   line-height: 1.2;
 }
 
 .hero-subtitle {
   font-size: 20px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   max-width: 800px;
   margin: 0 auto;
   line-height: 1.6;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
-/* Section Title */
 .section-title {
   font-size: 36px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   text-align: center;
   margin-bottom: 60px;
 }
 
-/* Triangulation Section */
-.triangulation-section {
+.triangulation-section,
+.features-section,
+.trust-section {
   padding: 80px 20px;
-  background: #FFFFFF;
 }
 
-.triangulation-grid {
+.triangulation-section,
+.trust-section {
+  background: #ffffff;
+}
+
+.features-section {
+  background: #f8fafb;
+}
+
+.triangulation-grid,
+.trust-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 40px;
 }
 
-.tri-card {
-  text-align: center;
-  padding: 40px 30px;
-  background: #F8FAFB;
+.tri-card,
+.trust-card {
+  background: #f8fafb;
   border-radius: 16px;
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.tri-card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -77,20 +86,17 @@
 .tri-card h3 {
   font-size: 24px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 16px;
 }
 
-.tri-card p {
+.tri-card p,
+.trust-card p,
+.feature-item p {
   font-size: 16px;
-  color: #5A7A9C;
+  color: #5a7a9c;
   line-height: 1.7;
-}
-
-/* Features Section */
-.features-section {
-  padding: 80px 20px;
-  background: #F8FAFB;
+  margin: 0;
 }
 
 .features-list {
@@ -99,77 +105,37 @@
 }
 
 .feature-item {
-  background: #FFFFFF;
+  background: #ffffff;
   padding: 40px;
   border-radius: 12px;
   margin-bottom: 24px;
-  border-left: 4px solid #4ECDC4;
+  border-left: 4px solid #4ecdc4;
 }
 
-.feature-item h3 {
+.feature-item h3,
+.trust-card h3 {
   font-size: 22px;
   font-weight: 500;
-  color: #1A3D5C;
+  color: #1a3d5c;
   margin-bottom: 12px;
 }
 
-.feature-item p {
-  font-size: 16px;
-  color: #5A7A9C;
-  line-height: 1.7;
-  margin: 0;
-}
-
-/* Trust Section */
-.trust-section {
-  padding: 80px 20px;
-  background: #FFFFFF;
-}
-
-.trust-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 30px;
-}
-
-.trust-card {
-  background: #F8FAFB;
-  padding: 40px;
-  border-radius: 12px;
-  text-align: center;
-}
-
-.trust-card h3 {
-  font-size: 20px;
-  font-weight: 500;
-  color: #2D5B8F;
-  margin-bottom: 16px;
-}
-
-.trust-card p {
-  font-size: 15px;
-  color: #5A7A9C;
-  line-height: 1.7;
-  margin: 0;
-}
-
-/* CTA Section */
 .platform-cta {
   padding: 80px 20px;
-  background: linear-gradient(135deg, #4ECDC4 0%, #3DB3A9 100%);
+  background: linear-gradient(135deg, #4ecdc4 0%, #3db3a9 100%);
   text-align: center;
 }
 
 .platform-cta h2 {
   font-size: 36px;
   font-weight: 500;
-  color: #FFFFFF;
+  color: #ffffff;
   margin-bottom: 20px;
 }
 
 .platform-cta p {
   font-size: 18px;
-  color: #FFFFFF;
+  color: #ffffff;
   max-width: 700px;
   margin: 0 auto 40px;
   line-height: 1.7;
@@ -177,13 +143,17 @@
 }
 
 .cta-button {
-  background: #FFFFFF;
-  color: #4ECDC4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  background: #ffffff;
+  color: #4ecdc4;
   border: none;
   padding: 16px 40px;
   border-radius: 8px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -193,18 +163,13 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
-/* Tablet */
 @media (min-width: 768px) {
-  .triangulation-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
+  .triangulation-grid,
   .trust-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Desktop */
 @media (min-width: 1024px) {
   .platform-hero h1 {
     font-size: 56px;

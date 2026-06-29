@@ -132,7 +132,8 @@
   font-weight: 600;
 }
 
-.profile-page-fields input {
+.profile-page-fields input,
+.profile-page-fields select {
   width: 100%;
   border: 1px solid var(--surface-border);
   border-radius: 14px;
@@ -147,7 +148,8 @@
   color: var(--text-soft);
 }
 
-.profile-page-fields input:focus {
+.profile-page-fields input:focus,
+.profile-page-fields select:focus {
   outline: none;
   border-color: var(--brand-mid);
   box-shadow: 0 0 0 4px rgba(47, 138, 160, 0.16);
@@ -175,6 +177,10 @@
 
 .profile-page-success {
   color: #1f6b37;
+}
+
+.profile-page-error {
+  color: #9b1c1c;
 }
 
 @media (max-width: 900px) {

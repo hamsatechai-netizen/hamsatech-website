@@ -9,7 +9,6 @@
   gap: 12px;
 }
 
-/* Floating avatar button */
 .saarthi-trigger {
   width: 68px;
   height: 68px;
@@ -36,7 +35,6 @@
   object-position: center;
 }
 
-/* Tooltip label */
 .saarthi-label {
   background: #021d39;
   color: #fff;
@@ -44,13 +42,10 @@
   padding: 5px 12px;
   border-radius: 20px;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.2s;
 }
 
-/* Chat panel */
 .saarthi-panel {
   width: 340px;
   background: #fff;
@@ -63,8 +58,15 @@
 }
 
 @keyframes saarthi-slide-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .saarthi-panel-header {
@@ -79,7 +81,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.6);
+  border: 2px solid rgba(255, 255, 255, 0.6);
   object-fit: cover;
   object-position: center;
   flex-shrink: 0;
@@ -104,7 +106,7 @@
 .saarthi-close-btn {
   background: transparent;
   border: none;
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 1.4rem;
   cursor: pointer;
   line-height: 1;
@@ -116,12 +118,11 @@
   color: #fff;
 }
 
-/* Messages area */
 .saarthi-messages {
   padding: 16px;
   flex: 1;
-  min-height: 200px;
-  max-height: 260px;
+  min-height: 180px;
+  max-height: 240px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -153,7 +154,7 @@
   color: #021d39;
   line-height: 1.45;
   max-width: 240px;
-  box-shadow: 0 1px 4px rgba(41,160,188,0.08);
+  box-shadow: 0 1px 4px rgba(41, 160, 188, 0.08);
 }
 
 .saarthi-msg.user {
@@ -167,7 +168,31 @@
   border-radius: 14px 14px 2px 14px;
 }
 
-/* Input area */
+.saarthi-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 14px 0;
+  background: #fff;
+}
+
+.saarthi-prompt-chip {
+  border: 1px solid #cfeaf1;
+  background: #f4fafc;
+  color: #021d39;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.saarthi-prompt-chip:hover {
+  background: #e6f6fb;
+  border-color: #29a0bc;
+  transform: translateY(-1px);
+}
+
 .saarthi-input-row {
   display: flex;
   gap: 8px;

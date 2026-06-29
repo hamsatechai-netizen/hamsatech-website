@@ -7,19 +7,34 @@ import ScrollNavigator from './components/ScrollNavigator'
 import Footer from './components/Footer'
 import PageLoader from './components/PageLoader'
 import SaarthiBot from './components/SaarthiBot'
+import { useAuth } from './context/AuthContext'
 
 const HomePage = lazy(() => import('./components/HomePage'))
 const AboutPage = lazy(() => import('./components/AboutPage'))
 const PlatformPage = lazy(() => import('./components/PlatformPage'))
 const UseCasesPage = lazy(() => import('./components/UseCasesPage'))
 const HowItWorksPage = lazy(() => import('./components/HowItWorksPage'))
-const SignInPage = lazy(() => import('./components/SignInPage'))
-const SignUpPage = lazy(() => import('./components/SignUpPage'))
 const SignOutPage = lazy(() => import('./components/SignOutPage'))
-const DashboardPage = lazy(() => import('./components/DashboardPage'))
-const AthleteIntakePage = lazy(() => import('./components/AthleteIntakePage'))
 const CoachAthleteDetailsPage = lazy(() => import('./components/CoachAthleteDetailsPage'))
+const CoachLoginPage = lazy(() => import('./components/CoachLoginPage'))
+const CoachDashboardPage = lazy(() => import('./components/coach/CoachDashboardV1Page'))
+const CoachFeedbackRequestPage = lazy(() => import('./components/coach/CoachFeedbackRequestPage'))
+const PendingAssignmentsPage = lazy(() => import('./components/coach/PendingAssignmentsPage'))
 const ProfilePage = lazy(() => import('./components/ProfilePage'))
+
+function DashboardRoute() {
+  const { user, isLoading } = useAuth()
+
+  if (!isLoading && user?.role === 'coach') {
+    return <Navigate to="/coach/dashboard" replace />
+  }
+
+  if (!isLoading) {
+    return <Navigate to="/coach/login" replace />
+  }
+
+  return <PageLoader />
+}
 
 function App() {
   const [isBooting, setIsBooting] = useState(true)
@@ -79,11 +94,14 @@ function App() {
             <Route path="/usecases" element={<UseCasesPage />} />
             <Route path="/howitworks" element={<HowItWorksPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/signin" element={<SignInPage />} />
-            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/signin" element={<CoachLoginPage />} />
+            <Route path="/signup" element={<Navigate to="/coach/login" replace />} />
             <Route path="/signout" element={<SignOutPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/athlete-intake" element={<AthleteIntakePage />} />
+            <Route path="/dashboard" element={<DashboardRoute />} />
+            <Route path="/coach/login" element={<CoachLoginPage />} />
+            <Route path="/coach/dashboard" element={<CoachDashboardPage />} />
+            <Route path="/coach/feedback/new" element={<CoachFeedbackRequestPage />} />
+            <Route path="/coach/assignments/pending" element={<PendingAssignmentsPage />} />
             <Route path="/coach/athletes/:athleteId" element={<CoachAthleteDetailsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Routes>
