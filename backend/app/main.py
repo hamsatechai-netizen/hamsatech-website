@@ -3084,7 +3084,6 @@ def serialize_family_details(row: dict[str, Any] | None) -> dict[str, Any] | Non
     if not row:
         return None
     conservative = row.get("family_conservative")
-    conservative = row.get("family_conservative")
     return {
         "motherName": row["mother_name"],
         "fatherName": row["father_name"],
@@ -3092,7 +3091,6 @@ def serialize_family_details(row: dict[str, Any] | None) -> dict[str, Any] | Non
         "fatherOccupation": row["father_occupation"],
         "educationLevel": row["education_level"],
         "siblingDetails": row["sibling_details"],
-        "familyConservative": conservative if conservative in {"Yes", "No"} else "Yes" if conservative is True else "No" if conservative is False else "Not provided",
         "familyConservative": conservative if conservative in {"Yes", "No"} else "Yes" if conservative is True else "No" if conservative is False else "Not provided",
         "disciplineLevel": row["discipline_level"],
         "healthConditions": row["health_conditions"],
@@ -4064,10 +4062,6 @@ def seed_psychology_questions() -> None:
         return
     except Exception as exception:
         logger.warning("Skipping psychology question seed because Supabase is unavailable: %s", exception)
-        logger.warning("Skipping psychology question seed because Supabase is not configured: %s", exception.detail)
-        return
-    except Exception as exception:
-        logger.warning("Skipping psychology question seed because Supabase is unavailable: %s", exception)
         return
 
 
@@ -4077,16 +4071,9 @@ def seed_application_data() -> None:
         ensure_seed_data()
         if settings.enable_startup_test_mapper:
             assign_existing_records_to_default_coach_for_testing()
-        if settings.enable_startup_test_mapper:
-            assign_existing_records_to_default_coach_for_testing()
         seed_psychology_questions()
     except HTTPException as exception:
-    except HTTPException as exception:
         # Allow the API to boot even before local env vars are configured.
-        logger.warning("Skipping startup seed because Supabase is not configured: %s", exception.detail)
-        return
-    except Exception as exception:
-        logger.warning("Skipping startup seed because Supabase is unavailable: %s", exception)
         logger.warning("Skipping startup seed because Supabase is not configured: %s", exception.detail)
         return
     except Exception as exception:
@@ -6241,37 +6228,10 @@ def list_coach_athletes(
     search: str = Query(default="", max_length=100),
     athlete_ids: str = Query(default="", alias="athleteIds", max_length=1000),
     include_pending: bool = Query(default=False, alias="includePending"),
-    athlete_ids: str = Query(default="", alias="athleteIds", max_length=1000),
-    include_pending: bool = Query(default=False, alias="includePending"),
     session_token: Annotated[str | None, Cookie(alias=settings.session_cookie_name)] = None,
 ) -> CoachAthleteListResponse:
     coach_user = ensure_coach_user(session_token)
     supabase = ensure_supabase()
-    coach_key = resolve_dashboard_coach_key(coach_user)
-    query = supabase.table(APP_TABLES["athletes"]).select("*")
-    if coach_key:
-        query = query.eq("coach_id", coach_key)
-    else:
-        # No mapping between App_Users coach and domain coaches table yet.
-        query = query.eq("coach_id", "__unmapped__")
-
-    try:
-        response = query.execute()
-        rows = response.data or []
-        if search.strip():
-            term = search.strip().lower()
-            rows = [
-                row for row in rows
-                if term in str(row.get("athlete_name") or row.get("name") or "").lower()
-            ]
-        athlete_ids_param = athlete_ids if isinstance(athlete_ids, str) else ""
-        requested_ids = {value.strip() for value in athlete_ids_param.split(",") if value.strip()}
-        if requested_ids:
-            rows = [row for row in rows if str(row.get("athlete_id") or "") in requested_ids]
-        rows.sort(key=lambda row: str(row.get("athlete_name") or row.get("name") or ""))
-        athlete_ids = [row["athlete_id"] for row in rows]
-        latest_sessions = get_latest_rows_by_athlete(APP_TABLES["shooting_session_log"], athlete_ids, "session_date")
-        latest_physiology = get_latest_rows_by_athlete(APP_TABLES["athlete_physiology"], athlete_ids, "recorded_date")
     coach_key = resolve_dashboard_coach_key(coach_user)
     query = supabase.table(APP_TABLES["athletes"]).select("*")
     if coach_key:
@@ -6521,7 +6481,6 @@ def get_coach_athlete_detail(
 ) -> CoachAthleteDetailResponse:
     coach_user = ensure_coach_user(session_token)
     coach_key = resolve_dashboard_coach_key(coach_user)
-    coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
 
     athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
@@ -6608,18 +6567,11 @@ def get_coach_athlete_detail(
         "familyDetails": serialize_family_details((family_rows or [None])[0]),
         "athleteProfile": serialize_athlete_profile((profile_rows or [None])[0]),
         "scores": [score.model_dump(by_alias=True) for score in get_scores_for_athlete(athlete_row)],
-        "familyDetails": serialize_family_details((family_rows or [None])[0]),
-        "athleteProfile": serialize_athlete_profile((profile_rows or [None])[0]),
-        "scores": [score.model_dump(by_alias=True) for score in get_scores_for_athlete(athlete_row)],
         "sessionsLog": [
-            serialize_shooting_session(row)
-            for row in session_rows
             serialize_shooting_session(row)
             for row in session_rows
         ],
         "physiologyData": [
-            serialize_app_physiology(row)
-            for row in physiology_rows
             serialize_app_physiology(row)
             for row in physiology_rows
         ],
@@ -6631,17 +6583,9 @@ def get_coach_athlete_detail(
                 "category": question_lookup.get(row.get("question_id"), {}).get("category", "Psychology"),
                 "questionType": "Text",
                 "answerText": row.get("answer_text") or row.get("chosen_option") or "",
-                "answerId": str(row.get("answer_id") or row.get("id") or f"{athlete_id}-{row.get('question_id')}"),
-                "questionId": str(row.get("question_id") or ""),
-                "questionText": question_lookup.get(row.get("question_id"), {}).get("question_text", f"Question {row.get('question_id')}"),
-                "category": question_lookup.get(row.get("question_id"), {}).get("category", "Psychology"),
-                "questionType": "Text",
-                "answerText": row.get("answer_text") or row.get("chosen_option") or "",
                 "answerScore": row.get("answer_score"),
                 "recordedAt": row.get("recorded_at") or row.get("created_at") or athlete_row.get("created_at"),
-                "recordedAt": row.get("recorded_at") or row.get("created_at") or athlete_row.get("created_at"),
             }
-            for row in psychology_rows
             for row in psychology_rows
         ],
     }
@@ -7471,17 +7415,7 @@ def list_coach_athlete_feedback(
 ) -> CoachFeedbackListResponse:
     coach_user = ensure_coach_user(session_token)
     coach_key = resolve_dashboard_coach_key(coach_user)
-    coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
-    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
-    if not athlete_row:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
-    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only access feedback for athletes assigned to you.",
-        )
-
     athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
     if not athlete_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
@@ -7493,9 +7427,7 @@ def list_coach_athlete_feedback(
 
     response = (
         supabase.table(APP_TABLES["coach_feedback"])
-        supabase.table(APP_TABLES["coach_feedback"])
         .select("*")
-        .eq("athlete_id", str(athlete_row.get("athlete_id") or athlete_id))
         .eq("athlete_id", str(athlete_row.get("athlete_id") or athlete_id))
         .order("created_at", desc=True)
         .execute()
@@ -7526,14 +7458,11 @@ def create_coach_athlete_feedback(
 ) -> CoachFeedbackResponse:
     coach_user = ensure_coach_user(session_token)
     coach_key = resolve_dashboard_coach_key(coach_user)
-    coach_key = resolve_dashboard_coach_key(coach_user)
     supabase = ensure_supabase()
 
     athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
-    athlete_row = resolve_athlete_row_by_identifier(supabase, athlete_id)
     if not athlete_row:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Athlete not found.")
-    if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
     if not coach_can_access_athlete(supabase=supabase, coach_id=coach_key, athlete_row=athlete_row):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -7541,12 +7470,8 @@ def create_coach_athlete_feedback(
         )
 
     canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
-    canonical_athlete_id = str(athlete_row.get("athlete_id") or athlete_id)
     feedback_item = {
         "feedback_id": str(uuid4()),
-        "athlete_id": canonical_athlete_id,
-        "athlete_name": athlete_row.get("athlete_name") or athlete_row.get("name") or "Athlete",
-        "athlete_email": athlete_row.get("email") or "",
         "athlete_id": canonical_athlete_id,
         "athlete_name": athlete_row.get("athlete_name") or athlete_row.get("name") or "Athlete",
         "athlete_email": athlete_row.get("email") or "",
@@ -7557,7 +7482,6 @@ def create_coach_athlete_feedback(
         "status": payload.status,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
-    supabase.table(APP_TABLES["coach_feedback"]).insert(feedback_item).execute()
     supabase.table(APP_TABLES["coach_feedback"]).insert(feedback_item).execute()
     return CoachFeedbackResponse(
         feedback=serialize_feedback_item(
@@ -7590,7 +7514,6 @@ def list_student_feedback(
 
     supabase = ensure_supabase()
     response = (
-        supabase.table(APP_TABLES["coach_feedback"])
         supabase.table(APP_TABLES["coach_feedback"])
         .select("*")
         .eq("athlete_email", user.email.lower())
@@ -7633,15 +7556,11 @@ def signup(payload: SignUpRequest, response: Response) -> AuthResponse:
         )
 
     assigned_coach = get_primary_coach()
-    assigned_coach = get_primary_coach()
     user = create_user_record(
         email=email,
         full_name=payload.full_name,
         password=payload.password,
         role="student",
-        assignment_status="assigned",
-        assigned_coach_email=assigned_coach.email.lower(),
-        assigned_coach_name=assigned_coach.full_name,
         assignment_status="assigned",
         assigned_coach_email=assigned_coach.email.lower(),
         assigned_coach_name=assigned_coach.full_name,
